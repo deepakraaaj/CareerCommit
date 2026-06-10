@@ -1,4 +1,4 @@
-import { principles } from '@/lib/mock-data'
+import { landingPrinciples } from '@/lib/content'
 
 export function LandingPrinciples() {
   return (
@@ -9,7 +9,7 @@ export function LandingPrinciples() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {principles.map((principle) => (
+          {landingPrinciples.map((principle) => (
             <div key={principle.title} className="text-center">
               <h3 className="font-semibold mb-2">{principle.title}</h3>
               <p className="text-sm text-muted-foreground">{principle.desc}</p>

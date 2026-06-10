@@ -1,16 +1,23 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { useParams } from 'next/navigation'
 import { History } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
+import { Button } from '@/components/ui/button'
 import { VersionCard } from '@/components/versions/version-card'
 import { RestoreModal } from '@/components/versions/restore-modal'
 import { CompareModal } from '@/components/versions/compare-modal'
-import { mockVersions } from '@/lib/mock-data'
-import type { VersionChange } from '@/lib/types'
+import { useAuth } from '@/components/auth/auth-provider'
+import { loadVersions } from '@/lib/supabase-loaders'
+import { supabasePlaceholder } from '@/lib/supabase-placeholder'
+import type { ResumeVersion, VersionChange } from '@/lib/types'
 
 export default function Versions() {
+  const params = useParams<{ id: string }>()
+  const resumeId = params?.id
+  const { user, loading } = useAuth()
   const [restoreModal, setRestoreModal] = useState<{ isOpen: boolean; versionTitle: string }>({
     isOpen: false,
     versionTitle: '',
@@ -26,13 +33,47 @@ export default function Versions() {
     versionB: '',
     changes: [],
   })
+  const [statusMessage, setStatusMessage] = useState('')
+  const [versions, setVersions] = useState<ResumeVersion[]>([])
 
-  const handleRestore = (id: number, title: string) => {
+  useEffect(() => {
+    let active = true
+
+    if (!user) {
+      setVersions([])
+      return () => {
+        active = false
+      }
+    }
+
+    loadVersions(resumeId, user.id).then((rows) => {
+      if (active) setVersions(rows)
+    })
+
+    return () => {
+      active = false
+    }
+  }, [resumeId, user])
+
+  const handleRestore = (id: string | number, title: string) => {
     setRestoreModal({ isOpen: true, versionTitle: title })
   }
 
   const handleConfirmRestore = () => {
     setRestoreModal({ isOpen: false, versionTitle: '' })
+    setStatusMessage('Restore completed locally in this demo.')
+    if (resumeId && user) {
+      void supabasePlaceholder.saveVersion({
+        id: crypto.randomUUID(),
+        resume_id: resumeId,
+        user_id: user.id,
+        title: `Restored ${restoreModal.versionTitle}`,
+        version_number: versions.length + 1,
+        saved_by: 'Manual',
+        fit_score: 0,
+        created_at: new Date().toISOString(),
+      })
+    }
   }
 
   const handleCompare = (versionA: string, versionB: string) => {
@@ -44,8 +85,20 @@ export default function Versions() {
     })
   }
 
-  const handleDuplicate = (id: number, title: string) => {
-    console.log('Duplicating version:', id, title)
+  const handleDuplicate = (id: string | number, title: string) => {
+    setStatusMessage(`Duplicated ${title} locally.`)
+    if (resumeId && user) {
+      void supabasePlaceholder.saveVersion({
+        id: crypto.randomUUID(),
+        resume_id: resumeId,
+        user_id: user.id,
+        title: `Copy of ${title}`,
+        version_number: versions.length + 1,
+        saved_by: 'Manual',
+        fit_score: 0,
+        created_at: new Date().toISOString(),
+      })
+    }
   }
 
   return (
@@ -53,6 +106,18 @@ export default function Versions() {
       <Navbar />
       <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {!user && !loading ? (
+            <div className="card-premium p-10 text-center mb-8">
+              <h1 className="text-3xl font-bold mb-2">Version History</h1>
+              <p className="text-muted-foreground mb-6">
+                Sign in to view and manage saved resume versions.
+              </p>
+              <Link href={`/login?next=/resumes/${resumeId}/versions`}>
+                <Button>Sign in</Button>
+              </Link>
+            </div>
+          ) : null}
+
           <Link href="/resumes" className="text-primary hover:underline mb-6 inline-flex items-center gap-1">
             Back to Resumes
           </Link>
@@ -62,20 +127,32 @@ export default function Versions() {
             <p className="text-muted-foreground">Senior Developer Resume</p>
           </div>
 
-          <div className="space-y-6">
-            {mockVersions.map((version, idx) => (
-              <VersionCard
-                key={version.id}
-                {...version}
-                isLatest={idx === 0}
-                index={idx}
-                total={mockVersions.length}
-                onRestore={handleRestore}
-                onCompare={handleCompare}
-                onDuplicate={handleDuplicate}
-              />
-            ))}
-          </div>
+          {statusMessage && (
+            <div className="card-premium p-4 mb-6 bg-secondary">
+              <p className="text-sm text-muted-foreground">{statusMessage}</p>
+            </div>
+          )}
+
+          {!user ? null : versions.length > 0 ? (
+            <div className="space-y-6">
+              {versions.map((version, idx) => (
+                <VersionCard
+                  key={version.id}
+                  {...version}
+                  isLatest={idx === 0}
+                  index={idx}
+                  total={versions.length}
+                  onRestore={handleRestore}
+                  onCompare={handleCompare}
+                  onDuplicate={handleDuplicate}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="card-premium p-8 text-center">
+              <p className="text-muted-foreground">No versions found in Supabase for this resume.</p>
+            </div>
+          )}
 
           <div className="card-premium p-6 mt-8 bg-secondary">
             <h3 className="font-semibold mb-2 flex items-center gap-2">

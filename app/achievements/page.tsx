@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Plus,
   Zap,
@@ -14,21 +14,36 @@ import {
 } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
-import { mockAchievementNotes, projectList, tagList } from '@/lib/mock-data'
+import { projectList, tagList } from '@/lib/content'
+import { loadAchievements } from '@/lib/supabase-loaders'
+import { supabasePlaceholder } from '@/lib/supabase-placeholder'
 import { getStatusColor } from '@/lib/utils'
 import type { AchievementNote } from '@/lib/types'
 
 export default function Achievements() {
-  const [notes, setNotes] = useState<AchievementNote[]>(mockAchievementNotes)
+  const [notes, setNotes] = useState<AchievementNote[]>([])
   const [newNote, setNewNote] = useState('')
   const [selectedProject, setSelectedProject] = useState('')
   const [selectedDate, setSelectedDate] = useState('2024-06-10')
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [lastAction, setLastAction] = useState('')
+
+  useEffect(() => {
+    let active = true
+
+    loadAchievements().then((rows) => {
+      if (active) setNotes(rows)
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const handleSaveNote = () => {
     if (newNote.trim()) {
       const note: AchievementNote = {
-        id: String(notes.length + 1),
+        id: crypto.randomUUID(),
         rawNote: newNote,
         resumeBullet: null,
         project: selectedProject || 'Uncategorized',
@@ -37,6 +52,18 @@ export default function Achievements() {
         status: 'Draft',
         createdAt: new Date().toISOString(),
       }
+      void supabasePlaceholder.saveAchievement({
+        id: note.id,
+        user_id: null,
+        raw_note: note.rawNote,
+        resume_bullet: note.resumeBullet,
+        project: note.project,
+        status: note.status,
+        date: note.date,
+        tags: note.tags,
+        created_at: note.createdAt,
+        updated_at: note.createdAt,
+      })
       setNotes([note, ...notes])
       setNewNote('')
       setSelectedProject('')
@@ -48,7 +75,70 @@ export default function Achievements() {
     setSelectedTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]))
   }
 
+  const summarizeNote = (text: string, maxWords: number) => {
+    const words = text.split(/\s+/).filter(Boolean)
+    return words.length <= maxWords ? text : `${words.slice(0, maxWords).join(' ')}...`
+  }
+
+  const updateNote = (id: string, updater: (note: AchievementNote) => AchievementNote) => {
+    setNotes((current) => current.map((note) => (note.id === id ? updater(note) : note)))
+  }
+
+  const improveNote = (note: AchievementNote) => {
+    updateNote(note.id, (current) => ({
+      ...current,
+      resumeBullet:
+        current.resumeBullet ||
+        `${summarizeNote(current.rawNote, 14)} with clearer ownership and measurable business impact`,
+      status: current.resumeBullet ? current.status : 'Converted',
+    }))
+    setLastAction('Improved note text.')
+  }
+
+  const shortenNote = (note: AchievementNote) => {
+    updateNote(note.id, (current) => ({
+      ...current,
+      resumeBullet: summarizeNote(current.resumeBullet || current.rawNote, 12),
+    }))
+    setLastAction('Shortened note text.')
+  }
+
+  const addToCurrent = (note: AchievementNote) => {
+    updateNote(note.id, (current) => ({
+      ...current,
+      resumeBullet:
+        current.resumeBullet || `${summarizeNote(current.rawNote, 14)} with measurable impact`,
+      status: 'Added to Resume',
+    }))
+    setLastAction('Added note to the current resume.')
+  }
+
+  const createNewVersion = (note: AchievementNote) => {
+    updateNote(note.id, (current) => ({
+      ...current,
+      resumeBullet:
+        current.resumeBullet ||
+        `${summarizeNote(current.rawNote, 14)} with measurable impact and clear ownership`,
+      status: 'Converted',
+    }))
+    setLastAction('Created a new version entry from this note.')
+  }
+
+  const copyNote = async (note: string) => {
+    try {
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(note)
+        setLastAction('Copied note text to clipboard.')
+      } else {
+        setLastAction('Clipboard access is unavailable in this browser context.')
+      }
+    } catch {
+      setLastAction('Could not copy note text.')
+    }
+  }
+
   const deleteNote = (id: string) => {
+    void supabasePlaceholder.deleteAchievement(id)
     setNotes(notes.filter((n) => n.id !== id))
   }
 
@@ -154,6 +244,10 @@ export default function Achievements() {
                 Save Note
               </Button>
             </div>
+
+            {lastAction && (
+              <p className="mt-4 text-sm text-muted-foreground">{lastAction}</p>
+            )}
           </div>
 
           {/* Empty State */}
@@ -190,7 +284,12 @@ export default function Achievements() {
                           </div>
                           <p className="text-sm text-muted-foreground">{note.project}</p>
                         </div>
-                        <button className="text-muted-foreground hover:text-foreground">
+                        <button
+                          type="button"
+                          title="Copy raw note"
+                          onClick={() => copyNote(note.rawNote)}
+                          className="text-muted-foreground hover:text-foreground"
+                        >
                           <MoreVertical className="w-4 h-4" />
                         </button>
                       </div>
@@ -219,11 +318,21 @@ export default function Achievements() {
                       <div className="flex flex-wrap gap-2 pt-3 border-t border-border">
                         {!note.resumeBullet && (
                           <>
-                            <Button variant="outline" size="sm" className="gap-1 text-xs">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 text-xs"
+                              onClick={() => improveNote(note)}
+                            >
                               <Wand2 className="w-3 h-3" />
                               Improve
                             </Button>
-                            <Button variant="outline" size="sm" className="gap-1 text-xs">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 text-xs"
+                              onClick={() => shortenNote(note)}
+                            >
                               <Minus className="w-3 h-3" />
                               Shorten
                             </Button>
@@ -232,11 +341,21 @@ export default function Achievements() {
 
                         {note.status !== 'Added to Resume' && (
                           <>
-                            <Button variant="outline" size="sm" className="gap-1 text-xs">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 text-xs"
+                              onClick={() => addToCurrent(note)}
+                            >
                               <PlusIcon className="w-3 h-3" />
                               Add to Current
                             </Button>
-                            <Button variant="outline" size="sm" className="gap-1 text-xs">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="gap-1 text-xs"
+                              onClick={() => createNewVersion(note)}
+                            >
                               <Check className="w-3 h-3" />
                               New Version
                             </Button>

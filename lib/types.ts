@@ -1,6 +1,6 @@
 // Resume types
 export interface Resume {
-  id: number
+  id: string | number
   name: string
   created: string
   modified: string
@@ -8,6 +8,7 @@ export interface Resume {
   lastModified?: string
   versions?: number
   status?: 'Ready' | 'Draft'
+  contentText?: string | null
 }
 
 // Achievement types
@@ -20,7 +21,7 @@ export interface Achievement {
 
 // Version types
 export interface ResumeVersion {
-  id: number
+  id: string | number
   name: string
   date: string
   time: string

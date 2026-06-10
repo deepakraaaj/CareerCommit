@@ -31,8 +31,8 @@ export function SaveVersionModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-card border border-border rounded-lg max-w-md w-full p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="w-full max-w-md rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold">Save New Version</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">

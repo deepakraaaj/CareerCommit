@@ -1,4 +1,4 @@
-import { formatComparison } from '@/lib/mock-data'
+import { exportFormatComparison } from '@/lib/content'
 
 export function FormatComparison() {
   return (
@@ -14,7 +14,7 @@ export function FormatComparison() {
             </tr>
           </thead>
           <tbody>
-            {formatComparison.map((row) => (
+            {exportFormatComparison.map((row) => (
               <tr key={row.feature} className="border-b border-border hover:bg-secondary">
                 <td className="px-4 py-3">{row.feature}</td>
                 <td className="px-4 py-3 text-center">{row.pdf}</td>

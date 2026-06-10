@@ -1,16 +1,18 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { Eye, Download, RotateCcw, Copy, GitCompare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { triggerDownload } from '@/lib/browser'
 import type { ResumeVersion } from '@/lib/types'
 
 interface VersionCardProps extends ResumeVersion {
   isLatest: boolean
   index: number
   total: number
-  onRestore: (id: number, title: string) => void
+  onRestore: (id: string | number, title: string) => void
   onCompare: (versionA: string, versionB: string) => void
-  onDuplicate: (id: number, title: string) => void
+  onDuplicate: (id: string | number, title: string) => void
 }
 
 export function VersionCard({
@@ -30,6 +32,20 @@ export function VersionCard({
   onCompare,
   onDuplicate,
 }: VersionCardProps) {
+  const router = useRouter()
+
+  const handleOpen = () => {
+    router.push('/editor')
+  }
+
+  const handleDownload = () => {
+    triggerDownload(
+      `${title.replace(/\s+/g, '_').toLowerCase()}.json`,
+      JSON.stringify({ id, name, title, date, time, changes, savedBy, template, fitStatus }, null, 2),
+      'application/json'
+    )
+  }
+
   return (
     <div className="card-premium p-6">
       <div className="flex items-start gap-4">
@@ -72,7 +88,7 @@ export function VersionCard({
           <p className="text-sm text-muted-foreground mb-4">{changes}</p>
 
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleOpen}>
               <Eye className="w-4 h-4" />
               Open
             </Button>
@@ -111,7 +127,7 @@ export function VersionCard({
               </>
             )}
 
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2" onClick={handleDownload}>
               <Download className="w-4 h-4" />
               Download
             </Button>

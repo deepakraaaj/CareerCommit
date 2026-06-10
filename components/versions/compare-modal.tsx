@@ -24,8 +24,8 @@ export function CompareModal({ isOpen, versionA, versionB, onClose }: CompareMod
   if (!isOpen) return null
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-card border border-border rounded-lg max-w-lg w-full p-6 max-h-[80vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <div className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-card p-6 text-card-foreground shadow-2xl">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-bold">Compare Versions</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">

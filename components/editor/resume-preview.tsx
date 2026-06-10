@@ -1,6 +1,7 @@
 'use client'
 
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Button } from '@/components/ui/button'
 
 interface ResumePreviewProps {
   name: string
@@ -9,7 +10,14 @@ interface ResumePreviewProps {
   preview: string
 }
 
-export type TemplateType = 'modern' | 'classic' | 'minimalist' | 'creative'
+export type TemplateType =
+  | 'modern'
+  | 'classic'
+  | 'minimalist'
+  | 'creative'
+  | 'elegant'
+  | 'bold'
+  | 'technical'
 
 export type Block =
   | { kind: 'bullet'; text: string }
@@ -37,6 +45,16 @@ const CONTACT_RE =
 const DATE_RE = /\d{4}|present|current/i
 const SECTION_WORDS_RE =
   /SUMMARY|EXPERIENCE|EDUCATION|SKILLS|PROJECTS?|CERTIFICATIONS?|OBJECTIVE|ACHIEVEMENTS?|AWARDS|LANGUAGES|INTERESTS|PROFILE|WORK|EMPLOYMENT|VOLUNTEER|PUBLICATIONS|REFERENCES/
+
+function isUrl(value: string) {
+  return /^https?:\/\//i.test(value)
+}
+
+function formatContactLabel(value: string) {
+  if (/linkedin/i.test(value)) return 'LinkedIn'
+  if (/github/i.test(value)) return 'GitHub'
+  return value
+}
 
 function isSectionHeading(line: string): boolean {
   return (
@@ -79,7 +97,7 @@ function parseBlock(line: string): Block {
   return { kind: 'para', text: line }
 }
 
-function parseResume(text: string): ParsedResume {
+export function parseResume(text: string): ParsedResume {
   const lines = text.split('\n').map((l) => l.trim())
   const nonEmpty = lines.filter(Boolean)
 
@@ -145,12 +163,15 @@ interface TemplateStyle {
   contactWrap: string
   contactSep: string
   heading: string
+  headingPrefix?: string
   entryPrimary: string
   entryMiddle: string
   entryDate: string
   bulletMarker: string
   para: string
   label: string
+  /** Tailwind classes for a thin accent bar along the left edge of the page */
+  sidebar?: string
 }
 
 const TEMPLATE_STYLES: Record<TemplateType, TemplateStyle> = {
@@ -215,6 +236,54 @@ const TEMPLATE_STYLES: Record<TemplateType, TemplateStyle> = {
     bulletMarker: 'text-blue-500',
     para: 'text-gray-700',
     label: 'font-semibold text-blue-700',
+    sidebar: 'bg-linear-to-b from-blue-600 to-violet-600',
+  },
+  elegant: {
+    page: 'font-serif text-gray-800',
+    headerWrap: 'text-center pb-4 border-b border-amber-300',
+    name: 'font-bold tracking-[0.04em] text-gray-900 leading-tight',
+    role: 'italic text-amber-700 mt-1',
+    contactWrap: 'text-gray-500 mt-2',
+    contactSep: 'mx-2 text-amber-200',
+    heading: 'font-semibold uppercase tracking-[0.24em] text-gray-800 border-b border-amber-200 pb-1',
+    entryPrimary: 'font-semibold text-gray-900',
+    entryMiddle: 'text-gray-600',
+    entryDate: 'italic text-amber-700',
+    bulletMarker: 'text-amber-500',
+    para: 'text-gray-700',
+    label: 'font-semibold text-gray-900',
+  },
+  bold: {
+    page: 'font-sans text-gray-800',
+    headerWrap: 'pb-3 border-b-4 border-emerald-600',
+    name: 'font-black tracking-tight text-gray-900 leading-tight',
+    role: 'font-bold uppercase tracking-[0.14em] text-emerald-600 mt-1',
+    contactWrap: 'text-gray-500 mt-1.5',
+    contactSep: 'mx-1.5 text-emerald-200',
+    heading: 'font-extrabold uppercase tracking-[0.14em] text-emerald-700 border-b-2 border-emerald-500 pb-1',
+    entryPrimary: 'font-bold text-gray-900',
+    entryMiddle: 'text-gray-600',
+    entryDate: 'font-bold text-emerald-700',
+    bulletMarker: 'text-emerald-600',
+    para: 'text-gray-700',
+    label: 'font-bold text-gray-900',
+    sidebar: 'bg-linear-to-b from-emerald-500 to-emerald-600',
+  },
+  technical: {
+    page: 'font-mono text-slate-700',
+    headerWrap: 'pb-3 border-b border-slate-300',
+    name: 'font-bold tracking-tight text-slate-900 leading-tight',
+    role: 'text-teal-600 font-medium mt-0.5',
+    contactWrap: 'text-slate-500 mt-1.5',
+    contactSep: 'mx-1.5 text-slate-300',
+    heading: 'font-semibold uppercase tracking-[0.1em] text-slate-700 border-b border-slate-200 pb-1',
+    headingPrefix: '// ',
+    entryPrimary: 'font-semibold text-slate-900',
+    entryMiddle: 'text-slate-500',
+    entryDate: 'text-teal-600',
+    bulletMarker: 'text-teal-500',
+    para: 'text-slate-600',
+    label: 'font-semibold text-slate-900',
   },
 }
 
@@ -341,7 +410,7 @@ function ResumeContent({
 
   return (
     <div
-      className={`${d.padding} ${style.page} ${template === 'creative' ? 'pl-10' : ''}`}
+      className={`${d.padding} ${style.page} ${style.sidebar ? 'pl-10' : ''}`}
       style={{ width: A4_WIDTH_PX }}
     >
       <div className={d.sectionGap}>
@@ -355,7 +424,18 @@ function ResumeContent({
                 {parsed.contacts.map((c, i) => (
                   <span key={i}>
                     {i > 0 && <span className={style.contactSep}>·</span>}
-                    {c}
+                    {isUrl(c) ? (
+                      <a
+                        href={c}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="underline decoration-dotted underline-offset-2 hover:opacity-80"
+                      >
+                        {formatContactLabel(c)}
+                      </a>
+                    ) : (
+                      c
+                    )}
                   </span>
                 ))}
               </div>
@@ -375,7 +455,10 @@ function ResumeContent({
         {/* Sections with page break handling */}
         {parsed.sections.map((section, i) => (
           <section key={i} className="break-inside-avoid">
-            <h4 className={`${d.heading} ${style.heading} mb-2`}>{section.heading}</h4>
+            <h4 className={`${d.heading} ${style.heading} mb-2`}>
+              {style.headingPrefix}
+              {section.heading}
+            </h4>
             {section.blocks.length > 0 ? (
               <div className={d.blockGap}>
                 {section.blocks.map((block, j) => (
@@ -403,6 +486,8 @@ function PageFrame({
   template: TemplateType
   children: React.ReactNode
 }) {
+  const style = TEMPLATE_STYLES[template]
+
   return (
     <div
       className="relative shrink-0 overflow-hidden rounded-sm bg-white shadow-md"
@@ -417,8 +502,8 @@ function PageFrame({
           transformOrigin: 'top left',
         }}
       >
-        {template === 'creative' && (
-          <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-linear-to-b from-blue-600 to-violet-600" />
+        {style.sidebar && (
+          <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${style.sidebar}`} />
         )}
         <div style={{ marginTop: -index * A4_HEIGHT_PX }}>{children}</div>
       </div>
@@ -536,36 +621,44 @@ export function ResumePreview({
   }
 
   return (
-    <div className="flex flex-col h-full gap-2">
-      <div className="flex items-center justify-between gap-2 shrink-0">
-        <div>
-          <h3 className="font-semibold text-xs">{name}</h3>
-          <p className="text-xs text-muted-foreground">v{currentVersion}</p>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className={`text-xs font-medium px-1.5 py-0.5 rounded-full whitespace-nowrap ${getDraftBadgeColor()}`}>
-            {getDraftLabel()}
-          </span>
-          <button
-            onClick={handleDownloadPDF}
-            className="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-          >
-            Download PDF
-          </button>
-          <select
-            value={template}
-            onChange={(e) => setTemplate(e.target.value as TemplateType)}
-            className="text-xs border border-input bg-background rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-primary"
-          >
-            <option value="modern">Modern</option>
-            <option value="classic">Classic</option>
-            <option value="minimalist">Minimal</option>
-            <option value="creative">Creative</option>
-          </select>
+    <div className="flex flex-col h-full gap-3">
+      <div className="shrink-0 rounded-2xl border border-border/70 bg-card/95 shadow-sm px-4 py-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Resume Preview
+            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <h3 className="truncate text-base font-semibold text-foreground">{name}</h3>
+              <span className="text-xs text-muted-foreground">v{currentVersion}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${getDraftBadgeColor()}`}>
+              {getDraftLabel()}
+            </span>
+            <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-2">
+              Download PDF
+            </Button>
+            <select
+              value={template}
+              onChange={(e) => setTemplate(e.target.value as TemplateType)}
+              className="h-7 rounded-md border border-border bg-background px-2 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            >
+              <option value="modern">Modern</option>
+              <option value="classic">Classic</option>
+              <option value="minimalist">Minimal</option>
+              <option value="creative">Creative</option>
+              <option value="elegant">Elegant</option>
+              <option value="bold">Bold</option>
+              <option value="technical">Technical</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 rounded-lg border border-border shadow-sm bg-gray-100 dark:bg-zinc-900 overflow-y-auto">
+      <div className="flex-1 min-h-0 rounded-lg border border-border shadow-sm bg-muted overflow-y-auto">
         <PaginatedResume parsed={parsed} template={template} />
       </div>
     </div>

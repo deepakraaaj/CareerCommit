@@ -1,67 +1,88 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { Save, Plus, History, Download } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { EditorSections } from '@/components/editor/editor-sections'
 import { ResumePreview } from '@/components/editor/resume-preview'
-import { FitChecker } from '@/components/editor/fit-checker'
-import { AISuggestionModal } from '@/components/editor/ai-suggestion-modal'
 import { SaveVersionModal } from '@/components/versions/save-version-modal'
-import { calculateWordCount } from '@/lib/utils'
-import { defaultEditorContent } from '@/lib/mock-data'
+import { loadResumes } from '@/lib/supabase-loaders'
 
 export default function Editor() {
+  const [resumeName, setResumeName] = useState('Resume')
   const [draftStatus, setDraftStatus] = useState<'unsaved' | 'draft_saved' | 'ready_to_save'>(
     'draft_saved'
   )
-  const [currentVersion, setCurrentVersion] = useState(5)
-  const [preview, setPreview] = useState(defaultEditorContent)
+  const [currentVersion, setCurrentVersion] = useState(1)
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [preview, setPreview] = useState('')
   const [saveVersionModalOpen, setSaveVersionModalOpen] = useState(false)
-  const [aiModal, setAiModal] = useState<{
-    isOpen: boolean
-    type: 'improve' | 'shorten' | 'fix_grammar'
-    original: string
-  }>({
-    isOpen: false,
-    type: 'improve',
-    original: '',
-  })
 
-  const wordCount = calculateWordCount(preview)
-  const readability = 85 // Fixed value - real ATS score only from JD Matcher analysis
+  useEffect(() => {
+    let active = true
+
+    loadResumes().then((rows) => {
+      if (active && rows[0]) {
+        setResumeName(rows[0].name)
+        setPreview(rows[0].contentText ?? '')
+      }
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const handleEditorChange = (content: {
     name: string
     title: string
     email: string
     phone: string
+    linkedin: string
+    github: string
+    sectionTitles: Record<'summary' | 'experience' | 'education' | 'skills', string>
     summary: string
     company: string
     position: string
     duration: string
     bullets: { id: string; text: string }[]
-    education: string
-    skills: string
+    educationEntries: { id: string; school: string; degree: string; duration: string }[]
+    skills: { id: string; label: string; items: string[] }[]
+    customFields: { id: string; label: string; value: string }[]
   }) => {
+    const contactParts = [content.email, content.phone, content.linkedin, content.github].filter(Boolean)
+    const customFieldLines = content.customFields
+      .filter((field) => field.label.trim() && field.value.trim())
+      .map((field) => `${field.label.trim().toUpperCase()}\n${field.value.trim()}`)
+    const educationLines = content.educationEntries
+      .filter((entry) => entry.school.trim() || entry.degree.trim() || entry.duration.trim())
+      .map((entry) =>
+        [entry.school.trim(), entry.degree.trim(), entry.duration.trim()].filter(Boolean).join(' | ')
+      )
+    const skillLines = content.skills
+      .filter((group) => group.label.trim() && group.items.length > 0)
+      .map((group) => `${group.label.trim()}: ${group.items.join(', ')}`)
+
     // Convert editor content to preview text format
     const previewText = `${content.name}
 ${content.title}
-${content.email} | ${content.phone}
+${contactParts.join(' | ')}
 
-PROFESSIONAL SUMMARY
+${content.sectionTitles.summary.toUpperCase()}
 ${content.summary}
 
-EXPERIENCE
+${content.sectionTitles.experience.toUpperCase()}
 ${content.position} | ${content.company} | ${content.duration}
 ${content.bullets.map((b) => `- ${b.text}`).join('\n')}
 
-EDUCATION
-${content.education}
+${content.sectionTitles.education.toUpperCase()}
+${educationLines.join('\n')}
 
-SKILLS
-${content.skills}`
+${content.sectionTitles.skills.toUpperCase()}
+${skillLines.join('\n')}
+${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim()
 
     setPreview(previewText)
     setDraftStatus('unsaved')
@@ -69,6 +90,7 @@ ${content.skills}`
 
   const handleDraftSave = () => {
     setDraftStatus('draft_saved')
+    setLastSaved(new Date())
   }
 
   const handleVersionSave = () => {
@@ -81,25 +103,6 @@ ${content.skills}`
     setSaveVersionModalOpen(false)
   }
 
-  const getSuggestedText = (original: string, type: string) => {
-    const suggestions: Record<string, string> = {
-      improve:
-        original +
-        ' (with measurable impact on system performance and team efficiency)',
-      shorten: original.substring(0, Math.max(20, original.length - 30)) + '...',
-      fix_grammar: original.replace('reducing', 'reducing'),
-    }
-    return suggestions[type] || original
-  }
-
-  const handleAIAction = (type: 'improve' | 'shorten' | 'fix_grammar', text: string) => {
-    setAiModal({
-      isOpen: true,
-      type,
-      original: text,
-    })
-  }
-
   return (
     <>
       <Navbar />
@@ -109,8 +112,10 @@ ${content.skills}`
           <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">Senior Developer Resume</h1>
-                <p className="text-sm text-muted-foreground">Last edited 2 hours ago</p>
+                <h1 className="text-2xl font-bold">{resumeName}</h1>
+                <p className="text-sm text-muted-foreground">
+                  {lastSaved ? `Saved at ${lastSaved.toLocaleTimeString()}` : 'Last edited 2 hours ago'}
+                </p>
               </div>
 
               <div className="flex flex-wrap gap-2">
@@ -133,23 +138,27 @@ ${content.skills}`
                   Save New Version
                 </Button>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <History className="w-4 h-4" />
-                  History
-                </Button>
+                <Link href="/resumes/1/versions">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <History className="w-4 h-4" />
+                    History
+                  </Button>
+                </Link>
 
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Export
-                </Button>
+                <Link href="/export">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2"
+                  >
+                    <Download className="w-4 h-4" />
+                    Export
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>
@@ -165,14 +174,9 @@ ${content.skills}`
 
             {/* Right: Preview - fits in viewport, no scroll */}
             <div className="w-full lg:w-[45%] lg:min-w-112.5 flex flex-col gap-3 pr-2">
-              <FitChecker
-                wordCount={wordCount}
-                readability={readability}
-              />
-
               <div className="flex-1 overflow-hidden">
                 <ResumePreview
-                  name="Senior Developer Resume"
+                  name={resumeName}
                   currentVersion={currentVersion}
                   draftStatus={draftStatus}
                   preview={preview}
@@ -182,18 +186,6 @@ ${content.skills}`
           </div>
         </div>
       </div>
-
-      {/* AI Suggestion Modal */}
-      <AISuggestionModal
-        isOpen={aiModal.isOpen}
-        originalText={aiModal.original}
-        suggestedText={getSuggestedText(aiModal.original, aiModal.type)}
-        actionType={aiModal.type}
-        onApply={(text) => {
-          console.log('Applied:', text)
-        }}
-        onClose={() => setAiModal({ ...aiModal, isOpen: false })}
-      />
 
       {/* Save Version Modal */}
       <SaveVersionModal

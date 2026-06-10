@@ -1,7 +1,7 @@
 'use client'
 
 import { UploadCloud } from 'lucide-react'
-import { supportedFormats } from '@/lib/mock-data'
+import { supportedFileFormats } from '@/lib/content'
 
 interface UploadAreaProps {
   onFileUpload: (fileName: string) => void
@@ -42,7 +42,7 @@ export function UploadArea({ onFileUpload }: UploadAreaProps) {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6">
-        {supportedFormats.map((item) => (
+        {supportedFileFormats.map((item) => (
           <div key={item.format} className="card-premium p-6 text-center">
             <div className="w-8 h-8 text-primary mx-auto mb-3">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor">

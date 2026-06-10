@@ -1,7 +1,11 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Eye, Download, Trash2 } from 'lucide-react'
 import { getStatusColor } from '@/lib/utils'
+import { triggerDownload } from '@/lib/browser'
+import { supabasePlaceholder } from '@/lib/supabase-placeholder'
 import type { Resume } from '@/lib/types'
 
 interface ResumeTableProps {
@@ -9,6 +13,21 @@ interface ResumeTableProps {
 }
 
 export function ResumeTable({ resumes }: ResumeTableProps) {
+  const router = useRouter()
+  const [visibleResumes, setVisibleResumes] = useState(resumes)
+
+  useEffect(() => {
+    setVisibleResumes(resumes)
+  }, [resumes])
+
+  const handleDownload = (resume: Resume) => {
+    triggerDownload(
+      `${resume.name.replace(/\s+/g, '_').toLowerCase()}.json`,
+      JSON.stringify(resume, null, 2),
+      'application/json'
+    )
+  }
+
   return (
     <div className="card-premium">
       <div className="border-b border-border p-6">
@@ -26,7 +45,7 @@ export function ResumeTable({ resumes }: ResumeTableProps) {
             </tr>
           </thead>
           <tbody>
-            {resumes.map((resume) => (
+            {visibleResumes.map((resume) => (
               <tr key={resume.id} className="border-b border-border hover:bg-secondary transition-colors">
                 <td className="px-6 py-4 font-medium">{resume.name}</td>
                 <td className="px-6 py-4 text-muted-foreground">{resume.versions} versions</td>
@@ -38,13 +57,33 @@ export function ResumeTable({ resumes }: ResumeTableProps) {
                 </td>
                 <td className="px-6 py-4">
                   <div className="flex gap-2">
-                    <button className="p-2 text-muted-foreground hover:text-foreground transition-colors" title="View">
+                    <button
+                      type="button"
+                      onClick={() => router.push(`/resumes/${resume.id}/versions`)}
+                      className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                      title="View"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-muted-foreground hover:text-foreground transition-colors" title="Download">
+                    <button
+                      type="button"
+                      onClick={() => handleDownload(resume)}
+                      className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+                      title="Download"
+                    >
                       <Download className="w-4 h-4" />
                     </button>
-                    <button className="p-2 text-muted-foreground hover:text-destructive transition-colors" title="Delete">
+    <button
+                      type="button"
+                      onClick={() => {
+                        void supabasePlaceholder.deleteResume(String(resume.id))
+                        setVisibleResumes((current) =>
+                          current.filter((item) => item.id !== resume.id)
+                        )
+                      }}
+                      className="p-2 text-muted-foreground hover:text-destructive transition-colors"
+                      title="Delete"
+                    >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

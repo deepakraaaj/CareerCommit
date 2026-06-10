@@ -1,4 +1,4 @@
-import { Document, Page, Text, View } from '@react-pdf/renderer'
+import { Document, Link, Page, Text, View } from '@react-pdf/renderer'
 import type { ParsedResume, Block, TemplateType } from './resume-preview'
 
 interface Theme {
@@ -18,6 +18,7 @@ interface Theme {
   sidebar: string | null
   roleStyle: 'plain' | 'italic' | 'caps'
   headingSpacing: number
+  headingPrefix?: string
 }
 
 const THEMES: Record<TemplateType, Theme> = {
@@ -93,6 +94,61 @@ const THEMES: Record<TemplateType, Theme> = {
     roleStyle: 'plain',
     headingSpacing: 1,
   },
+  elegant: {
+    body: 'Times-Roman',
+    bold: 'Times-Bold',
+    italic: 'Times-Italic',
+    text: '#374151',
+    muted: '#6b7280',
+    nameColor: '#111827',
+    roleColor: '#b45309',
+    headingColor: '#1f2937',
+    bulletColor: '#d97706',
+    dateColor: '#b45309',
+    centered: true,
+    headerRule: { width: 1, color: '#fcd34d' },
+    headingRule: '#fde68a',
+    sidebar: null,
+    roleStyle: 'italic',
+    headingSpacing: 2.4,
+  },
+  bold: {
+    body: 'Helvetica',
+    bold: 'Helvetica-Bold',
+    italic: 'Helvetica-Oblique',
+    text: '#1f2937',
+    muted: '#6b7280',
+    nameColor: '#111827',
+    roleColor: '#059669',
+    headingColor: '#047857',
+    bulletColor: '#10b981',
+    dateColor: '#047857',
+    centered: false,
+    headerRule: { width: 3, color: '#10b981' },
+    headingRule: '#6ee7b7',
+    sidebar: '#10b981',
+    roleStyle: 'caps',
+    headingSpacing: 1.4,
+  },
+  technical: {
+    body: 'Courier',
+    bold: 'Courier-Bold',
+    italic: 'Courier-Oblique',
+    text: '#334155',
+    muted: '#64748b',
+    nameColor: '#0f172a',
+    roleColor: '#0d9488',
+    headingColor: '#334155',
+    bulletColor: '#14b8a6',
+    dateColor: '#0d9488',
+    centered: false,
+    headerRule: { width: 1, color: '#cbd5e1' },
+    headingRule: '#e2e8f0',
+    sidebar: null,
+    roleStyle: 'plain',
+    headingSpacing: 1.2,
+    headingPrefix: '// ',
+  },
 }
 
 function BlockPdf({ block, t, size }: { block: Block; t: Theme; size: number }) {
@@ -131,6 +187,16 @@ function BlockPdf({ block, t, size }: { block: Block; t: Theme; size: number }) 
     case 'para':
       return <Text style={base}>{block.text}</Text>
   }
+}
+
+function isUrl(value: string) {
+  return /^https?:\/\//i.test(value)
+}
+
+function formatContactLabel(value: string) {
+  if (/linkedin/i.test(value)) return 'LinkedIn'
+  if (/github/i.test(value)) return 'GitHub'
+  return value
 }
 
 export function ResumePDF({ parsed, template }: { parsed: ParsedResume; template: TemplateType }) {
@@ -191,7 +257,18 @@ export function ResumePDF({ parsed, template }: { parsed: ParsedResume; template
             )}
             {parsed.contacts.length > 0 && (
               <Text style={{ fontSize: 9, color: t.muted, marginTop: 5 }}>
-                {parsed.contacts.join('   ·   ')}
+                {parsed.contacts.map((contact, index) => (
+                  <Text key={index}>
+                    {index > 0 ? '   ·   ' : ''}
+                    {isUrl(contact) ? (
+                      <Link src={contact} style={{ color: t.roleColor, textDecoration: 'underline' }}>
+                        {formatContactLabel(contact)}
+                      </Link>
+                    ) : (
+                      contact
+                    )}
+                  </Text>
+                ))}
               </Text>
             )}
           </View>
@@ -219,6 +296,7 @@ export function ResumePDF({ parsed, template }: { parsed: ParsedResume; template
                 ...(t.headingRule ? { borderBottomWidth: 0.75, borderBottomColor: t.headingRule } : {}),
               }}
             >
+              {t.headingPrefix}
               {s.heading}
             </Text>
             <View style={{ gap: blockGap }}>

@@ -1,4 +1,4 @@
-import { features } from '@/lib/mock-data'
+import { landingFeatures } from '@/lib/content'
 import { FeatureCard } from '@/components/shared/feature-card'
 
 export function LandingFeatures() {
@@ -14,7 +14,7 @@ export function LandingFeatures() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
-          {features.map((feature) => (
+          {landingFeatures.map((feature) => (
             <FeatureCard key={feature.title} {...feature} />
           ))}
         </div>

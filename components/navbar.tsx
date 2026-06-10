@@ -2,12 +2,15 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { FileText, Menu, X } from 'lucide-react'
+import { FileText, LogOut, Menu, UserCircle2, X } from 'lucide-react'
 import { useState } from 'react'
+import { useAuth } from '@/components/auth/auth-provider'
+import { Button } from '@/components/ui/button'
 
 export function Navbar() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
+  const { user, signOut } = useAuth()
 
   const isActive = (href: string) => pathname === href
 
@@ -42,10 +45,31 @@ export function Navbar() {
                     ? 'bg-primary text-primary-foreground'
                     : 'text-foreground hover:bg-secondary'
                 }`}
-              >
-                {item.label}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            {user ? (
+              <div className="ml-2 flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5">
+                <UserCircle2 className="h-4 w-4 text-muted-foreground" />
+                <span className="max-w-40 truncate text-sm">{user.email}</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => void signOut()}
+                  title="Sign out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <Link href="/login" className="ml-2">
+                <Button variant="outline" size="sm">
+                  Sign in
+                </Button>
               </Link>
-            ))}
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -75,6 +99,35 @@ export function Navbar() {
                   {item.label}
                 </Link>
               ))}
+              <div className="pt-2">
+                {user ? (
+                  <div className="flex items-center justify-between rounded-md border border-border bg-secondary px-3 py-2">
+                    <div className="min-w-0">
+                      <div className="text-xs text-muted-foreground">Signed in</div>
+                      <div className="truncate text-sm">{user.email}</div>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => void signOut()}
+                      title="Sign out"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setIsOpen(false)}
+                    className="block"
+                  >
+                    <Button variant="outline" size="sm" className="w-full">
+                      Sign in
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         )}

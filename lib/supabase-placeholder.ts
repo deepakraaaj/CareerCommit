@@ -1,12 +1,56 @@
-// SUPABASE PLACEHOLDER - Future Integration
-// This file prepares types for Supabase integration without adding real packages or logic
-// Do not import real @supabase/supabase-js yet
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-// TODO: Install @supabase/supabase-js when ready
-// TODO: Add NEXT_PUBLIC_SUPABASE_URL and SUPABASE_ANON_KEY env vars
-// TODO: Implement real Supabase client initialization
+// Centralized Supabase access for the app.
+// The UI still falls back to local demo data when the corresponding tables are empty
+// or when a request fails, but the client itself is real and uses the provided env vars.
 
-// Types for future Supabase tables
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseKey)
+
+let cachedClient: SupabaseClient | null = null
+
+function isUuidLike(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+}
+
+export function getSupabaseClient(): SupabaseClient {
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error(
+      'Supabase is not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY in .env.local.'
+    )
+  }
+
+  if (!cachedClient) {
+    cachedClient = createClient(supabaseUrl, supabaseKey)
+  }
+
+  return cachedClient
+}
+
+function getSupabaseOrNull() {
+  if (!isSupabaseConfigured) return null
+
+  try {
+    return getSupabaseClient()
+  } catch (error) {
+    console.error('[Supabase] Client initialization failed:', error)
+    return null
+  }
+}
+
+async function getCurrentUserId(supabase: SupabaseClient) {
+  const { data, error } = await supabase.auth.getUser()
+  if (error) {
+    console.warn('[Supabase] Unable to read current user:', error.message)
+    return null
+  }
+  return data.user?.id ?? null
+}
+
+// Types for Supabase tables
 export interface DbProfile {
   id: string
   email: string
@@ -21,6 +65,7 @@ export interface DbResume {
   name: string
   title: string
   template: string
+  content_text: string | null
   created_at: string
   updated_at: string
 }
@@ -87,153 +132,263 @@ export interface DbJDAnalysis {
   created_at: string
 }
 
-// Future Supabase tables schema (for reference):
-/*
-CREATE TABLE profiles (
-  id uuid PRIMARY KEY,
-  email text UNIQUE NOT NULL,
-  name text,
-  created_at timestamp DEFAULT now(),
-  updated_at timestamp DEFAULT now()
-);
-
-CREATE TABLE resumes (
-  id uuid PRIMARY KEY,
-  user_id uuid NOT NULL REFERENCES profiles(id),
-  name text NOT NULL,
-  title text,
-  template text DEFAULT 'Modern',
-  created_at timestamp DEFAULT now(),
-  updated_at timestamp DEFAULT now()
-);
-
-CREATE TABLE resume_versions (
-  id uuid PRIMARY KEY,
-  resume_id uuid NOT NULL REFERENCES resumes(id),
-  user_id uuid NOT NULL REFERENCES profiles(id),
-  title text NOT NULL,
-  version_number integer NOT NULL,
-  saved_by text NOT NULL,
-  fit_score integer DEFAULT 0,
-  created_at timestamp DEFAULT now()
-);
-
-CREATE TABLE achievements (
-  id uuid PRIMARY KEY,
-  user_id uuid NOT NULL REFERENCES profiles(id),
-  raw_note text NOT NULL,
-  resume_bullet text,
-  project text,
-  status text DEFAULT 'Draft',
-  date date,
-  tags text[],
-  created_at timestamp DEFAULT now(),
-  updated_at timestamp DEFAULT now()
-);
-
-CREATE TABLE exports (
-  id uuid PRIMARY KEY,
-  user_id uuid NOT NULL REFERENCES profiles(id),
-  resume_id uuid NOT NULL REFERENCES resumes(id),
-  format text NOT NULL,
-  created_at timestamp DEFAULT now()
-);
-
-CREATE TABLE uploaded_files (
-  id uuid PRIMARY KEY,
-  user_id uuid NOT NULL REFERENCES profiles(id),
-  filename text NOT NULL,
-  file_type text NOT NULL,
-  file_size integer NOT NULL,
-  uploaded_at timestamp DEFAULT now()
-);
-
-CREATE TABLE parse_jobs (
-  id uuid PRIMARY KEY,
-  user_id uuid NOT NULL REFERENCES profiles(id),
-  file_id uuid NOT NULL REFERENCES uploaded_files(id),
-  status text NOT NULL,
-  extracted_name text,
-  extracted_role text,
-  created_at timestamp DEFAULT now()
-);
-
-CREATE TABLE jd_analyses (
-  id uuid PRIMARY KEY,
-  user_id uuid NOT NULL REFERENCES profiles(id),
-  resume_id uuid NOT NULL REFERENCES resumes(id),
-  jd_text text NOT NULL,
-  fit_score integer DEFAULT 0,
-  matched_skills text[],
-  missing_skills text[],
-  created_at timestamp DEFAULT now()
-);
-*/
-
-// Placeholder functions (no real implementation yet)
-// TODO: Implement these with real Supabase calls
+async function safeSelect<T>(query: PromiseLike<{ data: T | null; error: { message: string } | null }>) {
+  const { data, error } = await query
+  if (error) {
+    console.error('[Supabase] Query failed:', error.message)
+    return null
+  }
+  return data
+}
 
 export const supabasePlaceholder = {
-  // Profile operations
   getProfile: async (userId: string) => {
-    console.log('[TODO] Fetch profile from Supabase:', userId)
-    return null
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    return safeSelect<DbProfile>(
+      supabase.from('profiles').select('*').eq('id', userId).maybeSingle()
+    )
   },
 
-  // Resume operations
-  getResumes: async (userId: string) => {
-    console.log('[TODO] Fetch resumes from Supabase:', userId)
-    return []
+  saveProfile: async (profile: DbProfile) => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    const currentUserId = await getCurrentUserId(supabase)
+    if (!currentUserId && !profile.id) {
+      console.warn('[Supabase] Skipping profile save because no authenticated user is available.')
+      return null
+    }
+
+    const payload = {
+      ...profile,
+      id: profile.id || currentUserId,
+      updated_at: new Date().toISOString(),
+    }
+
+    return safeSelect<DbProfile>(
+      supabase.from('profiles').upsert(payload, { onConflict: 'id' }).select('*').single()
+    )
+  },
+
+  getResumes: async (userId?: string) => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return []
+
+    const resolvedUserId = userId || (await getCurrentUserId(supabase))
+    if (!resolvedUserId) return []
+
+    const query = supabase
+      .from('resumes')
+      .select('*')
+      .eq('user_id', resolvedUserId)
+      .order('updated_at', { ascending: false })
+    const data = await safeSelect<DbResume[]>(query)
+    return data ?? []
   },
 
   saveResume: async (userId: string, resume: DbResume) => {
-    console.log('[TODO] Save resume to Supabase:', resume)
-    return null
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    const currentUserId = await getCurrentUserId(supabase)
+    if (!currentUserId && !userId) {
+      console.warn('[Supabase] Skipping resume save because no authenticated user is available.')
+      return null
+    }
+
+    const payload = { ...resume, user_id: userId || currentUserId }
+    return safeSelect<DbResume>(
+      supabase.from('resumes').upsert(payload, { onConflict: 'id' }).select('*').single()
+    )
   },
 
-  // Version operations
-  getVersions: async (resumeId: string) => {
-    console.log('[TODO] Fetch versions from Supabase:', resumeId)
-    return []
+  deleteResume: async (resumeId: string) => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return false
+
+    const { error } = await supabase.from('resumes').delete().eq('id', resumeId)
+    if (error) {
+      console.error('[Supabase] Delete resume failed:', error.message)
+      return false
+    }
+    return true
+  },
+
+  getVersions: async (resumeId?: string, userId?: string) => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return []
+    if (resumeId && !isUuidLike(resumeId)) return []
+
+    const currentUserId = userId || (await getCurrentUserId(supabase))
+    if (!currentUserId) return []
+
+    let query = supabase
+      .from('resume_versions')
+      .select('*')
+      .eq('user_id', currentUserId)
+      .order('version_number', { ascending: false })
+    if (resumeId) {
+      query = query.eq('resume_id', resumeId)
+    }
+    const data = await safeSelect<DbResumeVersion[]>(query)
+    return data ?? []
   },
 
   saveVersion: async (version: DbResumeVersion) => {
-    console.log('[TODO] Save version to Supabase:', version)
-    return null
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    const currentUserId = await getCurrentUserId(supabase)
+    if (!currentUserId && !version.user_id) {
+      console.warn('[Supabase] Skipping version save because no authenticated user is available.')
+      return null
+    }
+
+    const payload = { ...version, user_id: version.user_id || currentUserId }
+
+    return safeSelect<DbResumeVersion>(
+      supabase.from('resume_versions').insert(payload).select('*').single()
+    )
   },
 
-  // Achievement operations
-  getAchievements: async (userId: string) => {
-    console.log('[TODO] Fetch achievements from Supabase:', userId)
-    return []
+  getAchievements: async (userId?: string) => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return []
+
+    const resolvedUserId = userId || (await getCurrentUserId(supabase))
+    if (!resolvedUserId) return []
+
+    const query = supabase
+      .from('achievements')
+      .select('*')
+      .eq('user_id', resolvedUserId)
+      .order('date', { ascending: false })
+    const data = await safeSelect<DbAchievement[]>(query)
+    return data ?? []
   },
 
   saveAchievement: async (achievement: DbAchievement) => {
-    console.log('[TODO] Save achievement to Supabase:', achievement)
-    return null
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    const currentUserId = await getCurrentUserId(supabase)
+    if (!currentUserId && !achievement.user_id) {
+      console.warn('[Supabase] Skipping achievement save because no authenticated user is available.')
+      return null
+    }
+
+    const payload = { ...achievement, user_id: achievement.user_id || currentUserId }
+
+    return safeSelect<DbAchievement>(
+      supabase.from('achievements').upsert(payload, { onConflict: 'id' }).select('*').single()
+    )
   },
 
-  // Export operations
+  deleteAchievement: async (achievementId: string) => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return false
+
+    const { error } = await supabase.from('achievements').delete().eq('id', achievementId)
+    if (error) {
+      console.error('[Supabase] Delete achievement failed:', error.message)
+      return false
+    }
+    return true
+  },
+
   logExport: async (exportData: DbExport) => {
-    console.log('[TODO] Log export to Supabase:', exportData)
-    return null
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    const currentUserId = await getCurrentUserId(supabase)
+    if (!currentUserId && !exportData.user_id) {
+      console.warn('[Supabase] Skipping export log because no authenticated user is available.')
+      return null
+    }
+
+    const payload = { ...exportData, user_id: exportData.user_id || currentUserId }
+
+    return safeSelect<DbExport>(
+      supabase.from('exports').insert(payload).select('*').single()
+    )
   },
 
-  // File upload operations
   uploadFile: async (file: DbUploadedFile) => {
-    console.log('[TODO] Upload file metadata to Supabase:', file)
-    return null
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    const currentUserId = await getCurrentUserId(supabase)
+    if (!currentUserId && !file.user_id) {
+      console.warn('[Supabase] Skipping file upload record because no authenticated user is available.')
+      return null
+    }
+
+    const payload = { ...file, user_id: file.user_id || currentUserId }
+
+    return safeSelect<DbUploadedFile>(
+      supabase.from('uploaded_files').upsert(payload, { onConflict: 'id' }).select('*').single()
+    )
   },
 
-  // Parse job operations
+  deleteUploadedFile: async (fileId: string) => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return false
+
+    const { error } = await supabase.from('uploaded_files').delete().eq('id', fileId)
+    if (error) {
+      console.error('[Supabase] Delete uploaded file failed:', error.message)
+      return false
+    }
+    return true
+  },
+
+  getUploadedFiles: async (userId?: string) => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return []
+
+    const resolvedUserId = userId || (await getCurrentUserId(supabase))
+    if (!resolvedUserId) return []
+
+    const query = supabase
+      .from('uploaded_files')
+      .select('*')
+      .eq('user_id', resolvedUserId)
+      .order('uploaded_at', { ascending: false })
+    const data = await safeSelect<DbUploadedFile[]>(query)
+    return data ?? []
+  },
+
   createParseJob: async (job: DbParseJob) => {
-    console.log('[TODO] Create parse job in Supabase:', job)
-    return null
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    const currentUserId = await getCurrentUserId(supabase)
+    if (!currentUserId && !job.user_id) {
+      console.warn('[Supabase] Skipping parse job because no authenticated user is available.')
+      return null
+    }
+
+    const payload = { ...job, user_id: job.user_id || currentUserId }
+
+    return safeSelect<DbParseJob>(supabase.from('parse_jobs').insert(payload).select('*').single())
   },
 
-  // JD analysis operations
   analyzeJD: async (analysis: DbJDAnalysis) => {
-    console.log('[TODO] Save JD analysis to Supabase:', analysis)
-    return null
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return null
+
+    const currentUserId = await getCurrentUserId(supabase)
+    if (!currentUserId && !analysis.user_id) {
+      console.warn('[Supabase] Skipping JD analysis because no authenticated user is available.')
+      return null
+    }
+
+    const payload = { ...analysis, user_id: analysis.user_id || currentUserId }
+
+    return safeSelect<DbJDAnalysis>(
+      supabase.from('jd_analyses').insert(payload).select('*').single()
+    )
   },
 }

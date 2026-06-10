@@ -1,18 +1,93 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { GitCompare } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { MatcherResults } from '@/components/jd/matcher-results'
-import { mockMatchResults } from '@/lib/mock-data'
+import { loadResumes } from '@/lib/supabase-loaders'
+import type { MatchResult, Resume } from '@/lib/types'
+
+const STOP_WORDS = new Set([
+  'the',
+  'and',
+  'for',
+  'with',
+  'your',
+  'you',
+  'our',
+  'from',
+  'that',
+  'this',
+  'are',
+  'was',
+  'were',
+  'have',
+  'has',
+  'will',
+  'can',
+  'able',
+  'into',
+  'work',
+  'role',
+  'team',
+  'using',
+  'use',
+  'must',
+  'years',
+  'year',
+  'experience',
+])
+
+function extractKeywords(text: string) {
+  const tokens = text
+    .toLowerCase()
+    .match(/[a-z][a-z0-9+.-]{3,}/g)
+    ?.filter((word) => !STOP_WORDS.has(word)) ?? []
+
+  return Array.from(new Set(tokens)).slice(0, 12)
+}
+
+function analyzeMatch(jdText: string, resumeText: string): MatchResult {
+  const keywords = extractKeywords(jdText)
+  const resumeLower = resumeText.toLowerCase()
+
+  const matched = keywords.filter((keyword) => resumeLower.includes(keyword))
+  const missing = keywords.filter((keyword) => !resumeLower.includes(keyword))
+
+  return {
+    matched,
+    missing,
+    keywords,
+  }
+}
 
 export default function JDMatcher() {
   const [jdText, setJdText] = useState('')
   const [matched, setMatched] = useState(false)
+  const [results, setResults] = useState<MatchResult>({
+    matched: [],
+    missing: [],
+    keywords: [],
+  })
+  const [resumeText, setResumeText] = useState('')
+
+  useEffect(() => {
+    let active = true
+
+    loadResumes().then((rows: Resume[]) => {
+      if (!active) return
+      setResumeText(rows[0]?.contentText ?? '')
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const handleAnalyze = () => {
     if (jdText.trim()) {
+      setResults(analyzeMatch(jdText, resumeText))
       setMatched(true)
     }
   }
@@ -49,7 +124,7 @@ export default function JDMatcher() {
               </div>
             </div>
           ) : (
-            <MatcherResults results={mockMatchResults} onAnalyzeAnother={() => setMatched(false)} />
+            <MatcherResults results={results} onAnalyzeAnother={() => setMatched(false)} />
           )}
         </div>
       </div>

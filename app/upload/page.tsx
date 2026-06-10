@@ -1,18 +1,35 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Cloud, CheckCircle2, AlertCircle, FileText, File, Loader2 } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
-import { mockExtractedResume, mockUploadedFiles } from '@/lib/mock-data'
+import { loadUploadedFiles } from '@/lib/supabase-loaders'
+import { supabasePlaceholder } from '@/lib/supabase-placeholder'
 import { getConfidenceBadge, getConfidenceLabel } from '@/lib/utils'
+import type { UploadedFile } from '@/lib/types'
 
 type UploadState = 'ready' | 'uploading' | 'extracting' | 'completed' | 'review_needed' | 'failed'
 
 export default function Upload() {
+  const router = useRouter()
   const [uploadState, setUploadState] = useState<UploadState>('ready')
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFile, setUploadedFile] = useState<{ name: string; size: number; type: 'PDF' | 'DOCX' } | null>(null)
+  const [recentUploads, setRecentUploads] = useState<UploadedFile[]>([])
+
+  useEffect(() => {
+    let active = true
+
+    loadUploadedFiles().then((rows) => {
+      if (active) setRecentUploads(rows)
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -36,14 +53,36 @@ export default function Upload() {
       const fileType = fileName.endsWith('.pdf') ? 'PDF' : fileName.endsWith('.docx') ? 'DOCX' : null
 
       if (fileType) {
-        handleFileSelect(file.name, fileType)
+        void handleFileSelect(file.name, fileType)
       }
     }
   }
 
-  const handleFileSelect = (name: string, type: 'PDF' | 'DOCX') => {
+  const handleFileSelect = async (name: string, type: 'PDF' | 'DOCX') => {
+    const id = crypto.randomUUID()
     setUploadedFile({ name, size: 245000, type })
     setUploadState('uploading')
+
+    setRecentUploads((current) => [
+      {
+        id,
+        name,
+        type,
+        size: 245000,
+        uploadedAt: new Date().toISOString(),
+        status: 'completed',
+      },
+      ...current,
+    ])
+
+    void supabasePlaceholder.uploadFile({
+      id,
+      user_id: null,
+      filename: name,
+      file_type: type,
+      file_size: 245000,
+      uploaded_at: new Date().toISOString(),
+    })
 
     setTimeout(() => {
       setUploadState('extracting')
@@ -59,7 +98,7 @@ export default function Upload() {
   }
 
   const handleLoadToEditor = () => {
-    window.location.href = '/editor'
+    router.push('/editor')
   }
 
   const getStatusMessage = (state: UploadState) => {
@@ -125,7 +164,7 @@ export default function Upload() {
                     const file = e.target.files?.[0]
                     if (file) {
                       const type = file.name.endsWith('.pdf') ? 'PDF' : 'DOCX'
-                      handleFileSelect(file.name, type)
+                      void handleFileSelect(file.name, type)
                     }
                   }}
                 />
@@ -143,11 +182,11 @@ export default function Upload() {
               </p>
             </div>
 
-            {mockUploadedFiles.length > 0 && (
+            {recentUploads.length > 0 && (
               <div className="mt-12">
                 <h3 className="text-lg font-semibold mb-4">Recently Uploaded</h3>
                 <div className="space-y-2">
-                  {mockUploadedFiles.map((file) => (
+                  {recentUploads.map((file) => (
                     <div key={file.id} className="card-premium p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         {file.type === 'PDF' ? (
@@ -162,7 +201,7 @@ export default function Upload() {
                           </p>
                         </div>
                       </div>
-                      <Button variant="ghost" size="sm">
+                      <Button variant="ghost" size="sm" onClick={handleLoadToEditor}>
                         Open
                       </Button>
                     </div>
@@ -208,7 +247,31 @@ export default function Upload() {
   }
 
   if (uploadState === 'completed' || uploadState === 'review_needed') {
-    const extracted = mockExtractedResume
+    const extracted = uploadedFile
+      ? {
+          name: uploadedFile.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '),
+          role: null,
+          email: null,
+          phone: null,
+          location: null,
+          skills: [],
+          experience: [],
+          projects: [],
+          education: [],
+          confidence: 'needs_review' as const,
+        }
+      : {
+          name: null,
+          role: null,
+          email: null,
+          phone: null,
+          location: null,
+          skills: [],
+          experience: [],
+          projects: [],
+          education: [],
+          confidence: 'missing' as const,
+        }
 
     return (
       <>
