@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #fcfcfc;
+  --foreground: #262626;
+  --card: #ffffff;
+  --card-foreground: #262626;
+  --popover: #ffffff;
+  --popover-foreground: #262626;
+  --primary: #5848c0;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f2;
+  --secondary-foreground: #404040;
+  --muted: #ededed;
+  --muted-foreground: #808080;
+  --accent: #4a8fb9;
+  --accent-foreground: #fcfcfc;
+  --destructive: #991b1b;
+  --border: #e5e5e5;
+  --input: #f5f5f5;
+  --ring: #5848c0;
+  --chart-1: #5848c0;
+  --chart-2: #4a8fb9;
+  --chart-3: #3d9b7f;
+  --chart-4: #c8b81f;
+  --chart-5: #d97706;
+  --radius: 0.5rem;
+  --sidebar: #f7f7f7;
+  --sidebar-foreground: #262626;
+  --sidebar-primary: #5848c0;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f2f2f2;
+  --sidebar-accent-foreground: #404040;
+  --sidebar-border: #e5e5e5;
+  --sidebar-ring: #5848c0;
+}
+
+.dark {
+  --background: #1f1f1f;
+  --foreground: #e5e5e5;
+  --card: #2d2d2d;
+  --card-foreground: #e5e5e5;
+  --popover: #2d2d2d;
+  --popover-foreground: #e5e5e5;
+  --primary: #b8a8f0;
+  --primary-foreground: #1f1f1f;
+  --secondary: #404040;
+  --secondary-foreground: #e5e5e5;
+  --muted: #474747;
+  --muted-foreground: #a6a6a6;
+  --accent: #7ba8d1;
+  --accent-foreground: #1f1f1f;
+  --destructive: #ef4444;
+  --border: #404040;
+  --input: #2a2a2a;
+  --ring: #b8a8f0;
+  --chart-1: #b8a8f0;
+  --chart-2: #7ba8d1;
+  --chart-3: #6fc199;
+  --chart-4: #e5d03e;
+  --chart-5: #f59e0b;
+  --sidebar: #262626;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #b8a8f0;
+  --sidebar-primary-foreground: #1f1f1f;
+  --sidebar-accent: #404040;
+  --sidebar-accent-foreground: #e5e5e5;
+  --sidebar-border: #404040;
+  --sidebar-ring: #b8a8f0;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
+  html {
+    background-color: var(--background);
+  }
+}
+
+@layer components {
+  .card-premium {
+    @apply bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow;
+  }
+  
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg font-medium transition-colors;
+  }
+  
+  .heading-lg {
+    @apply text-4xl font-bold text-foreground tracking-tight;
+  }
+  
+  .heading-md {
+    @apply text-2xl font-semibold text-foreground;
+  }
+  
+  .text-muted-sm {
+    @apply text-sm text-muted-foreground;
+  }
+}
