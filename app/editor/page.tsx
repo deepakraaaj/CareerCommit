@@ -8,9 +8,12 @@ import { Button } from '@/components/ui/button'
 import { EditorSections } from '@/components/editor/editor-sections'
 import { ResumePreview } from '@/components/editor/resume-preview'
 import { SaveVersionModal } from '@/components/versions/save-version-modal'
+import { LoginModal } from '@/components/auth/login-modal'
+import { useAuth } from '@/components/auth/auth-provider'
 import { loadResumes } from '@/lib/supabase-loaders'
 
 export default function Editor() {
+  const { user } = useAuth()
   const [resumeName, setResumeName] = useState('Resume')
   const [draftStatus, setDraftStatus] = useState<'unsaved' | 'draft_saved' | 'ready_to_save'>(
     'draft_saved'
@@ -19,6 +22,7 @@ export default function Editor() {
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [preview, setPreview] = useState('')
   const [saveVersionModalOpen, setSaveVersionModalOpen] = useState(false)
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -89,11 +93,19 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
   }
 
   const handleDraftSave = () => {
+    if (!user) {
+      setLoginModalOpen(true)
+      return
+    }
     setDraftStatus('draft_saved')
     setLastSaved(new Date())
   }
 
   const handleVersionSave = () => {
+    if (!user) {
+      setLoginModalOpen(true)
+      return
+    }
     setSaveVersionModalOpen(true)
   }
 
@@ -124,6 +136,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   size="sm"
                   onClick={handleDraftSave}
                   className="gap-2"
+                  title={user ? 'Save your draft' : 'Sign in to save drafts'}
                 >
                   <Save className="w-4 h-4" />
                   Save Draft
@@ -133,21 +146,24 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   size="sm"
                   onClick={handleVersionSave}
                   className="gap-2"
+                  title={user ? 'Save a new version' : 'Sign in to save versions'}
                 >
                   <Plus className="w-4 h-4" />
                   Save New Version
                 </Button>
 
-                <Link href="/resumes/1/versions">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <History className="w-4 h-4" />
-                    History
-                  </Button>
-                </Link>
+                {user && (
+                  <Link href="/resumes/1/versions">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2"
+                    >
+                      <History className="w-4 h-4" />
+                      History
+                    </Button>
+                  </Link>
+                )}
 
                 <Link href="/export">
                   <Button
@@ -156,7 +172,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     className="gap-2"
                   >
                     <Download className="w-4 h-4" />
-                    Export
+                    Export PDF
                   </Button>
                 </Link>
               </div>
@@ -193,6 +209,13 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         currentVersion={currentVersion}
         onClose={() => setSaveVersionModalOpen(false)}
         onSave={handleSaveVersionConfirm}
+      />
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={loginModalOpen}
+        onClose={() => setLoginModalOpen(false)}
+        onSuccess={() => setLoginModalOpen(false)}
       />
     </>
   )
