@@ -615,8 +615,8 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
   return (
     <div className="space-y-6 pr-1">
       {/* Quick Navigation Tabs - Pipeline Stepper Style with Connection Arrow */}
-      <div className="sticky top-0 z-30 bg-[#FAF9F6] pb-1 pt-2 mb-0 w-full relative">
-        <div className="flex h-9 w-full rounded-full p-[2px] bg-white border border-slate-200 shadow-sm relative z-20">
+      <div className="sticky top-0 z-30 bg-[#FAF9F6] pb-2 pt-2 mb-0 w-full relative">
+        <div className="flex h-11 w-full rounded-full p-[3px] bg-white border border-slate-200 shadow-sm relative z-20">
           {[
             { id: 'personal', label: 'Personal Info' },
             { id: 'summary', label: 'Summary' },
@@ -629,8 +629,8 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
             
             let clipPath = '';
             let marginLeft = idx === 0 ? '0' : '-14px';
-            let paddingLeft = idx === 0 ? 'pl-4' : 'pl-7';
-            let paddingRight = idx === arr.length - 1 ? 'pr-4' : 'pr-7';
+            let paddingLeft = idx === 0 ? 'pl-5' : 'pl-8';
+            let paddingRight = idx === arr.length - 1 ? 'pr-5' : 'pr-8';
 
             if (idx === 0) {
               clipPath = 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)';
@@ -668,7 +668,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
                 <button
                    type="button"
                    onClick={() => handleSectionSwitch(step.id as any)}
-                   className={`relative z-10 w-full h-full flex items-center justify-center text-[10px] sm:text-[11px] uppercase tracking-wider ${paddingLeft} ${paddingRight} ${isActive ? colors[step.id].text + ' font-bold' : 'text-slate-700 font-medium'}`}
+                   className={`relative z-10 w-full h-full flex items-center justify-center text-[11px] sm:text-xs uppercase tracking-wider ${paddingLeft} ${paddingRight} ${isActive ? colors[step.id].text + ' font-bold' : 'text-slate-700 font-medium'}`}
                 >
                   <span className="truncate">{step.label}</span>
                 </button>
@@ -676,7 +676,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
                 {/* The Connecting Arrow */}
                 {isActive && (
                   <div 
-                    className={`absolute -bottom-[8px] left-1/2 -translate-x-1/2 w-3.5 h-3.5 rotate-45 border-b-[3px] border-r-[3px] z-10 shadow-[2px_2px_2px_-1px_rgba(0,0,0,0.05)] ${colors[step.id].arrowBg}`}
+                    className={`absolute -bottom-[12px] left-1/2 -translate-x-1/2 w-5 h-5 rotate-45 border-b-[4px] border-r-[4px] z-10 shadow-[3px_3px_4px_-2px_rgba(0,0,0,0.05)] ${colors[step.id].arrowBg}`}
                     style={{ borderColor: colors[step.id].borderColor }}
                   />
                 )}
