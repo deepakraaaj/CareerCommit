@@ -1,18 +1,17 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono, Instrument_Serif } from 'next/font/google'
+import { Figtree, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth/auth-provider'
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const figtree = Figtree({
+  variable: '--font-sans',
   subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
 })
-const instrumentSerif = Instrument_Serif({
-  variable: '--font-display',
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-mono',
   subsets: ['latin'],
-  weight: '400',
 })
 
 export const metadata: Metadata = {
@@ -47,7 +46,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable}`}
+      className={`${figtree.variable} ${jetbrainsMono.variable}`}
     >
       <body className="font-sans antialiased">
         <AuthProvider>{children}</AuthProvider>

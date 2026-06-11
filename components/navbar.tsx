@@ -16,11 +16,13 @@ export function Navbar() {
   const isActive = (href: string) => pathname === href
 
   const navItems = [
-    { href: '/dashboard', label: 'Dashboard' },
     { href: '/editor', label: 'Editor' },
     { href: '/export', label: 'Export' },
     { href: '/jd-matcher', label: 'Job Matcher' },
   ]
+
+  // Only show Dashboard for logged-in users
+  const dashboardItems = user ? [{ href: '/dashboard', label: 'Dashboard' }] : []
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-sm">
@@ -33,7 +35,7 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {navItems.map((item) => (
+            {[...dashboardItems, ...navItems].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -48,9 +50,9 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Right Side - Auth */}
+          {/* Right Side - Auth (only show if logged in or on pages that need it) */}
           <div className="flex items-center gap-4">
-            {user ? (
+            {user && (
               <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -73,12 +75,6 @@ export function Navbar() {
                   </div>
                 )}
               </div>
-            ) : (
-              <Link href="/login" className="hidden md:block">
-                <Button size="sm" className="btn-primary">
-                  Sign in
-                </Button>
-              </Link>
             )}
 
             {/* Mobile Menu Button */}
@@ -95,7 +91,7 @@ export function Navbar() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden border-t border-border/50 py-4 space-y-2">
-            {navItems.map((item) => (
+            {[...dashboardItems, ...navItems].map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -109,8 +105,8 @@ export function Navbar() {
                 {item.label}
               </Link>
             ))}
-            <div className="pt-3 border-t border-border/50 mt-2">
-              {user ? (
+            {user && (
+              <div className="pt-3 border-t border-border/50 mt-2">
                 <div className="flex items-center justify-between px-4 py-2.5 text-sm">
                   <span className="text-foreground/70">{user.email}</span>
                   <button
@@ -123,14 +119,8 @@ export function Navbar() {
                     Sign out
                   </button>
                 </div>
-              ) : (
-                <Link href="/login" onClick={() => setIsOpen(false)} className="block">
-                  <Button size="sm" className="w-full btn-primary">
-                    Sign in
-                  </Button>
-                </Link>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
       </div>
