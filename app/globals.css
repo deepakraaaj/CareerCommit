@@ -3,72 +3,72 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 99%;
-  --foreground: 240 10% 10%;
+  --background: 0 0% 100%;
+  --foreground: 0 0% 0%;
   --card: 0 0% 100%;
-  --card-foreground: 240 10% 10%;
+  --card-foreground: 0 0% 0%;
   --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 10%;
-  --primary: 142 71% 45%;
+  --popover-foreground: 0 0% 0%;
+  --primary: 200 100% 50%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 240 10% 94%;
-  --secondary-foreground: 240 10% 20%;
-  --muted: 240 10% 88%;
-  --muted-foreground: 240 5% 45%;
-  --accent: 280 85% 65%;
+  --secondary: 0 0% 95%;
+  --secondary-foreground: 0 0% 0%;
+  --muted: 0 0% 92%;
+  --muted-foreground: 0 0% 40%;
+  --accent: 200 100% 50%;
   --accent-foreground: 0 0% 100%;
   --destructive: 0 84% 60%;
-  --border: 240 10% 88%;
-  --input: 240 10% 94%;
-  --ring: 142 71% 45%;
-  --chart-1: 142 71% 45%;
-  --chart-2: 280 85% 65%;
-  --chart-3: 50 96% 53%;
-  --chart-4: 10 86% 63%;
-  --chart-5: 200 90% 56%;
-  --radius: 0.75rem;
+  --border: 0 0% 90%;
+  --input: 0 0% 96%;
+  --ring: 200 100% 50%;
+  --chart-1: 200 100% 50%;
+  --chart-2: 0 0% 60%;
+  --chart-3: 0 0% 40%;
+  --chart-4: 0 0% 30%;
+  --chart-5: 0 0% 20%;
+  --radius: 0.5rem;
   --sidebar: 0 0% 98%;
-  --sidebar-foreground: 240 10% 10%;
-  --sidebar-primary: 142 71% 45%;
+  --sidebar-foreground: 0 0% 0%;
+  --sidebar-primary: 200 100% 50%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 280 85% 65%;
-  --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 240 10% 88%;
-  --sidebar-ring: 142 71% 45%;
+  --sidebar-accent: 0 0% 95%;
+  --sidebar-accent-foreground: 0 0% 0%;
+  --sidebar-border: 0 0% 90%;
+  --sidebar-ring: 200 100% 50%;
 }
 
 .dark {
-  --background: 240 10% 6%;
+  --background: 0 0% 8%;
   --foreground: 0 0% 98%;
-  --card: 240 10% 12%;
+  --card: 0 0% 12%;
   --card-foreground: 0 0% 98%;
-  --popover: 240 10% 12%;
+  --popover: 0 0% 12%;
   --popover-foreground: 0 0% 98%;
-  --primary: 142 71% 45%;
-  --primary-foreground: 240 10% 6%;
-  --secondary: 240 10% 18%;
+  --primary: 200 100% 60%;
+  --primary-foreground: 0 0% 8%;
+  --secondary: 0 0% 15%;
   --secondary-foreground: 0 0% 98%;
-  --muted: 240 10% 20%;
-  --muted-foreground: 240 5% 65%;
-  --accent: 280 85% 65%;
-  --accent-foreground: 240 10% 6%;
+  --muted: 0 0% 20%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 200 100% 60%;
+  --accent-foreground: 0 0% 8%;
   --destructive: 0 84% 60%;
-  --border: 240 10% 20%;
-  --input: 240 10% 16%;
-  --ring: 142 71% 45%;
-  --chart-1: 142 71% 45%;
-  --chart-2: 280 85% 65%;
-  --chart-3: 50 96% 53%;
-  --chart-4: 10 86% 63%;
-  --chart-5: 200 90% 56%;
-  --sidebar: 240 10% 10%;
+  --border: 0 0% 18%;
+  --input: 0 0% 14%;
+  --ring: 200 100% 60%;
+  --chart-1: 200 100% 60%;
+  --chart-2: 0 0% 50%;
+  --chart-3: 0 0% 40%;
+  --chart-4: 0 0% 30%;
+  --chart-5: 0 0% 20%;
+  --sidebar: 0 0% 10%;
   --sidebar-foreground: 0 0% 98%;
-  --sidebar-primary: 142 71% 45%;
-  --sidebar-primary-foreground: 240 10% 6%;
-  --sidebar-accent: 280 85% 65%;
-  --sidebar-accent-foreground: 240 10% 6%;
-  --sidebar-border: 240 10% 20%;
-  --sidebar-ring: 142 71% 45%;
+  --sidebar-primary: 200 100% 60%;
+  --sidebar-primary-foreground: 0 0% 8%;
+  --sidebar-accent: 0 0% 15%;
+  --sidebar-accent-foreground: 0 0% 98%;
+  --sidebar-border: 0 0% 18%;
+  --sidebar-ring: 200 100% 60%;
 }
 
 @layer base {
@@ -84,37 +84,59 @@
     min-height: 100vh;
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-family: var(--font-geist-sans, -apple-system), BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     font-size: 1rem;
     font-weight: 400;
     line-height: 1.6;
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-weight: 600;
-    line-height: 1.2;
+    font-weight: 700;
+    line-height: 1.15;
     letter-spacing: -0.02em;
   }
 
   h1 {
-    font-size: 2.5rem;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    margin-bottom: 0.5em;
   }
 
   h2 {
-    font-size: 2rem;
+    font-size: clamp(1.875rem, 4vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 0.6em;
   }
 
   h3 {
     font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.7em;
+  }
+
+  h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
   }
 
   p {
     line-height: 1.7;
-    letter-spacing: -0.005em;
+    color: hsl(var(--muted-foreground));
+    margin-bottom: 1em;
+  }
+
+  a {
+    color: hsl(var(--primary));
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  a:hover {
+    color: hsl(var(--primary) / 0.8);
   }
 
   ::selection {
@@ -127,19 +149,19 @@
   .font-display {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.015em;
   }
 
   .card-premium {
-    @apply rounded-xl border border-border/40 bg-card shadow-sm transition-all duration-200 hover:border-border/60 hover:shadow-md;
+    @apply rounded-lg border border-border/50 bg-card transition-all duration-150 hover:border-border/70;
   }
 
   .btn-primary {
-    @apply rounded-lg bg-gradient-to-r from-primary to-primary/90 px-6 py-2.5 font-semibold text-primary-foreground shadow-md transition-all hover:shadow-lg hover:shadow-primary/30 active:scale-95;
+    @apply rounded-lg bg-primary px-6 py-2.5 font-semibold text-primary-foreground shadow-sm transition-all hover:shadow-md active:scale-95;
   }
 
   .heading-lg {
-    @apply text-6xl font-bold tracking-tight text-foreground;
+    @apply text-5xl font-bold text-foreground;
   }
 
   .heading-md {
@@ -151,21 +173,21 @@
   }
 
   .premium-chip {
-    @apply inline-flex items-center gap-2 rounded-full border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground;
+    @apply inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground;
   }
 
   .premium-shell {
-    @apply relative overflow-hidden rounded-xl border border-border/40 bg-card shadow-md;
+    @apply relative overflow-hidden rounded-lg border border-border/50 bg-card;
   }
 
   .premium-grid {
     background-image:
-      linear-gradient(to right, hsl(var(--border) / 0.15) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--border) / 0.15) 1px, transparent 1px);
+      linear-gradient(to right, hsl(var(--border) / 0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.1) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 
   .gradient-text {
-    @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
+    @apply text-primary;
   }
 }
