@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { EditorSections } from '@/components/editor/editor-sections'
 import { supabasePlaceholder, type DbResume } from '@/lib/supabase-placeholder'
@@ -107,14 +107,13 @@ export default function Editor() {
   const { user, profile, signOut } = useAuth()
   const router = useRouter()
   const pathname = usePathname()
-  const searchParams = useSearchParams()
-  const isNewResume = searchParams.get('new') === '1'
   const [versionId, setVersionId] = useState<string | null>(null)
+  const [isNewResume, setIsNewResume] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [resumeName, setResumeName] = useState(isNewResume ? 'New Resume' : 'My Resume')
+  const [resumeName, setResumeName] = useState('My Resume')
   const [isEditingName, setIsEditingName] = useState(false)
-  const [tempName, setTempName] = useState(isNewResume ? 'New Resume' : 'My Resume')
-  const [resumeId, setResumeId] = useState(() => getOrCreateResumeId(isNewResume))
+  const [tempName, setTempName] = useState('My Resume')
+  const [resumeId, setResumeId] = useState(() => getOrCreateResumeId())
 
   const [draftStatus, setDraftStatus] = useState<'unsaved' | 'draft_saved' | 'ready_to_save'>(
     'draft_saved'
@@ -146,7 +145,11 @@ export default function Editor() {
 
   // Load Initial State
   useEffect(() => {
-    if (isNewResume) {
+    const params = new URLSearchParams(window.location.search)
+    const newResumeMode = params.get('new') === '1'
+    setIsNewResume(newResumeMode)
+
+    if (newResumeMode) {
       const blank = createBlankResumeData()
       const freshResumeId = getOrCreateResumeId(true)
       setResumeId(freshResumeId)
@@ -216,7 +219,7 @@ export default function Editor() {
         triggerPreviewUpdate(blank)
       }
     })
-  }, [isNewResume, versionId, user?.id])
+  }, [versionId, user?.id])
 
   useEffect(() => {
     if (!userMenuOpen) return
