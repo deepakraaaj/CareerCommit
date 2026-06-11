@@ -119,23 +119,23 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
   return (
     <>
       <Navbar />
-      <div className="flex flex-col h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900/20 overflow-hidden">
-        {/* Premium Top Bar */}
-        <div className="border-b border-slate-200/50 dark:border-slate-700/50 shrink-0 z-20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl">
-          <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-10 py-4">
+      <div className="flex flex-col h-[calc(100vh-4rem)] bg-white overflow-hidden">
+        {/* Clean Premium Top Bar */}
+        <div className="border-b border-gray-200 shrink-0 z-20 bg-white">
+          <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-10 py-3.5">
             <div className="flex items-center justify-between gap-6">
               <div className="flex-1 flex items-center gap-3">
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Resume Editor</h2>
-                <div className="h-5 w-px bg-slate-300/50 dark:bg-slate-600/50"></div>
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{resumeName}</span>
+                <h2 className="text-sm font-semibold text-gray-900">Resume Editor</h2>
+                <div className="h-4 w-px bg-gray-300"></div>
+                <span className="text-xs text-gray-500 font-medium">{resumeName}</span>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600/50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Template</span>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gray-100 border border-gray-200">
+                  <span className="text-xs font-semibold text-gray-600">Template:</span>
                   <select
                     value={template}
                     onChange={(e) => setTemplate(e.target.value as TemplateType)}
-                    className="bg-transparent text-xs text-slate-900 dark:text-white focus:outline-none cursor-pointer font-medium"
+                    className="bg-transparent text-xs text-gray-900 focus:outline-none cursor-pointer font-medium"
                   >
                     <option value="modern">Modern</option>
                     <option value="classic">Classic</option>
@@ -149,7 +149,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                 <Button
                   size="sm"
                   onClick={handleDraftSave}
-                  className="gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold shadow-lg shadow-blue-200 dark:shadow-blue-900/50 hover:shadow-xl transition-all"
+                  className="gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium shadow-sm hover:shadow-md transition-all"
                   title={user ? 'Save changes' : 'Sign in to save'}
                 >
                   <Save className="w-4 h-4" />
@@ -162,7 +162,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     const element = document.getElementById('download-pdf-btn')
                     element?.click()
                   }}
-                  className="gap-2 font-semibold border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-900 dark:text-white"
+                  className="gap-2 font-medium border-gray-200 hover:bg-gray-50 text-gray-900"
                 >
                   <Download className="w-4 h-4" />
                   Export PDF
@@ -176,7 +176,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         <div className="flex-1 overflow-hidden">
           <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-10 h-full flex flex-col lg:flex-row gap-8 py-8">
             {/* Left: Editor - scrollable */}
-            <div className="flex-1 overflow-y-auto pr-3 space-y-5 pb-20 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
+            <div className="flex-1 overflow-y-auto pr-3 space-y-6 pb-20">
               <EditorSections onContentChange={handleEditorChange} />
             </div>
 

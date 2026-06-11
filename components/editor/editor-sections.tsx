@@ -316,19 +316,19 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
 
   const SectionHeader = ({ sectionKey }: { sectionKey: string }) =>
     renamingSection === sectionKey ? (
-      <div className="w-full flex items-center gap-2.5 p-5 bg-gradient-to-r from-blue-50 to-blue-25 dark:from-blue-900/20 dark:to-blue-900/10 border-b border-blue-200/50 dark:border-blue-900/30">
+      <div className="w-full flex items-center gap-2.5 p-4 bg-gray-50 border-b border-gray-200">
         <input
           autoFocus
           value={sections[sectionKey].title}
           onChange={(e) => handleSectionTitleChange(sectionKey, e.target.value)}
-          className="flex-1 min-w-0 px-4 py-2.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-all"
+          className="flex-1 min-w-0 px-3 py-2 rounded-md bg-white border border-gray-300 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
         />
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={() => setRenamingSection(null)}
           title="Save"
-          className="text-green-600 hover:text-green-700 dark:text-green-400"
+          className="text-green-600 hover:text-green-700 hover:bg-green-50"
         >
           <Check className="w-4 h-4" />
         </Button>
@@ -337,21 +337,21 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
           size="icon-sm"
           onClick={() => setRenamingSection(null)}
           title="Cancel"
-          className="text-slate-600 hover:text-slate-700 dark:text-slate-400"
+          className="text-gray-600 hover:text-gray-700 hover:bg-gray-100"
         >
           <X className="w-4 h-4" />
         </Button>
       </div>
     ) : (
-      <div className="w-full flex items-center justify-between gap-3 p-5 bg-gradient-to-r from-blue-50 via-white to-blue-25 dark:from-blue-900/20 dark:via-slate-800/50 dark:to-blue-900/20 border-b border-blue-200/40 dark:border-blue-900/30 hover:from-blue-100/50 dark:hover:from-blue-900/30 transition-all">
+      <div className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors">
         <button
           type="button"
           onClick={() => toggleSection(sectionKey)}
           className="flex items-center justify-between flex-1 min-w-0 text-left gap-3 group"
         >
-          <h3 className="font-bold text-slate-900 dark:text-white truncate text-sm uppercase tracking-wide">{sections[sectionKey].title}</h3>
+          <h3 className="font-semibold text-gray-900 truncate text-sm">{sections[sectionKey].title}</h3>
           <ChevronDown
-            className={`w-5 h-5 text-slate-400 dark:text-slate-500 transition-transform flex-shrink-0 group-hover:text-slate-600 dark:group-hover:text-slate-400 ${sections[sectionKey].expanded ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 group-hover:text-gray-600 ${sections[sectionKey].expanded ? 'rotate-180' : ''}`}
           />
         </button>
         <Button
@@ -359,7 +359,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
           size="icon-sm"
           onClick={() => setRenamingSection(sectionKey)}
           title="Rename"
-          className="text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 hover:bg-white dark:hover:bg-slate-700/50"
+          className="text-gray-400 hover:text-gray-600 hover:bg-gray-200"
         >
           <Edit2 className="w-4 h-4" />
         </Button>
@@ -367,88 +367,88 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
     )
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {/* Header Section - Personal Info */}
-      <div className="border border-slate-300/30 dark:border-slate-700/50 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-shadow">
-        <div className="flex items-center justify-between gap-4 p-6 bg-gradient-to-r from-blue-50 via-white to-blue-25 dark:from-blue-900/20 dark:via-slate-800/50 dark:to-blue-900/10 border-b border-blue-200/40 dark:border-blue-900/30">
+      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 border-b border-gray-200">
           <div className="flex-1">
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">Personal Information</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">Your core identity and contact details</p>
+            <h3 className="font-semibold text-gray-900 text-sm">Personal Information</h3>
+            <p className="text-xs text-gray-500 mt-1">Your core identity and contact details</p>
           </div>
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={() => setPersonalInfoExpanded((prev) => !prev)}
             title={personalInfoExpanded ? 'Collapse' : 'Expand'}
-            className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700/50"
+            className="text-gray-400 hover:text-gray-600 hover:bg-gray-200"
           >
             <ChevronDown
-              className={`w-5 h-5 transition-transform ${personalInfoExpanded ? 'rotate-180' : ''}`}
+              className={`w-4 h-4 transition-transform ${personalInfoExpanded ? 'rotate-180' : ''}`}
             />
           </Button>
         </div>
         {personalInfoExpanded && (
-          <div className="p-6 space-y-5 bg-white dark:bg-slate-800/50">
-          <div className="grid gap-2.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Full Name</label>
+          <div className="p-6 space-y-5 bg-white">
+          <div className="grid gap-2">
+            <label className="text-xs font-semibold text-gray-700">Full Name</label>
             <input
               type="text"
               placeholder="Enter your full name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+              className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
             />
           </div>
-          <div className="grid gap-2.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Professional Title</label>
+          <div className="grid gap-2">
+            <label className="text-xs font-semibold text-gray-700">Professional Title</label>
             <input
               type="text"
               placeholder="e.g., Senior Full Stack Developer"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+              className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="grid gap-2.5">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Email</label>
+            <div className="grid gap-2">
+              <label className="text-xs font-semibold text-gray-700">Email</label>
               <input
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
               />
             </div>
-            <div className="grid gap-2.5">
-              <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Phone</label>
+            <div className="grid gap-2">
+              <label className="text-xs font-semibold text-gray-700">Phone</label>
               <input
                 type="tel"
                 placeholder="+1 555 123 4567"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
               />
             </div>
           </div>
-          <div className="grid gap-2.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">LinkedIn URL</label>
+          <div className="grid gap-2">
+            <label className="text-xs font-semibold text-gray-700">LinkedIn URL</label>
             <input
               type="url"
               placeholder="https://linkedin.com/in/yourname"
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+              className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
             />
           </div>
-          <div className="grid gap-2.5">
-            <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">GitHub URL</label>
+          <div className="grid gap-2">
+            <label className="text-xs font-semibold text-gray-700">GitHub URL</label>
             <input
               type="url"
               placeholder="https://github.com/yourname"
               value={github}
               onChange={(e) => setGithub(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+              className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
             />
           </div>
           </div>
@@ -456,50 +456,50 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
       </div>
 
       {/* Summary Section */}
-      <div className="border border-slate-300/30 dark:border-slate-700/50 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-shadow">
+      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
         <SectionHeader sectionKey="summary" />
         {sections.summary.expanded && (
-          <div className="p-6 space-y-4 bg-white dark:bg-slate-800/50">
+          <div className="p-5 space-y-4 bg-white">
             <textarea
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all resize-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+              className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none placeholder:text-gray-400"
               rows={4}
-              placeholder="Write a compelling professional summary that highlights your key strengths and career goals..."
+              placeholder="Write a compelling professional summary..."
             />
           </div>
         )}
       </div>
 
       {/* Experience Section */}
-      <div className="border border-slate-300/30 dark:border-slate-700/50 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-shadow">
+      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
         <SectionHeader sectionKey="experience" />
         {sections.experience.expanded && (
-          <div className="p-6 space-y-6 bg-white dark:bg-slate-800/50">
+          <div className="p-5 space-y-5 bg-white">
             <div className="space-y-5">
-              <div className="space-y-5 p-6 bg-gradient-to-br from-blue-50 to-blue-25 dark:from-blue-900/20 dark:to-blue-900/10 border border-blue-200/40 dark:border-blue-900/30 rounded-2xl">
-                <div className="grid gap-2.5">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Company</label>
+              <div className="space-y-4 p-5 bg-gray-50 border border-gray-200 rounded-lg">
+                <div className="grid gap-2">
+                  <label className="text-xs font-semibold text-gray-700">Company</label>
                   <input
                     type="text"
                     placeholder="e.g., Tech Corporation"
                     value={company}
                     onChange={(e) => setCompany(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
                   />
                 </div>
-                <div className="grid gap-2.5">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Position</label>
+                <div className="grid gap-2">
+                  <label className="text-xs font-semibold text-gray-700">Position</label>
                   <input
                     type="text"
                     placeholder="e.g., Senior Software Engineer"
                     value={position}
                     onChange={(e) => setPosition(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg bg-white dark:bg-slate-900/50 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
                   />
                 </div>
-                <div className="grid gap-2.5">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Duration</label>
+                <div className="grid gap-2">
+                  <label className="text-xs font-semibold text-gray-700">Duration</label>
                   <DateRangePicker
                     value={duration}
                     onChange={setDuration}
@@ -507,7 +507,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                   />
                 </div>
 
-                <div className="space-y-4 pt-2">
+                <div className="space-y-3 pt-2">
                   {bullets.experience.map((bullet, idx) => (
                     <BulletEditor
                       key={bullet.id}
@@ -535,51 +535,51 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
       </div>
 
       {/* Education Section */}
-      <div className="border border-slate-300/30 dark:border-slate-700/50 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-shadow">
+      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
         <SectionHeader sectionKey="education" />
         {sections.education.expanded && (
-          <div className="p-6 space-y-5 bg-white dark:bg-slate-800/50">
+          <div className="p-5 space-y-4 bg-white">
             <div className="space-y-4">
               {educationEntries.map((entry, idx) => (
-                <div key={entry.id} className="rounded-xl border border-slate-300/30 dark:border-slate-700/50 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900/30 dark:to-slate-800/20 p-6 space-y-4 hover:shadow-md hover:border-slate-400/40 dark:hover:border-slate-600 transition-all">
+                <div key={entry.id} className="rounded-lg border border-gray-200 bg-gray-50 p-5 space-y-4 hover:shadow-sm hover:border-gray-300 transition-all">
                   <div className="flex items-center justify-between gap-3">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Education Entry {idx + 1}</h4>
+                    <h4 className="text-sm font-semibold text-gray-900">Education {idx + 1}</h4>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteEducationEntry(entry.id)}
                       disabled={educationEntries.length === 1}
-                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 font-medium text-xs"
                     >
                       Remove
                     </Button>
                   </div>
                   <div className="grid gap-4 md:grid-cols-2">
-                    <div className="grid gap-2.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">School</label>
+                    <div className="grid gap-2">
+                      <label className="text-xs font-semibold text-gray-700">School</label>
                       <input
                         value={entry.school}
                         onChange={(e) =>
                           handleUpdateEducationEntry(entry.id, { school: e.target.value })
                         }
                         placeholder="e.g., State University"
-                        className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
                       />
                     </div>
-                    <div className="grid gap-2.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Degree</label>
+                    <div className="grid gap-2">
+                      <label className="text-xs font-semibold text-gray-700">Degree</label>
                       <input
                         value={entry.degree}
                         onChange={(e) =>
                           handleUpdateEducationEntry(entry.id, { degree: e.target.value })
                         }
                         placeholder="e.g., B.S. Computer Science"
-                        className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
                       />
                     </div>
                   </div>
-                  <div className="grid gap-2.5">
-                    <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Duration</label>
+                  <div className="grid gap-2">
+                    <label className="text-xs font-semibold text-gray-700">Duration</label>
                     <DateRangePicker
                       value={entry.duration}
                       onChange={(value) => handleUpdateEducationEntry(entry.id, { duration: value })}
@@ -588,7 +588,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                   </div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" onClick={handleAddEducationEntry} className="w-full font-semibold text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+              <Button variant="outline" size="sm" onClick={handleAddEducationEntry} className="w-full font-medium text-gray-900 border-gray-300 hover:bg-gray-50">
                 + Add Education
               </Button>
             </div>
@@ -596,23 +596,23 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
         )}
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         {/* Skills Section */}
-        <div className="border border-slate-300/30 dark:border-slate-700/50 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-shadow">
+        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
           <SectionHeader sectionKey="skills" />
           {sections.skills.expanded && (
-            <div className="p-6 space-y-5 bg-white dark:bg-slate-800/50">
+            <div className="p-5 space-y-4 bg-white">
               <div className="grid gap-4">
                 {skills.map((group) => (
-                  <div key={group.id} className="rounded-xl border border-slate-300/30 dark:border-slate-700/50 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900/30 dark:to-slate-800/20 p-6 space-y-4 hover:shadow-md hover:border-slate-400/40 dark:hover:border-slate-600 transition-all">
+                  <div key={group.id} className="rounded-lg border border-gray-200 bg-gray-50 p-5 space-y-4 hover:shadow-sm hover:border-gray-300 transition-all">
                     <div className="flex items-center gap-3">
                       <input
                         value={group.label}
                         onChange={(e) => handleUpdateSkillGroup(group.id, { label: e.target.value })}
                         placeholder="Category name"
-                        className="flex-1 min-w-0 px-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        className="flex-1 min-w-0 px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
                       />
-                      <span className="text-xs text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 py-1.5 rounded-lg">
+                      <span className="text-xs text-gray-600 font-semibold whitespace-nowrap bg-blue-100 text-blue-700 px-2.5 py-1 rounded-md">
                         {group.items.length}
                       </span>
                       <Button
@@ -620,7 +620,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                         size="icon-sm"
                         onClick={() => handleDeleteSkillGroup(group.id)}
                         title="Remove category"
-                        className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
                       >
                         <X className="w-4 h-4" />
                       </Button>
@@ -632,7 +632,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                             key={skill}
                             type="button"
                             onClick={() => handleDeleteSkill(group.id, skill)}
-                            className="rounded-full border border-blue-300 dark:border-blue-700 bg-blue-100 dark:bg-blue-900/30 px-3 py-1.5 text-xs font-semibold text-blue-900 dark:text-blue-200 hover:bg-red-100 dark:hover:bg-red-900/30 hover:border-red-400 dark:hover:border-red-600 hover:text-red-900 dark:hover:text-red-200 transition-all"
+                            className="rounded-full border border-blue-300 bg-blue-100 px-3 py-1 text-xs font-medium text-blue-900 hover:bg-red-100 hover:border-red-300 hover:text-red-900 transition-all"
                             title="Click to remove"
                           >
                             {skill} ×
@@ -653,20 +653,20 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                           }
                         }}
                         placeholder="Add skill and press Enter"
-                        className="flex-1 px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        className="flex-1 px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
                       />
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleAddSkillToGroup(group.id)}
-                        className="font-semibold text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50"
+                        className="font-medium text-gray-900 border-gray-300 hover:bg-gray-50"
                       >
                         Add
                       </Button>
                     </div>
                   </div>
                 ))}
-                <Button variant="outline" size="sm" onClick={handleAddSkillGroup} className="w-full font-semibold text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                <Button variant="outline" size="sm" onClick={handleAddSkillGroup} className="w-full font-medium text-gray-900 border-gray-300 hover:bg-gray-50">
                   + Add Category
                 </Button>
               </div>
@@ -675,59 +675,57 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
         </div>
 
         {/* Custom Fields */}
-        <div className="border border-slate-300/30 dark:border-slate-700/50 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-lg hover:shadow-xl transition-shadow">
-          <div className="p-6 bg-gradient-to-r from-blue-50 via-white to-blue-25 dark:from-blue-900/20 dark:via-slate-800/50 dark:to-blue-900/10 border-b border-blue-200/40 dark:border-blue-900/30">
-            <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">Custom Fields</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
-              Portfolio, location, awards, certifications, or anything else
-            </p>
+        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
+          <div className="p-4 bg-gray-50 border-b border-gray-200">
+            <h3 className="font-semibold text-gray-900 text-sm">Custom Fields</h3>
+            <p className="text-xs text-gray-500 mt-1">Portfolio, location, awards, certifications, etc.</p>
           </div>
-          <div className="p-6 space-y-5 bg-white dark:bg-slate-800/50">
+          <div className="p-5 space-y-4 bg-white">
             {customFields.length > 0 ? (
               customFields.map((field, idx) => (
-                <div key={field.id} className="rounded-xl border border-slate-300/30 dark:border-slate-700/50 bg-gradient-to-br from-slate-50 to-white dark:from-slate-900/30 dark:to-slate-800/20 p-6 space-y-4 hover:shadow-md hover:border-slate-400/40 dark:hover:border-slate-600 transition-all">
+                <div key={field.id} className="rounded-lg border border-gray-200 bg-gray-50 p-5 space-y-4 hover:shadow-sm hover:border-gray-300 transition-all">
                   <div className="flex items-center justify-between gap-3">
-                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">Field {idx + 1}</h4>
+                    <h4 className="text-sm font-semibold text-gray-900">Field {idx + 1}</h4>
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteCustomField(field.id)}
-                      className="text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 font-medium"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 font-medium text-xs"
                     >
                       Remove
                     </Button>
                   </div>
-                  <div className="grid gap-4">
-                    <div className="grid gap-2.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Label</label>
+                  <div className="grid gap-3">
+                    <div className="grid gap-2">
+                      <label className="text-xs font-semibold text-gray-700">Label</label>
                       <input
                         type="text"
                         value={field.label}
                         onChange={(e) => handleUpdateCustomField(field.id, { label: e.target.value })}
                         placeholder="e.g., Certifications"
-                        className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
                       />
                     </div>
-                    <div className="grid gap-2.5">
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-200 uppercase tracking-widest">Value</label>
+                    <div className="grid gap-2">
+                      <label className="text-xs font-semibold text-gray-700">Value</label>
                       <input
                         type="text"
                         value={field.value}
                         onChange={(e) => handleUpdateCustomField(field.id, { value: e.target.value })}
                         placeholder="Enter the value"
-                        className="w-full px-4 py-3 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900/50 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-transparent transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                        className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
                       />
                     </div>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="text-center py-10">
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">No custom fields yet</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Add fields to showcase additional achievements</p>
+              <div className="text-center py-8">
+                <p className="text-sm text-gray-600">No custom fields yet</p>
+                <p className="text-xs text-gray-500 mt-1">Add fields to showcase achievements</p>
               </div>
             )}
-            <Button variant="outline" size="sm" onClick={handleAddCustomField} className="w-full font-semibold text-slate-900 dark:text-white border-slate-300 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+            <Button variant="outline" size="sm" onClick={handleAddCustomField} className="w-full font-medium text-gray-900 border-gray-300 hover:bg-gray-50">
               + Add Field
             </Button>
           </div>
