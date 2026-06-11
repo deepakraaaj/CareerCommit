@@ -122,16 +122,30 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         {/* Top Action Bar */}
         <div className="border-b border-border/50 shrink-0 z-20 bg-background/80 backdrop-blur-sm">
           <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex items-center justify-end gap-2">
-              <Button
-                size="sm"
-                onClick={handleDraftSave}
-                className="gap-2"
-                title={user ? 'Save changes' : 'Sign in to save'}
-              >
-                <Save className="w-4 h-4" />
-                Save
-              </Button>
+            <div className="flex items-center justify-between gap-3">
+              <div></div>
+              <div className="flex items-center gap-3">
+                <Button
+                  size="sm"
+                  onClick={handleDraftSave}
+                  className="gap-2"
+                  title={user ? 'Save changes' : 'Sign in to save'}
+                >
+                  <Save className="w-4 h-4" />
+                  Save
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const element = document.getElementById('download-pdf-btn')
+                    element?.click()
+                  }}
+                  className="gap-2"
+                >
+                  Download PDF
+                </Button>
+              </div>
             </div>
           </div>
         </div>

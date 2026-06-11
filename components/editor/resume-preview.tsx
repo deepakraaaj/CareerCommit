@@ -622,14 +622,18 @@ export function ResumePreview({
 
   return (
     <div className="flex flex-col h-full gap-3">
-      <div className="shrink-0 flex items-center justify-between gap-3">
-        <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-2">
-          Download PDF
-        </Button>
+      <button
+        id="download-pdf-btn"
+        onClick={handleDownloadPDF}
+        style={{ display: 'none' }}
+      >
+        Download
+      </button>
+      <div className="flex items-center justify-center gap-3 shrink-0">
         <select
           value={template}
           onChange={(e) => setTemplate(e.target.value as TemplateType)}
-          className="h-8 rounded-lg border border-border bg-background px-3 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="h-8 rounded-lg border border-border bg-background px-3 py-1 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
         >
           <option value="modern">Modern</option>
           <option value="classic">Classic</option>
