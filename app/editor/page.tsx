@@ -132,17 +132,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                 <Save className="w-4 h-4" />
                 Save
               </Button>
-
-              <Link href="/export">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Export PDF
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
