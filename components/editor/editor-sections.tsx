@@ -614,74 +614,55 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
 
   return (
     <div className="space-y-6 pr-1">
-      {/* Quick Navigation Tabs - Classic Modernized Editorial Style */}
-      <div className="sticky top-0 z-30 bg-[#FAF9F6] pb-3 pt-2 mb-4 border-b border-slate-200 flex items-center justify-between overflow-x-auto no-scrollbar gap-2">
-        <button
-          type="button"
-          onClick={() => handleSectionSwitch('personal')}
-          className={`shrink-0 pb-2.5 text-[10px] tracking-widest font-extrabold uppercase transition-all border-b-2 ${
-            activeSection === 'personal'
-              ? 'text-indigo-600 border-indigo-600'
-              : 'text-slate-400 border-transparent hover:text-slate-700 hover:border-slate-205'
-          }`}
-        >
-          <span className="font-serif italic font-normal text-xs mr-1 text-slate-400">I.</span> Personal Info
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSectionSwitch('summary')}
-          className={`shrink-0 pb-2.5 text-[10px] tracking-widest font-extrabold uppercase transition-all border-b-2 ${
-            activeSection === 'summary'
-              ? 'text-violet-650 border-violet-650'
-              : 'text-slate-400 border-transparent hover:text-slate-700 hover:border-slate-205'
-          }`}
-        >
-          <span className="font-serif italic font-normal text-xs mr-1 text-slate-400">II.</span> Summary
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSectionSwitch('experience')}
-          className={`shrink-0 pb-2.5 text-[10px] tracking-widest font-extrabold uppercase transition-all border-b-2 ${
-            activeSection === 'experience'
-              ? 'text-blue-655 border-blue-655'
-              : 'text-slate-400 border-transparent hover:text-slate-700 hover:border-slate-205'
-          }`}
-        >
-          <span className="font-serif italic font-normal text-xs mr-1 text-slate-400">III.</span> Experience
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSectionSwitch('education')}
-          className={`shrink-0 pb-2.5 text-[10px] tracking-widest font-extrabold uppercase transition-all border-b-2 ${
-            activeSection === 'education'
-              ? 'text-emerald-650 border-emerald-650'
-              : 'text-slate-400 border-transparent hover:text-slate-700 hover:border-slate-205'
-          }`}
-        >
-          <span className="font-serif italic font-normal text-xs mr-1 text-slate-400">IV.</span> Education
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSectionSwitch('skills')}
-          className={`shrink-0 pb-2.5 text-[10px] tracking-widest font-extrabold uppercase transition-all border-b-2 ${
-            activeSection === 'skills'
-              ? 'text-amber-655 border-amber-655'
-              : 'text-slate-400 border-transparent hover:text-slate-700 hover:border-slate-205'
-          }`}
-        >
-          <span className="font-serif italic font-normal text-xs mr-1 text-slate-400">V.</span> Skills
-        </button>
-        <button
-          type="button"
-          onClick={() => handleSectionSwitch('custom')}
-          className={`shrink-0 pb-2.5 text-[10px] tracking-widest font-extrabold uppercase transition-all border-b-2 ${
-            activeSection === 'custom'
-              ? 'text-rose-650 border-rose-650'
-              : 'text-slate-400 border-transparent hover:text-slate-700 hover:border-slate-205'
-          }`}
-        >
-          <span className="font-serif italic font-normal text-xs mr-1 text-slate-400">VI.</span> Custom
-        </button>
+      {/* Quick Navigation Tabs - Pipeline Stepper Style */}
+      <div className="sticky top-0 z-30 bg-[#FAF9F6] pb-3 pt-2 mb-4 w-full">
+        <div className="flex h-9 w-full rounded-full overflow-hidden p-[2px] bg-white border border-slate-200 shadow-sm">
+          {[
+            { id: 'personal', label: 'Personal Info' },
+            { id: 'summary', label: 'Summary' },
+            { id: 'experience', label: 'Experience' },
+            { id: 'education', label: 'Education' },
+            { id: 'skills', label: 'Skills' },
+            { id: 'custom', label: 'Custom' },
+          ].map((step, idx, arr) => {
+            const isActive = activeSection === step.id;
+            
+            let clipPath = '';
+            let marginLeft = idx === 0 ? '0' : '-14px';
+            let paddingLeft = idx === 0 ? 'pl-4' : 'pl-7';
+            let paddingRight = idx === arr.length - 1 ? 'pr-4' : 'pr-7';
+
+            if (idx === 0) {
+              clipPath = 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%)';
+            } else if (idx === arr.length - 1) {
+              clipPath = 'polygon(0 0, 100% 0, 100% 100%, 0 100%, 16px 50%)';
+            } else {
+              clipPath = 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%, 16px 50%)';
+            }
+
+            const colors: Record<string, { active: string; inactive: string }> = {
+              personal: { active: 'bg-indigo-200 text-indigo-900 font-bold', inactive: 'bg-indigo-50/60 text-indigo-700 hover:bg-indigo-100/80' },
+              summary: { active: 'bg-violet-200 text-violet-900 font-bold', inactive: 'bg-violet-50/60 text-violet-700 hover:bg-violet-100/80' },
+              experience: { active: 'bg-blue-200 text-blue-900 font-bold', inactive: 'bg-blue-50/60 text-blue-700 hover:bg-blue-100/80' },
+              education: { active: 'bg-emerald-200 text-emerald-900 font-bold', inactive: 'bg-emerald-50/60 text-emerald-700 hover:bg-emerald-100/80' },
+              skills: { active: 'bg-amber-200 text-amber-900 font-bold', inactive: 'bg-amber-50/60 text-amber-700 hover:bg-amber-100/80' },
+              custom: { active: 'bg-rose-200 text-rose-900 font-bold', inactive: 'bg-rose-50/60 text-rose-700 hover:bg-rose-100/80' },
+            };
+            const colorClass = isActive ? colors[step.id].active : colors[step.id].inactive;
+
+            return (
+              <button
+                key={step.id}
+                type="button"
+                onClick={() => handleSectionSwitch(step.id as any)}
+                style={{ clipPath, marginLeft }}
+                className={`flex-1 flex items-center justify-center text-[10px] sm:text-[11px] uppercase tracking-wider transition-colors duration-200 ${paddingLeft} ${paddingRight} ${colorClass} ${!isActive && 'font-medium'}`}
+              >
+                <span className="truncate">{step.label}</span>
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* 1. Personal Info */}
