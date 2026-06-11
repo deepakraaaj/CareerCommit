@@ -779,8 +779,16 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
             <div className="relative">
               <textarea
                 value={summary}
-                onChange={(e) => setSummary(e.target.value)}
-                className={`${inputClass} resize-none min-h-[150px] pb-10`}
+                onChange={(e) => {
+                  setSummary(e.target.value)
+                  e.target.style.height = 'auto'
+                  e.target.style.height = `${e.target.scrollHeight}px`
+                }}
+                onFocus={(e) => {
+                  e.target.style.height = 'auto'
+                  e.target.style.height = `${e.target.scrollHeight}px`
+                }}
+                className={`${inputClass} resize-y min-h-[150px] pb-10 overflow-hidden`}
                 placeholder="Write a compelling summary highlighting your core skills, years of experience, and achievements..."
               />
               <div className="absolute bottom-2.5 right-3 text-[10px] text-slate-400 font-bold uppercase">
