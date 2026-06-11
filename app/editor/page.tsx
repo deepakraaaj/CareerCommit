@@ -528,7 +528,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
           
           {/* Left Side: Scrollable Input Form */}
-          <div className="w-full lg:w-[55%] h-full overflow-y-auto px-6 py-6 border-r border-slate-200/80 bg-slate-50 custom-scrollbar">
+          <div className="w-full lg:w-[55%] h-full overflow-y-auto px-6 py-6 border-r border-slate-200/80 bg-[#FAF9F6] custom-scrollbar">
             {editorContent && (
               <EditorSections
                 initialContent={editorContent}
