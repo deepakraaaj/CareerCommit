@@ -8,6 +8,8 @@ interface ResumePreviewProps {
   currentVersion: number
   draftStatus: 'unsaved' | 'draft_saved' | 'ready_to_save'
   preview: string
+  template: TemplateType
+  onTemplateChange: (template: TemplateType) => void
 }
 
 export type TemplateType =
@@ -577,8 +579,9 @@ export function ResumePreview({
   currentVersion,
   draftStatus,
   preview,
+  template,
+  onTemplateChange,
 }: ResumePreviewProps) {
-  const [template, setTemplate] = useState<TemplateType>('modern')
   const parsed = useMemo(() => parseResume(preview), [preview])
 
   const handleDownloadPDF = async () => {
@@ -621,7 +624,7 @@ export function ResumePreview({
   }
 
   return (
-    <div className="flex flex-col h-full gap-3">
+    <div className="flex flex-col h-full">
       <button
         id="download-pdf-btn"
         onClick={handleDownloadPDF}
@@ -629,21 +632,6 @@ export function ResumePreview({
       >
         Download
       </button>
-      <div className="flex items-center justify-center gap-3 shrink-0">
-        <select
-          value={template}
-          onChange={(e) => setTemplate(e.target.value as TemplateType)}
-          className="h-8 rounded-lg border border-border bg-background px-3 py-1 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-        >
-          <option value="modern">Modern</option>
-          <option value="classic">Classic</option>
-          <option value="minimalist">Minimal</option>
-          <option value="creative">Creative</option>
-          <option value="elegant">Elegant</option>
-          <option value="bold">Bold</option>
-          <option value="technical">Technical</option>
-        </select>
-      </div>
 
       <div className="flex-1 min-h-0 rounded-lg border border-border shadow-sm bg-muted overflow-y-auto">
         <PaginatedResume parsed={parsed} template={template} />

@@ -6,7 +6,7 @@ import { Save, Plus, History, Download } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { EditorSections } from '@/components/editor/editor-sections'
-import { ResumePreview } from '@/components/editor/resume-preview'
+import { ResumePreview, type TemplateType } from '@/components/editor/resume-preview'
 import { SaveVersionModal } from '@/components/versions/save-version-modal'
 import { LoginModal } from '@/components/auth/login-modal'
 import { useAuth } from '@/components/auth/auth-provider'
@@ -23,6 +23,7 @@ export default function Editor() {
   const [preview, setPreview] = useState('')
   const [saveVersionModalOpen, setSaveVersionModalOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [template, setTemplate] = useState<TemplateType>('modern')
 
   useEffect(() => {
     let active = true
@@ -121,10 +122,10 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
       <div className="flex flex-col h-[calc(100vh-4rem)] bg-background overflow-hidden">
         {/* Top Action Bar */}
         <div className="border-b border-border/50 shrink-0 z-20 bg-background/80 backdrop-blur-sm">
-          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
             <div className="flex items-center justify-between gap-3">
               <div></div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <Button
                   size="sm"
                   onClick={handleDraftSave}
@@ -134,6 +135,19 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   <Save className="w-4 h-4" />
                   Save
                 </Button>
+                <select
+                  value={template}
+                  onChange={(e) => setTemplate(e.target.value as TemplateType)}
+                  className="h-8 rounded-lg border border-border bg-background px-2 py-1 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+                >
+                  <option value="modern">Modern</option>
+                  <option value="classic">Classic</option>
+                  <option value="minimalist">Minimal</option>
+                  <option value="creative">Creative</option>
+                  <option value="elegant">Elegant</option>
+                  <option value="bold">Bold</option>
+                  <option value="technical">Technical</option>
+                </select>
                 <Button
                   variant="outline"
                   size="sm"
@@ -166,6 +180,8 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   currentVersion={currentVersion}
                   draftStatus={draftStatus}
                   preview={preview}
+                  template={template}
+                  onTemplateChange={setTemplate}
                 />
               </div>
             </div>
