@@ -119,35 +119,43 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
   return (
     <>
       <Navbar />
-      <div className="flex flex-col h-[calc(100vh-4rem)] bg-background overflow-hidden">
-        {/* Top Action Bar */}
-        <div className="border-b border-border/50 shrink-0 z-20 bg-background/80 backdrop-blur-sm">
-          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-            <div className="flex items-center justify-between gap-3">
-              <div></div>
-              <div className="flex items-center gap-2">
+      <div className="flex flex-col h-[calc(100vh-4rem)] bg-gradient-to-b from-background to-background/95 overflow-hidden">
+        {/* Top Action Bar - Modern Design */}
+        <div className="border-b border-border/30 shrink-0 z-20 bg-background/95 backdrop-blur-md">
+          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex-1 flex items-center gap-2">
+                <h2 className="text-sm font-semibold text-foreground">Resume Editor</h2>
+                <div className="h-4 w-px bg-border/30"></div>
+                <span className="text-xs text-muted-foreground">{resumeName}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/40 border border-border/30">
+                  <span className="text-xs font-medium text-muted-foreground">Template:</span>
+                  <select
+                    value={template}
+                    onChange={(e) => setTemplate(e.target.value as TemplateType)}
+                    className="bg-transparent text-xs text-foreground focus:outline-none cursor-pointer font-medium"
+                  >
+                    <option value="modern">Modern</option>
+                    <option value="classic">Classic</option>
+                    <option value="minimalist">Minimal</option>
+                    <option value="creative">Creative</option>
+                    <option value="elegant">Elegant</option>
+                    <option value="bold">Bold</option>
+                    <option value="technical">Technical</option>
+                  </select>
+                </div>
+                <div className="h-4 w-px bg-border/30"></div>
                 <Button
                   size="sm"
                   onClick={handleDraftSave}
-                  className="gap-2"
+                  className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
                   title={user ? 'Save changes' : 'Sign in to save'}
                 >
                   <Save className="w-4 h-4" />
                   Save
                 </Button>
-                <select
-                  value={template}
-                  onChange={(e) => setTemplate(e.target.value as TemplateType)}
-                  className="h-8 rounded-lg border border-border bg-background px-2 py-1 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-                >
-                  <option value="modern">Modern</option>
-                  <option value="classic">Classic</option>
-                  <option value="minimalist">Minimal</option>
-                  <option value="creative">Creative</option>
-                  <option value="elegant">Elegant</option>
-                  <option value="bold">Bold</option>
-                  <option value="technical">Technical</option>
-                </select>
                 <Button
                   variant="outline"
                   size="sm"
@@ -155,9 +163,10 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     const element = document.getElementById('download-pdf-btn')
                     element?.click()
                   }}
-                  className="gap-2"
+                  className="gap-2 font-medium"
                 >
-                  Download PDF
+                  <Download className="w-4 h-4" />
+                  Export PDF
                 </Button>
               </div>
             </div>

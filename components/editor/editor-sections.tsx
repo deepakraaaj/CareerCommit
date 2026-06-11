@@ -316,23 +316,24 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
 
   const SectionHeader = ({ sectionKey }: { sectionKey: string }) =>
     renamingSection === sectionKey ? (
-      <div className="w-full flex items-center gap-2 p-4 bg-secondary/50 rounded-lg">
+      <div className="w-full flex items-center gap-2 p-4 bg-primary/5 border-b border-border/30">
         <input
           autoFocus
           value={sections[sectionKey].title}
           onChange={(e) => handleSectionTitleChange(sectionKey, e.target.value)}
-          className="flex-1 min-w-0 px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+          className="flex-1 min-w-0 px-3 py-2 rounded-lg bg-background border border-border/50 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon-sm"
           onClick={() => setRenamingSection(null)}
           title="Save section title"
+          className="text-primary hover:text-primary"
         >
           <Check className="w-4 h-4" />
         </Button>
         <Button
-          variant="outline"
+          variant="ghost"
           size="icon-sm"
           onClick={() => setRenamingSection(null)}
           title="Cancel rename"
@@ -341,15 +342,15 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
         </Button>
       </div>
     ) : (
-      <div className="w-full flex items-center justify-between gap-2 p-4 bg-secondary/50 hover:bg-secondary transition-colors rounded-lg">
+      <div className="w-full flex items-center justify-between gap-2 p-4 bg-gradient-to-r from-primary/5 to-primary/2 border-b border-border/30 hover:from-primary/8 transition-colors">
         <button
           type="button"
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between flex-1 min-w-0 text-left"
+          className="flex items-center justify-between flex-1 min-w-0 text-left gap-3"
         >
-          <h3 className="font-semibold truncate">{sections[sectionKey].title}</h3>
+          <h3 className="font-semibold text-foreground truncate">{sections[sectionKey].title}</h3>
           <ChevronDown
-            className={`w-5 h-5 transition-transform ${sections[sectionKey].expanded ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-muted-foreground transition-transform flex-shrink-0 ${sections[sectionKey].expanded ? 'rotate-180' : ''}`}
           />
         </button>
         <Button
@@ -357,6 +358,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
           size="icon-sm"
           onClick={() => setRenamingSection(sectionKey)}
           title="Rename section"
+          className="text-muted-foreground hover:text-foreground"
         >
           <Edit2 className="w-4 h-4" />
         </Button>
@@ -365,18 +367,19 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
 
   return (
     <div className="space-y-4">
-      {/* Header Section */}
-      <div className="border border-border rounded-lg overflow-hidden bg-secondary/20">
-        <div className="flex items-center justify-between gap-2 p-4 bg-secondary/50">
-          <div>
-            <h3 className="font-semibold text-sm">Personal Info</h3>
-            <p className="text-xs text-muted-foreground mt-1">Core identity and contact details</p>
+      {/* Header Section - Personal Info */}
+      <div className="border border-border/30 rounded-xl overflow-hidden bg-white dark:bg-card shadow-sm">
+        <div className="flex items-center justify-between gap-3 p-4 bg-gradient-to-r from-primary/8 to-primary/3 border-b border-border/20">
+          <div className="flex-1">
+            <h3 className="font-semibold text-sm text-foreground">Personal Information</h3>
+            <p className="text-xs text-muted-foreground mt-1">Your core identity and contact details</p>
           </div>
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={() => setPersonalInfoExpanded((prev) => !prev)}
-            title={personalInfoExpanded ? 'Collapse personal info' : 'Expand personal info'}
+            title={personalInfoExpanded ? 'Collapse' : 'Expand'}
+            className="text-muted-foreground hover:text-foreground"
           >
             <ChevronDown
               className={`w-4 h-4 transition-transform ${personalInfoExpanded ? 'rotate-180' : ''}`}
@@ -384,67 +387,67 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
           </Button>
         </div>
         {personalInfoExpanded && (
-          <div className="p-4 space-y-3 border-t border-border">
+          <div className="p-5 space-y-4 border-t border-border/20 bg-background">
           <div className="grid gap-2">
-            <label className="text-xs font-medium text-muted-foreground">Full Name</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Full Name</label>
             <input
               type="text"
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2.5 rounded-lg bg-background border border-border/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
             />
           </div>
           <div className="grid gap-2">
-            <label className="text-xs font-medium text-muted-foreground">Professional Title</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Professional Title</label>
             <input
               type="text"
-              placeholder="Senior Full Stack Developer"
+              placeholder="e.g., Senior Full Stack Developer"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2.5 rounded-lg bg-background border border-border/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
             />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <label className="text-xs font-medium text-muted-foreground">Email</label>
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Email</label>
               <input
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-2.5 rounded-lg bg-background border border-border/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
               />
             </div>
             <div className="grid gap-2">
-              <label className="text-xs font-medium text-muted-foreground">Phone</label>
+              <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Phone</label>
               <input
                 type="tel"
                 placeholder="+1 555 123 4567"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-4 py-2.5 rounded-lg bg-background border border-border/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
               />
             </div>
           </div>
           <div className="grid gap-2">
-            <label className="text-xs font-medium text-muted-foreground">LinkedIn URL</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wide">LinkedIn URL</label>
             <input
               type="url"
               placeholder="https://linkedin.com/in/yourname"
               value={linkedin}
               onChange={(e) => setLinkedin(e.target.value)}
-              className="w-full px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2.5 rounded-lg bg-background border border-border/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
             />
           </div>
           <div className="grid gap-2">
-            <label className="text-xs font-medium text-muted-foreground">GitHub URL</label>
+            <label className="text-xs font-semibold text-foreground uppercase tracking-wide">GitHub URL</label>
             <input
               type="url"
               placeholder="https://github.com/yourname"
               value={github}
               onChange={(e) => setGithub(e.target.value)}
-              className="w-full px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full px-4 py-2.5 rounded-lg bg-background border border-border/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
             />
           </div>
           </div>
@@ -452,43 +455,50 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
       </div>
 
       {/* Summary Section */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      <div className="border border-border/30 rounded-xl overflow-hidden bg-white dark:bg-card shadow-sm">
         <SectionHeader sectionKey="summary" />
         {sections.summary.expanded && (
-          <div className="p-4 space-y-3 border-t border-border">
+          <div className="p-5 space-y-3 bg-background">
             <textarea
               value={summary}
               onChange={(e) => setSummary(e.target.value)}
-              className="w-full p-3 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-              rows={3}
+              className="w-full px-4 py-3 rounded-lg border border-border/40 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors resize-none placeholder:text-muted-foreground/60"
+              rows={4}
+              placeholder="Write a compelling professional summary that highlights your key strengths and career goals..."
             />
           </div>
         )}
       </div>
 
       {/* Experience Section */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      <div className="border border-border/30 rounded-xl overflow-hidden bg-white dark:bg-card shadow-sm">
         <SectionHeader sectionKey="experience" />
         {sections.experience.expanded && (
-          <div className="p-4 space-y-4 border-t border-border">
+          <div className="p-5 space-y-5 bg-background">
             <div className="space-y-4">
-              <div className="space-y-3 p-4 bg-secondary/30 rounded-lg">
-                <input
-                  type="text"
-                  placeholder="Company"
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  className="w-full px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                />
-                <input
-                  type="text"
-                  placeholder="Position"
-                  value={position}
-                  onChange={(e) => setPosition(e.target.value)}
-                  className="w-full px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                />
+              <div className="space-y-4 p-5 bg-primary/3 border border-primary/10 rounded-xl">
                 <div className="grid gap-2">
-                  <label className="text-xs font-medium text-muted-foreground">Duration</label>
+                  <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Company</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Tech Corporation"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-lg bg-background border border-border/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Position</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Senior Software Engineer"
+                    value={position}
+                    onChange={(e) => setPosition(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-lg bg-background border border-border/40 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Duration</label>
                   <DateRangePicker
                     value={duration}
                     onChange={setDuration}
@@ -496,7 +506,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-3 pt-2">
                   {bullets.experience.map((bullet, idx) => (
                     <BulletEditor
                       key={bullet.id}
@@ -514,8 +524,8 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                   ))}
                 </div>
 
-                <Button variant="outline" size="sm" className="w-full" onClick={handleAddBullet}>
-                  Add bullet point
+                <Button variant="outline" size="sm" className="w-full font-medium" onClick={handleAddBullet}>
+                  + Add Bullet Point
                 </Button>
               </div>
             </div>
@@ -524,50 +534,51 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
       </div>
 
       {/* Education Section */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      <div className="border border-border/30 rounded-xl overflow-hidden bg-white dark:bg-card shadow-sm">
         <SectionHeader sectionKey="education" />
         {sections.education.expanded && (
-          <div className="p-4 space-y-3 border-t border-border">
-            <div className="space-y-3">
-              {educationEntries.map((entry) => (
-                <div key={entry.id} className="rounded-xl border border-border bg-background p-4 space-y-3">
+          <div className="p-5 space-y-4 bg-background">
+            <div className="space-y-4">
+              {educationEntries.map((entry, idx) => (
+                <div key={entry.id} className="rounded-xl border border-border/30 bg-primary/2 p-5 space-y-4 hover:border-border/50 transition-colors">
                   <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-sm font-medium">Education entry</h4>
+                    <h4 className="text-sm font-semibold text-foreground">Education Entry {idx + 1}</h4>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteEducationEntry(entry.id)}
                       disabled={educationEntries.length === 1}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       Remove
                     </Button>
                   </div>
-                  <div className="grid gap-3 md:grid-cols-2">
+                  <div className="grid gap-4 md:grid-cols-2">
                     <div className="grid gap-2">
-                      <label className="text-xs font-medium text-muted-foreground">School</label>
+                      <label className="text-xs font-semibold text-foreground uppercase tracking-wide">School</label>
                       <input
                         value={entry.school}
                         onChange={(e) =>
                           handleUpdateEducationEntry(entry.id, { school: e.target.value })
                         }
-                        placeholder="State University"
-                        className="w-full px-3 py-2 rounded border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="e.g., State University"
+                        className="w-full px-4 py-2.5 rounded-lg border border-border/40 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
                       />
                     </div>
                     <div className="grid gap-2">
-                      <label className="text-xs font-medium text-muted-foreground">Degree</label>
+                      <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Degree</label>
                       <input
                         value={entry.degree}
                         onChange={(e) =>
                           handleUpdateEducationEntry(entry.id, { degree: e.target.value })
                         }
-                        placeholder="B.S. Computer Science"
-                        className="w-full px-3 py-2 rounded border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="e.g., B.S. Computer Science"
+                        className="w-full px-4 py-2.5 rounded-lg border border-border/40 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
                       />
                     </div>
                   </div>
                   <div className="grid gap-2">
-                    <label className="text-xs font-medium text-muted-foreground">Duration</label>
+                    <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Duration</label>
                     <DateRangePicker
                       value={entry.duration}
                       onChange={(value) => handleUpdateEducationEntry(entry.id, { duration: value })}
@@ -576,55 +587,58 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                   </div>
                 </div>
               ))}
-              <Button variant="outline" size="sm" onClick={handleAddEducationEntry} className="w-full">
-                Add Education
+              <Button variant="outline" size="sm" onClick={handleAddEducationEntry} className="w-full font-medium">
+                + Add Education
               </Button>
             </div>
           </div>
         )}
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-5 lg:grid-cols-2">
         {/* Skills Section */}
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-border/30 rounded-xl overflow-hidden bg-white dark:bg-card shadow-sm">
           <SectionHeader sectionKey="skills" />
           {sections.skills.expanded && (
-            <div className="p-4 space-y-3 border-t border-border">
-              <div className="grid gap-3">
+            <div className="p-5 space-y-4 bg-background">
+              <div className="grid gap-4">
                 {skills.map((group) => (
-                  <div key={group.id} className="rounded-xl border border-border bg-background p-4 space-y-3">
+                  <div key={group.id} className="rounded-xl border border-border/30 bg-primary/2 p-5 space-y-4 hover:border-border/50 transition-colors">
                     <div className="flex items-center gap-2">
                       <input
                         value={group.label}
                         onChange={(e) => handleUpdateSkillGroup(group.id, { label: e.target.value })}
                         placeholder="Category name"
-                        className="flex-1 min-w-0 px-3 py-2 rounded border border-border bg-background text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary"
+                        className="flex-1 min-w-0 px-4 py-2.5 rounded-lg border border-border/40 bg-background text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
                       />
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">
-                        {group.items.length} items
+                      <span className="text-xs text-muted-foreground font-medium whitespace-nowrap bg-primary/10 px-2.5 py-1.5 rounded-lg">
+                        {group.items.length}
                       </span>
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="icon-sm"
                         onClick={() => handleDeleteSkillGroup(group.id)}
                         title="Remove category"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
                       >
                         <X className="w-4 h-4" />
                       </Button>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      {group.items.map((skill) => (
-                        <button
-                          key={skill}
-                          type="button"
-                          onClick={() => handleDeleteSkill(group.id, skill)}
-                          className="rounded-full border border-border bg-secondary px-3 py-1 text-xs hover:bg-destructive/10 hover:border-destructive transition-colors"
-                          title="Click to remove"
-                        >
-                          {skill}
-                        </button>
-                      ))}
-                    </div>
+                    {group.items.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {group.items.map((skill) => (
+                          <button
+                            key={skill}
+                            type="button"
+                            onClick={() => handleDeleteSkill(group.id, skill)}
+                            className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-destructive/20 hover:border-destructive/50 hover:text-destructive transition-all"
+                            title="Click to remove"
+                          >
+                            {skill} ×
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     <div className="flex flex-col sm:flex-row gap-2">
                       <input
                         value={skillInputs[group.id] ?? ''}
@@ -637,75 +651,83 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
                             handleAddSkillToGroup(group.id)
                           }
                         }}
-                        placeholder="Add item and press Enter"
-                        className="flex-1 px-3 py-2 rounded border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Add skill and press Enter"
+                        className="flex-1 px-4 py-2.5 rounded-lg border border-border/40 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
                       />
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleAddSkillToGroup(group.id)}
+                        className="font-medium"
                       >
-                        Add item
+                        Add
                       </Button>
                     </div>
                   </div>
                 ))}
-                <Button variant="outline" size="sm" onClick={handleAddSkillGroup} className="w-full">
-                  Add Skill Category
+                <Button variant="outline" size="sm" onClick={handleAddSkillGroup} className="w-full font-medium">
+                  + Add Category
                 </Button>
-                <div className="text-xs text-muted-foreground">
-                  Click any chip to remove it. You can rename or remove whole categories too.
-                </div>
               </div>
             </div>
           )}
         </div>
 
         {/* Custom Fields */}
-        <div className="border border-border rounded-lg overflow-hidden">
-          <div className="p-4 bg-secondary/50">
-            <h3 className="font-semibold">Custom Fields</h3>
+        <div className="border border-border/30 rounded-xl overflow-hidden bg-white dark:bg-card shadow-sm">
+          <div className="p-4 bg-gradient-to-r from-primary/8 to-primary/3 border-b border-border/20">
+            <h3 className="font-semibold text-sm text-foreground">Custom Fields</h3>
             <p className="text-xs text-muted-foreground mt-1">
-              Use this for portfolio, location, awards, certifications, or any extra field you want.
+              Portfolio, location, awards, certifications, or anything else
             </p>
           </div>
-          <div className="p-4 space-y-3 border-t border-border">
+          <div className="p-5 space-y-4 bg-background">
             {customFields.length > 0 ? (
-              customFields.map((field) => (
-                <div key={field.id} className="grid grid-cols-1 gap-2">
-                  <div className="grid gap-2 md:grid-cols-[1fr_auto]">
-                    <input
-                      type="text"
-                      value={field.label}
-                      onChange={(e) => handleUpdateCustomField(field.id, { label: e.target.value })}
-                      placeholder="Field label"
-                      className="w-full px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
+              customFields.map((field, idx) => (
+                <div key={field.id} className="rounded-xl border border-border/30 bg-primary/2 p-5 space-y-3 hover:border-border/50 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-sm font-semibold text-foreground">Field {idx + 1}</h4>
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => handleDeleteCustomField(field.id)}
-                      className="md:w-auto"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
                     >
                       Remove
                     </Button>
                   </div>
-                  <input
-                    type="text"
-                    value={field.value}
-                    onChange={(e) => handleUpdateCustomField(field.id, { value: e.target.value })}
-                    placeholder="Field value"
-                    className="w-full px-3 py-2 rounded bg-background border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                  />
+                  <div className="grid gap-3">
+                    <div className="grid gap-2">
+                      <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Label</label>
+                      <input
+                        type="text"
+                        value={field.label}
+                        onChange={(e) => handleUpdateCustomField(field.id, { label: e.target.value })}
+                        placeholder="e.g., Certifications"
+                        className="w-full px-4 py-2.5 rounded-lg border border-border/40 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
+                      />
+                    </div>
+                    <div className="grid gap-2">
+                      <label className="text-xs font-semibold text-foreground uppercase tracking-wide">Value</label>
+                      <input
+                        type="text"
+                        value={field.value}
+                        onChange={(e) => handleUpdateCustomField(field.id, { value: e.target.value })}
+                        placeholder="Enter the value"
+                        className="w-full px-4 py-2.5 rounded-lg border border-border/40 bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition-colors"
+                      />
+                    </div>
+                  </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">
-                Add optional fields like certifications, portfolio, location, or anything else you want to show.
-              </p>
+              <div className="text-center py-8">
+                <p className="text-sm text-muted-foreground">No custom fields yet</p>
+                <p className="text-xs text-muted-foreground mt-1">Add fields to showcase additional achievements</p>
+              </div>
             )}
-            <Button variant="outline" size="sm" onClick={handleAddCustomField} className="w-full">
-              Add Field
+            <Button variant="outline" size="sm" onClick={handleAddCustomField} className="w-full font-medium">
+              + Add Field
             </Button>
           </div>
         </div>
