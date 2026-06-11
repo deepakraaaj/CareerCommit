@@ -11,30 +11,19 @@ import { supabasePlaceholder } from '@/lib/supabase-placeholder'
 
 export default function SettingsPage() {
   const router = useRouter()
-  const { user, loading } = useAuth()
+  const { user, loading, profile, refreshProfile } = useAuth()
   const [fullName, setFullName] = useState('')
   const [savedChanges, setSavedChanges] = useState(false)
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
-    let active = true
-
     if (!user) {
       setFullName('')
-      return () => {
-        active = false
-      }
+      return
     }
 
-    supabasePlaceholder.getProfile(user.id).then((profile) => {
-      if (!active) return
-      setFullName(profile?.name || user.user_metadata?.full_name || user.email || '')
-    })
-
-    return () => {
-      active = false
-    }
-  }, [user])
+    setFullName(profile?.name || user.user_metadata?.full_name || user.email || '')
+  }, [profile, user])
 
   const handleSave = async () => {
     if (!user) {
@@ -54,6 +43,8 @@ export default function SettingsPage() {
     })
 
     if (result) {
+      setFullName(result.name)
+      await refreshProfile()
       setSavedChanges(true)
       window.setTimeout(() => setSavedChanges(false), 2000)
     }
@@ -62,7 +53,7 @@ export default function SettingsPage() {
   }
 
   const handleCancel = () => {
-    setFullName(user?.user_metadata?.full_name || user?.email || '')
+    setFullName(profile?.name || user?.user_metadata?.full_name || user?.email || '')
   }
 
   return (

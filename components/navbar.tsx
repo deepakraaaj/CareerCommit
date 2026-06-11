@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, X, ChevronDown, LogOut, Shield, Zap, FileText } from 'lucide-react'
+import { Menu, X, ChevronDown, Shield, FileText } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
 import { Button } from '@/components/ui/button'
@@ -12,17 +12,18 @@ export function Navbar() {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const { user, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
 
   const isActive = (href: string) => pathname === href
 
   const navItems = [
     { href: '/editor', label: 'Editor', icon: FileText },
-    { href: '/export', label: 'Export', icon: Zap },
     { href: '/jd-matcher', label: 'Job Matcher', icon: Shield },
   ]
 
-  const dashboardItems = user ? [{ href: '/dashboard', label: 'My Resumes' }] : []
+  const dashboardItems = user ? [{ href: '/resumes', label: 'Resumes' }] : []
+  const displayName = profile?.name || user?.email?.split('@')[0] || 'Account'
+  const displayInitial = displayName.charAt(0).toUpperCase()
 
   const handleSignOut = async () => {
     await signOut()
@@ -84,20 +85,21 @@ export function Navbar() {
                     className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm text-foreground/70 hover:bg-secondary transition-colors group"
                   >
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary to-blue-600 flex items-center justify-center text-xs font-bold text-white">
-                      {user.email?.charAt(0).toUpperCase()}
+                      {displayInitial}
                     </div>
-                    <span className="hidden lg:inline">{user.email?.split('@')[0]}</span>
+                    <span className="hidden lg:inline">{displayName}</span>
                     <ChevronDown className="w-4 h-4 group-hover:text-foreground" />
                   </button>
 
                   {userMenuOpen && (
                     <div className="absolute top-full right-0 mt-2 w-48 rounded-xl border border-border/50 bg-card shadow-xl p-2 z-50">
                       <div className="px-3 py-2 text-xs text-foreground/60 border-b border-border/30 mb-2">
-                        {user.email}
+                        <div className="font-medium text-foreground">{displayName}</div>
+                        <div>{user.email}</div>
                       </div>
-                      <Link href="/dashboard">
+                      <Link href="/resumes">
                         <button className="w-full px-3 py-2 rounded-lg text-sm text-left text-foreground/70 hover:bg-secondary hover:text-foreground transition-colors">
-                          📊 My Resumes
+                          📊 Resumes
                         </button>
                       </Link>
                       <button

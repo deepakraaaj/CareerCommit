@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
-import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive } from 'lucide-react'
+import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { EditorSections } from '@/components/editor/editor-sections'
 import { supabasePlaceholder, type DbResume } from '@/lib/supabase-placeholder'
@@ -56,60 +56,29 @@ function formatRelativeTime(value: Date | null) {
   return `Saved ${value.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
 }
 
-const DEFAULT_RESUME_DATA: EditorContent = {
-  name: 'Alex Morgan',
-  title: 'Senior Full Stack Engineer',
-  email: 'alex.morgan@design.com',
-  phone: '+1 (555) 019-2834',
-  linkedin: 'https://linkedin.com/in/alexmorgan',
-  github: 'https://github.com/alexmorgan',
-  sectionTitles: {
-    summary: 'Professional Summary',
-    experience: 'Experience',
-    education: 'Education',
-    skills: 'Skills',
-  },
-  summary: 'Passionate and results-driven Software Engineer with over 6 years of experience building scalable web applications. Expert in React, Next.js, Node.js, and modern cloud infrastructure. Dedicated to writing clean, maintainable code and mentoring developers to achieve high-velocity product delivery. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
-  experiences: [
-    {
-      id: 'exp-1',
-      company: 'InnovateTech Solutions',
-      position: 'Lead Software Engineer',
-      duration: '2022 - Present',
-      bullets: [
-        { id: 'b1-1', text: 'Architected and built a micro-frontend dashboard using Next.js, reducing bundle size by 40% and improving page load speeds by 1.2 seconds.' },
-        { id: 'b1-2', text: 'Spearheaded the migration of legacy REST APIs to GraphQL, increasing developer productivity by 25% and reducing server roundtrips.' },
-        { id: 'b1-3', text: 'Mentored a team of 4 junior developers, conducting regular code reviews and introducing testing best practices with Jest and Cypress.' }
-      ],
-      expanded: true
+function createBlankResumeData(): EditorContent {
+  return {
+    name: '',
+    title: '',
+    email: '',
+    phone: '',
+    linkedin: '',
+    github: '',
+    sectionTitles: {
+      summary: 'Professional Summary',
+      experience: 'Experience',
+      education: 'Education',
+      skills: 'Skills',
     },
-    {
-      id: 'exp-2',
-      company: 'CloudScale Inc.',
-      position: 'Senior Frontend Developer',
-      duration: '2020 - 2022',
-      bullets: [
-        { id: 'b2-1', text: 'Redesigned the core e-commerce platform using TailwindCSS and React, resulting in a 15% increase in conversion rate and seamless mobile responsive layouts.' },
-        { id: 'b2-2', text: 'Optimized state management using Redux Toolkit and swr, eliminating redundant API requests and saving $5k/month in server costs.' }
-      ],
-      expanded: false
-    }
-  ],
-  educationEntries: [
-    { id: 'edu-1', school: 'University of Washington', degree: 'B.S. in Computer Science', duration: '2016 - 2020', expanded: false }
-  ],
-  skills: [
-    { id: 'skills-1', label: 'Languages', items: ['JavaScript', 'TypeScript', 'Python', 'Go', 'SQL', 'HTML/CSS'] },
-    { id: 'skills-2', label: 'Frameworks', items: ['React', 'Next.js', 'Node.js', 'Express', 'TailwindCSS', 'Redux'] },
-    { id: 'skills-3', label: 'Tools & Cloud', items: ['Docker', 'AWS', 'Vercel', 'Git', 'GraphQL', 'PostgreSQL'] }
-  ],
-  customFields: [
-    { id: 'cf-1', label: 'Certifications', value: 'AWS Certified Solutions Architect (2024)' },
-    { id: 'cf-2', label: 'Languages Spoken', value: 'English (Native), Spanish (Conversational)' }
-  ],
-  accentColor: 'blue',
-  density: 'auto',
-  fontFamily: 'sans'
+    summary: '',
+    experiences: [],
+    educationEntries: [],
+    skills: [],
+    customFields: [],
+    accentColor: 'blue',
+    density: 'auto',
+    fontFamily: 'sans',
+  }
 }
 
 const COLOR_OPTIONS = [
@@ -123,9 +92,9 @@ const COLOR_OPTIONS = [
 ]
 
 // Initialize resume ID synchronously before component render
-function getOrCreateResumeId(): string {
+function getOrCreateResumeId(forceNew = false): string {
   const stored = typeof window !== 'undefined' ? localStorage.getItem('career-commit-resume-id') : null
-  if (stored) return stored
+  if (!forceNew && stored) return stored
 
   const newId = crypto.randomUUID()
   if (typeof window !== 'undefined') {
@@ -137,12 +106,15 @@ function getOrCreateResumeId(): string {
 export default function Editor() {
   const { user, profile, signOut } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const isNewResume = searchParams.get('new') === '1'
   const [versionId, setVersionId] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [resumeName, setResumeName] = useState('My Resume')
+  const [resumeName, setResumeName] = useState(isNewResume ? 'New Resume' : 'My Resume')
   const [isEditingName, setIsEditingName] = useState(false)
-  const [tempName, setTempName] = useState('My Resume')
-  const resumeId = getOrCreateResumeId()
+  const [tempName, setTempName] = useState(isNewResume ? 'New Resume' : 'My Resume')
+  const [resumeId, setResumeId] = useState(() => getOrCreateResumeId(isNewResume))
 
   const [draftStatus, setDraftStatus] = useState<'unsaved' | 'draft_saved' | 'ready_to_save'>(
     'draft_saved'
@@ -156,7 +128,7 @@ export default function Editor() {
   const [fontFamily, setFontFamily] = useState<'sans' | 'serif' | 'mono'>('sans')
 
   const [preview, setPreview] = useState('')
-  const [editorContent, setEditorContent] = useState<EditorContent>(DEFAULT_RESUME_DATA)
+  const [editorContent, setEditorContent] = useState<EditorContent>(createBlankResumeData())
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [versionModalOpen, setVersionModalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -164,6 +136,7 @@ export default function Editor() {
 
   const displayName = profile?.name || user?.email?.split('@')[0] || 'Account'
   const displayEmail = user?.email || 'No email available'
+  const isActiveRoute = (href: string) => pathname === href
 
   // Extract versionId from URL
   useEffect(() => {
@@ -173,6 +146,21 @@ export default function Editor() {
 
   // Load Initial State
   useEffect(() => {
+    if (isNewResume) {
+      const blank = createBlankResumeData()
+      const freshResumeId = getOrCreateResumeId(true)
+      setResumeId(freshResumeId)
+      setVersionId(null)
+      setResumeName('New Resume')
+      setTempName('New Resume')
+      setEditorContent(blank)
+      setAccentColor(blank.accentColor)
+      setDensity(blank.density)
+      setFontFamily(blank.fontFamily)
+      setPreview('')
+      return
+    }
+
     // If versionId is in URL, fetch that version
     if (versionId) {
       console.log('[Editor] Loading version:', versionId)
@@ -219,14 +207,16 @@ export default function Editor() {
     loadResumes().then((rows) => {
       if (rows && rows[0]) {
         setResumeName(rows[0].name)
-        setEditorContent(DEFAULT_RESUME_DATA)
-        triggerPreviewUpdate(DEFAULT_RESUME_DATA)
+        const blank = createBlankResumeData()
+        setEditorContent(blank)
+        triggerPreviewUpdate(blank)
       } else {
-        setEditorContent(DEFAULT_RESUME_DATA)
-        triggerPreviewUpdate(DEFAULT_RESUME_DATA)
+        const blank = createBlankResumeData()
+        setEditorContent(blank)
+        triggerPreviewUpdate(blank)
       }
     })
-  }, [versionId, user?.id])
+  }, [isNewResume, versionId, user?.id])
 
   useEffect(() => {
     if (!userMenuOpen) return
@@ -413,6 +403,28 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
     setUserMenuOpen(false)
   }
 
+  const handleCreateNewResume = () => {
+    const nextPath = '/editor?new=1'
+
+    if (isNewResume) {
+      const blank = createBlankResumeData()
+      const freshResumeId = getOrCreateResumeId(true)
+      setResumeId(freshResumeId)
+      setVersionId(null)
+      setResumeName('New Resume')
+      setTempName('New Resume')
+      setEditorContent(blank)
+      setAccentColor(blank.accentColor)
+      setDensity(blank.density)
+      setFontFamily(blank.fontFamily)
+      setPreview('')
+      localStorage.removeItem('career-commit-editor-state')
+      return
+    }
+
+    router.push(nextPath)
+  }
+
 
   const resumeStrength = useMemo(() => {
     if (!editorContent) return 0
@@ -451,7 +463,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
       <div className="h-screen overflow-hidden flex flex-col bg-slate-50 text-slate-800">
         
         {/* Workspace Toolbar (Controls) */}
-        <div className="shrink-0 border-b border-slate-200/80 bg-white px-6 py-3.5 flex flex-col md:flex-row gap-4 items-center justify-between z-10 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+        <div className="shrink-0 border-b border-slate-200/80 bg-white px-4 py-3.5 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-4 items-center justify-between z-10 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
           
           {/* Left: Logo, Separator, Document Details, Save Status Badge */}
           <div className="flex items-center gap-4 min-w-0 w-full md:w-auto">
@@ -466,6 +478,38 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
             </Link>
             
             <div className="h-6 w-px bg-slate-200 hidden sm:block" />
+
+            {user && (
+              <div className="hidden xl:flex items-center gap-1">
+                <Link href="/resumes">
+                  <Button
+                    variant={isActiveRoute('/resumes') ? 'default' : 'ghost'}
+                    size="sm"
+                    className="text-xs font-semibold"
+                  >
+                    Resumes
+                  </Button>
+                </Link>
+                <Link href="/jd-matcher">
+                  <Button
+                    variant={isActiveRoute('/jd-matcher') ? 'default' : 'ghost'}
+                    size="sm"
+                    className="text-xs font-semibold"
+                  >
+                    Job Matcher
+                  </Button>
+                </Link>
+                <Link href="/editor">
+                  <Button
+                    variant={isActiveRoute('/editor') ? 'default' : 'ghost'}
+                    size="sm"
+                    className="text-xs font-semibold"
+                  >
+                    Editor
+                  </Button>
+                </Link>
+              </div>
+            )}
             
             <div className="flex items-center gap-3 min-w-0">
               <div className="min-w-0">
@@ -643,6 +687,16 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                 PDF
               </Button>
 
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleCreateNewResume}
+                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                New
+              </Button>
+
               <div className="h-6 w-px bg-slate-200 mx-1" />
 
               {user ? (
@@ -670,11 +724,25 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                         <div className="truncate text-xs text-slate-500">{displayEmail}</div>
                       </div>
                       <Link
-                        href="/dashboard"
+                        href="/resumes"
                         onClick={() => setUserMenuOpen(false)}
                         className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
                       >
-                        📊 My Resumes
+                        📊 Resumes
+                      </Link>
+                      <Link
+                        href="/jd-matcher"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+                      >
+                        🧩 Job Matcher
+                      </Link>
+                      <Link
+                        href="/editor"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+                      >
+                        ✏️ Editor
                       </Link>
                       <button
                         type="button"
@@ -704,7 +772,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
           
           {/* Left Side: Scrollable Input Form */}
-          <div className="w-full lg:w-[55%] h-full overflow-y-auto px-6 py-6 border-r border-slate-200/80 bg-[#FAF9F6] custom-scrollbar">
+          <div className="w-full lg:w-[55%] h-full overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 border-r border-slate-200/80 bg-[#FAF9F6] custom-scrollbar">
             {editorContent && (
               <EditorSections
                 initialContent={editorContent}
@@ -717,6 +785,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
           <div className="w-full lg:w-[45%] h-full overflow-y-hidden bg-slate-100">
             <ResumePreview
               name={resumeName}
+              currentVersion={1}
               draftStatus={draftStatus}
               preview={preview}
               template={template}

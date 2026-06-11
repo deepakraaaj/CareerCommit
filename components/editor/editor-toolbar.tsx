@@ -14,7 +14,7 @@ export function EditorToolbar({ resumeName, wordCount, isSaved, onSave }: Editor
   return (
     <>
       <div className="bg-card border-b border-border sticky top-16 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div className="px-4 py-3 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-semibold">{resumeName}</h2>
             <p className="text-xs text-muted-foreground">{wordCount} words</p>

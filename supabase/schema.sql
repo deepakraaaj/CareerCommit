@@ -31,6 +31,9 @@ create table if not exists public.resume_versions (
   version_number integer not null default 1,
   saved_by text not null default 'Manual',
   fit_score integer not null default 0,
+  content_snapshot jsonb not null default '{}'::jsonb,
+  change_notes text,
+  section_changes jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 

@@ -44,10 +44,10 @@ export default function Resumes() {
             description="Browse and manage your saved resume history."
             action={
               user ? (
-                <Link href="/upload">
+                <Link href="/editor?new=1">
                   <Button>
                     <Plus className="w-4 h-4 mr-2" />
-                    New Resume
+                    Create New
                   </Button>
                 </Link>
               ) : (

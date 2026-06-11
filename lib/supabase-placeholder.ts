@@ -78,6 +78,9 @@ export interface DbResumeVersion {
   version_number: number
   saved_by: 'Manual' | 'AI Assist' | 'JD Matcher' | 'Upload Parser'
   fit_score: number
+  content_snapshot?: Record<string, unknown>
+  change_notes?: string
+  section_changes?: Record<string, 'added' | 'modified' | 'removed' | 'unchanged'>
   created_at: string
 }
 
@@ -173,35 +176,61 @@ export const supabasePlaceholder = {
   },
 
   getResumes: async (userId?: string) => {
-    const supabase = getSupabaseOrNull()
-    if (!supabase) return []
+    if (!userId) return []
 
-    const resolvedUserId = userId || (await getCurrentUserId(supabase))
-    if (!resolvedUserId) return []
+    try {
+      const response = await fetch(`/api/resumes/list?userId=${userId}`)
 
-    const query = supabase
-      .from('resumes')
-      .select('*')
-      .eq('user_id', resolvedUserId)
-      .order('updated_at', { ascending: false })
-    const data = await safeSelect<DbResume[]>(query)
-    return data ?? []
+      if (!response.ok) return []
+
+      const result = await response.json()
+      return result.data as DbResume[]
+    } catch (error) {
+      console.error('[API] getResumes error:', error)
+      return []
+    }
   },
 
   saveResume: async (userId: string, resume: DbResume) => {
-    const supabase = getSupabaseOrNull()
-    if (!supabase) return null
-
-    const currentUserId = await getCurrentUserId(supabase)
-    if (!currentUserId && !userId) {
-      console.warn('[Supabase] Skipping resume save because no authenticated user is available.')
-      return null
+    if (!userId) {
+      throw new Error('No userId provided')
     }
 
-    const payload = { ...resume, user_id: userId || currentUserId }
-    return safeSelect<DbResume>(
-      supabase.from('resumes').upsert(payload, { onConflict: 'id' }).select('*').single()
-    )
+    const payload = {
+      id: resume.id,
+      user_id: userId,
+      name: resume.name,
+      title: resume.title,
+      template: resume.template,
+      content_text: resume.content_text,
+      created_at: resume.created_at,
+      updated_at: new Date().toISOString()
+    }
+
+    try {
+      console.log('[API] Saving resume...')
+
+      const response = await fetch('/api/resumes/save', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Save failed')
+      }
+
+      console.log('[API] ✅ Save successful')
+      return resume
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error('[API] Error:', message)
+      throw error
+    }
   },
 
   deleteResume: async (resumeId: string) => {
@@ -217,23 +246,24 @@ export const supabasePlaceholder = {
   },
 
   getVersions: async (resumeId?: string, userId?: string) => {
-    const supabase = getSupabaseOrNull()
-    if (!supabase) return []
-    if (resumeId && !isUuidLike(resumeId)) return []
+    if (!userId) return []
 
-    const currentUserId = userId || (await getCurrentUserId(supabase))
-    if (!currentUserId) return []
+    try {
+      let url = `/api/resumes/versions?userId=${userId}`
+      if (resumeId) {
+        url += `&resumeId=${resumeId}`
+      }
 
-    let query = supabase
-      .from('resume_versions')
-      .select('*')
-      .eq('user_id', currentUserId)
-      .order('version_number', { ascending: false })
-    if (resumeId) {
-      query = query.eq('resume_id', resumeId)
+      const response = await fetch(url)
+
+      if (!response.ok) return []
+
+      const result = await response.json()
+      return result.data as DbResumeVersion[]
+    } catch (error) {
+      console.error('[API] getVersions error:', error)
+      return []
     }
-    const data = await safeSelect<DbResumeVersion[]>(query)
-    return data ?? []
   },
 
   saveVersion: async (version: DbResumeVersion) => {
