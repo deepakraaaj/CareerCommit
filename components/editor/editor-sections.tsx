@@ -614,9 +614,9 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
 
   return (
     <div className="space-y-6 pr-1">
-      {/* Quick Navigation Tabs - Pipeline Stepper Style */}
-      <div className="sticky top-0 z-30 bg-[#FAF9F6] pb-3 pt-2 mb-4 w-full">
-        <div className="flex h-9 w-full rounded-full overflow-hidden p-[2px] bg-white border border-slate-200 shadow-sm">
+      {/* Quick Navigation Tabs - Pipeline Stepper Style with Connection Arrow */}
+      <div className="sticky top-0 z-30 bg-[#FAF9F6] pb-1 pt-2 mb-0 w-full relative">
+        <div className="flex h-9 w-full rounded-full p-[2px] bg-white border border-slate-200 shadow-sm relative z-20">
           {[
             { id: 'personal', label: 'Personal Info' },
             { id: 'summary', label: 'Summary' },
@@ -640,26 +640,47 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
               clipPath = 'polygon(0 0, calc(100% - 16px) 0, 100% 50%, calc(100% - 16px) 100%, 0 100%, 16px 50%)';
             }
 
-            const colors: Record<string, { active: string; inactive: string }> = {
-              personal: { active: 'bg-indigo-200 text-indigo-900 font-bold', inactive: 'bg-indigo-50/60 text-indigo-700 hover:bg-indigo-100/80' },
-              summary: { active: 'bg-violet-200 text-violet-900 font-bold', inactive: 'bg-violet-50/60 text-violet-700 hover:bg-violet-100/80' },
-              experience: { active: 'bg-blue-200 text-blue-900 font-bold', inactive: 'bg-blue-50/60 text-blue-700 hover:bg-blue-100/80' },
-              education: { active: 'bg-emerald-200 text-emerald-900 font-bold', inactive: 'bg-emerald-50/60 text-emerald-700 hover:bg-emerald-100/80' },
-              skills: { active: 'bg-amber-200 text-amber-900 font-bold', inactive: 'bg-amber-50/60 text-amber-700 hover:bg-amber-100/80' },
-              custom: { active: 'bg-rose-200 text-rose-900 font-bold', inactive: 'bg-rose-50/60 text-rose-700 hover:bg-rose-100/80' },
+            const colors: Record<string, { active: string; inactive: string; text: string; arrowBg: string; borderColor: string }> = {
+              personal: { active: 'bg-indigo-200', inactive: 'bg-indigo-50/60 hover:bg-indigo-100/80', text: 'text-indigo-900', arrowBg: 'bg-indigo-200', borderColor: '#4f46e5' },
+              summary: { active: 'bg-violet-200', inactive: 'bg-violet-50/60 hover:bg-violet-100/80', text: 'text-violet-900', arrowBg: 'bg-violet-200', borderColor: '#7c3aed' },
+              experience: { active: 'bg-blue-200', inactive: 'bg-blue-50/60 hover:bg-blue-100/80', text: 'text-blue-900', arrowBg: 'bg-blue-200', borderColor: '#2563eb' },
+              education: { active: 'bg-emerald-200', inactive: 'bg-emerald-50/60 hover:bg-emerald-100/80', text: 'text-emerald-900', arrowBg: 'bg-emerald-200', borderColor: '#059669' },
+              skills: { active: 'bg-amber-200', inactive: 'bg-amber-50/60 hover:bg-amber-100/80', text: 'text-amber-900', arrowBg: 'bg-amber-200', borderColor: '#d97706' },
+              custom: { active: 'bg-rose-200', inactive: 'bg-rose-50/60 hover:bg-rose-100/80', text: 'text-rose-900', arrowBg: 'bg-rose-200', borderColor: '#e11d48' },
             };
             const colorClass = isActive ? colors[step.id].active : colors[step.id].inactive;
 
             return (
-              <button
+              <div
                 key={step.id}
-                type="button"
-                onClick={() => handleSectionSwitch(step.id as any)}
-                style={{ clipPath, marginLeft }}
-                className={`flex-1 flex items-center justify-center text-[10px] sm:text-[11px] uppercase tracking-wider transition-colors duration-200 ${paddingLeft} ${paddingRight} ${colorClass} ${!isActive && 'font-medium'}`}
+                style={{ marginLeft }}
+                className="relative flex-1 group"
               >
-                <span className="truncate">{step.label}</span>
-              </button>
+                {/* The clipped background layer */}
+                <button
+                  type="button"
+                  onClick={() => handleSectionSwitch(step.id as any)}
+                  style={{ clipPath }}
+                  className={`absolute inset-0 w-full h-full transition-colors duration-200 ${colorClass} ${idx === 0 ? 'rounded-l-full' : ''} ${idx === arr.length - 1 ? 'rounded-r-full' : ''}`}
+                />
+                
+                {/* The text layer */}
+                <button
+                   type="button"
+                   onClick={() => handleSectionSwitch(step.id as any)}
+                   className={`relative z-10 w-full h-full flex items-center justify-center text-[10px] sm:text-[11px] uppercase tracking-wider ${paddingLeft} ${paddingRight} ${isActive ? colors[step.id].text + ' font-bold' : 'text-slate-700 font-medium'}`}
+                >
+                  <span className="truncate">{step.label}</span>
+                </button>
+
+                {/* The Connecting Arrow */}
+                {isActive && (
+                  <div 
+                    className={`absolute -bottom-[8px] left-1/2 -translate-x-1/2 w-3.5 h-3.5 rotate-45 border-b-[3px] border-r-[3px] z-10 shadow-[2px_2px_2px_-1px_rgba(0,0,0,0.05)] ${colors[step.id].arrowBg}`}
+                    style={{ borderColor: colors[step.id].borderColor }}
+                  />
+                )}
+              </div>
             )
           })}
         </div>
