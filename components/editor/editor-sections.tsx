@@ -514,18 +514,17 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
     }
   }
 
-  const getPanelShellClass = (isExpanded: boolean, colorKey: string) => {
+   const getUnifiedShellClass = (colorKey: string) => {
     const activeBorders: Record<string, string> = {
-      personal: 'border-t-[4px] border-t-indigo-600 shadow-[0_6px_28px_-4px_rgba(0,0,0,0.05)] border-slate-205',
-      summary: 'border-t-[4px] border-t-violet-650 shadow-[0_6px_28px_-4px_rgba(0,0,0,0.05)] border-slate-205',
-      experience: 'border-t-[4px] border-t-blue-650 shadow-[0_6px_28px_-4px_rgba(0,0,0,0.05)] border-slate-205',
-      education: 'border-t-[4px] border-t-emerald-650 shadow-[0_6px_28px_-4px_rgba(0,0,0,0.05)] border-slate-205',
-      skills: 'border-t-[4px] border-t-amber-655 shadow-[0_6px_28px_-4px_rgba(0,0,0,0.05)] border-slate-205',
-      custom: 'border-t-[4px] border-t-rose-650 shadow-[0_6px_28px_-4px_rgba(0,0,0,0.05)] border-slate-205',
+      personal: 'border-t-indigo-600',
+      summary: 'border-t-violet-650',
+      experience: 'border-t-blue-655',
+      education: 'border-t-emerald-650',
+      skills: 'border-t-amber-655',
+      custom: 'border-t-rose-650',
     }
-    return `overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all duration-300 shadow-sm ${
-      isExpanded ? activeBorders[colorKey] : 'border-slate-200'
-    }`
+    
+    return `rounded-2xl border border-slate-205 bg-white transition-all duration-300 relative shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] border-t-[4px] ${activeBorders[colorKey]} overflow-hidden`
   }
 
   const getSectionIcon = (key: string) => {
@@ -613,9 +612,10 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
     )
 
   return (
-    <div className="space-y-6 pr-1">
+    <div className="pr-1 pb-10">
+      <div className={getUnifiedShellClass(activeSection)}>
       {/* Quick Navigation Tabs - Pipeline Stepper Style with Connection Arrow */}
-      <div className="sticky top-0 z-30 bg-[#FAF9F6] pb-2 pt-2 mb-0 w-full relative">
+      <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md pb-2 pt-4 px-5 w-full relative border-b border-slate-200">
         <div className="flex h-11 w-full rounded-full p-[3px] bg-white border border-slate-200 shadow-sm relative z-20">
           {[
             { id: 'personal', label: 'Personal Info' },
@@ -676,8 +676,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
                 {/* The Connecting Arrow */}
                 {isActive && (
                   <div 
-                    className={`absolute -bottom-[12px] left-1/2 -translate-x-1/2 w-5 h-5 rotate-45 border-b-[4px] border-r-[4px] z-10 shadow-[3px_3px_4px_-2px_rgba(0,0,0,0.05)] ${colors[step.id].arrowBg}`}
-                    style={{ borderColor: colors[step.id].borderColor }}
+                    className={`absolute -bottom-[14px] left-1/2 -translate-x-1/2 w-5 h-5 rotate-45 border-b-[1px] border-r-[1px] border-slate-200 z-10 shadow-[2px_2px_4px_-2px_rgba(0,0,0,0.05)] ${colors[step.id].arrowBg}`}
                   />
                 )}
               </div>
@@ -686,9 +685,10 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
         </div>
       </div>
 
+      <div className="relative bg-white min-h-[500px]">
       {/* 1. Personal Info */}
       {activeSection === 'personal' && (
-        <div className={getPanelShellClass(true, 'personal')} id="sec-personal">
+        <div id="sec-personal" className="animate-in fade-in duration-300">
           <div className={panelHeader}>
             <div className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left">
               <div className="flex items-center gap-3 min-w-0">
@@ -778,7 +778,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
 
       {/* 2. Professional Summary */}
       {activeSection === 'summary' && (
-        <div className={getPanelShellClass(true, 'summary')} id="sec-summary">
+        <div id="sec-summary" className="animate-in fade-in duration-300">
           <SectionHeader 
             sectionKey="summary" 
             counts={summary.trim() ? `${summary.trim().split(/\s+/).length} words` : 'No summary written yet'} 
@@ -802,7 +802,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
 
       {/* 3. Work Experience */}
       {activeSection === 'experience' && (
-        <div className={getPanelShellClass(true, 'experience')} id="sec-experience">
+        <div id="sec-experience" className="animate-in fade-in duration-300">
           <SectionHeader 
             sectionKey="experience" 
             counts={`${experiences.length} positions · ${experiences.reduce((acc, exp) => acc + exp.bullets.length, 0)} bullets`} 
@@ -946,7 +946,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
 
       {/* 4. Education */}
       {activeSection === 'education' && (
-        <div className={getPanelShellClass(true, 'education')} id="sec-education">
+        <div id="sec-education" className="animate-in fade-in duration-300">
           <SectionHeader 
             sectionKey="education" 
             counts={`${educationEntries.length} entries`} 
@@ -1059,7 +1059,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
 
       {/* 5. Skills */}
       {activeSection === 'skills' && (
-        <div className={getPanelShellClass(true, 'skills')} id="sec-skills">
+        <div id="sec-skills" className="animate-in fade-in duration-300">
           <SectionHeader 
             sectionKey="skills" 
             counts={`${skills.reduce((sum, group) => sum + group.items.length, 0)} skills across ${skills.length} categories`} 
@@ -1166,7 +1166,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
 
       {/* 6. Custom Fields */}
       {activeSection === 'custom' && (
-        <div className={getPanelShellClass(true, 'custom')} id="sec-custom">
+        <div id="sec-custom" className="animate-in fade-in duration-300">
           <div className="border-b border-slate-100 bg-white px-6 py-5 flex items-center justify-between">
             <div className="flex items-center gap-3 min-w-0">
               <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-serif text-sm font-black shadow-inner shrink-0 ${getSectionIconBg('custom')}`}>
@@ -1238,6 +1238,8 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
           <SectionFooter current="custom" />
         </div>
       )}
+      </div>
+      </div>
 
       <AISuggestionModal
         isOpen={aiModal.isOpen}
