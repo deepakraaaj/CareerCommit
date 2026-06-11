@@ -42,6 +42,9 @@ export default function Dashboard() {
     <>
       <Navbar />
       <div className="min-h-screen bg-background">
+        <div className="absolute inset-0 -z-10 premium-grid opacity-30" />
+        <div className="absolute left-[-8rem] top-32 -z-10 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
+        <div className="absolute right-[-6rem] top-96 -z-10 h-80 w-80 rounded-full bg-accent/8 blur-3xl" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <PageHeader
             title="Dashboard"

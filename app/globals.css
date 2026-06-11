@@ -4,104 +4,168 @@
 
 :root {
   --background: 0 0% 99%;
-  --foreground: 0 0% 15%;
+  --foreground: 240 10% 10%;
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 15%;
+  --card-foreground: 240 10% 10%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 15%;
-  --primary: 248 49% 52%;
+  --popover-foreground: 240 10% 10%;
+  --primary: 142 71% 45%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 95%;
-  --secondary-foreground: 0 0% 25%;
-  --muted: 0 0% 93%;
-  --muted-foreground: 0 0% 50%;
-  --accent: 203 44% 51%;
-  --accent-foreground: 0 0% 99%;
-  --destructive: 0 70% 35%;
-  --border: 0 0% 90%;
-  --input: 0 0% 96%;
-  --ring: 248 49% 52%;
-  --chart-1: 248 49% 52%;
-  --chart-2: 203 44% 51%;
-  --chart-3: 162 44% 42%;
-  --chart-4: 54 73% 45%;
-  --chart-5: 32 95% 44%;
-  --radius: 0.5rem;
-  --sidebar: 0 0% 97%;
-  --sidebar-foreground: 0 0% 15%;
-  --sidebar-primary: 248 49% 52%;
+  --secondary: 240 10% 94%;
+  --secondary-foreground: 240 10% 20%;
+  --muted: 240 10% 88%;
+  --muted-foreground: 240 5% 45%;
+  --accent: 280 85% 65%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --border: 240 10% 88%;
+  --input: 240 10% 94%;
+  --ring: 142 71% 45%;
+  --chart-1: 142 71% 45%;
+  --chart-2: 280 85% 65%;
+  --chart-3: 50 96% 53%;
+  --chart-4: 10 86% 63%;
+  --chart-5: 200 90% 56%;
+  --radius: 0.75rem;
+  --sidebar: 0 0% 98%;
+  --sidebar-foreground: 240 10% 10%;
+  --sidebar-primary: 142 71% 45%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 0 0% 95%;
-  --sidebar-accent-foreground: 0 0% 25%;
-  --sidebar-border: 0 0% 90%;
-  --sidebar-ring: 248 49% 52%;
+  --sidebar-accent: 280 85% 65%;
+  --sidebar-accent-foreground: 0 0% 100%;
+  --sidebar-border: 240 10% 88%;
+  --sidebar-ring: 142 71% 45%;
 }
 
 .dark {
-  --background: 0 0% 12%;
-  --foreground: 0 0% 90%;
-  --card: 0 0% 18%;
-  --card-foreground: 0 0% 90%;
-  --popover: 0 0% 18%;
-  --popover-foreground: 0 0% 90%;
-  --primary: 253 71% 80%;
-  --primary-foreground: 0 0% 12%;
-  --secondary: 0 0% 25%;
-  --secondary-foreground: 0 0% 90%;
-  --muted: 0 0% 28%;
-  --muted-foreground: 0 0% 65%;
-  --accent: 209 48% 65%;
-  --accent-foreground: 0 0% 12%;
+  --background: 240 10% 6%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 12%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 12%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 142 71% 45%;
+  --primary-foreground: 240 10% 6%;
+  --secondary: 240 10% 18%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 10% 20%;
+  --muted-foreground: 240 5% 65%;
+  --accent: 280 85% 65%;
+  --accent-foreground: 240 10% 6%;
   --destructive: 0 84% 60%;
-  --border: 0 0% 25%;
-  --input: 0 0% 16%;
-  --ring: 253 71% 80%;
-  --chart-1: 253 71% 80%;
-  --chart-2: 209 48% 65%;
-  --chart-3: 151 40% 60%;
-  --chart-4: 52 76% 57%;
-  --chart-5: 38 92% 50%;
-  --sidebar: 0 0% 15%;
-  --sidebar-foreground: 0 0% 90%;
-  --sidebar-primary: 253 71% 80%;
-  --sidebar-primary-foreground: 0 0% 12%;
-  --sidebar-accent: 0 0% 25%;
-  --sidebar-accent-foreground: 0 0% 90%;
-  --sidebar-border: 0 0% 25%;
-  --sidebar-ring: 253 71% 80%;
+  --border: 240 10% 20%;
+  --input: 240 10% 16%;
+  --ring: 142 71% 45%;
+  --chart-1: 142 71% 45%;
+  --chart-2: 280 85% 65%;
+  --chart-3: 50 96% 53%;
+  --chart-4: 10 86% 63%;
+  --chart-5: 200 90% 56%;
+  --sidebar: 240 10% 10%;
+  --sidebar-foreground: 0 0% 98%;
+  --sidebar-primary: 142 71% 45%;
+  --sidebar-primary-foreground: 240 10% 6%;
+  --sidebar-accent: 280 85% 65%;
+  --sidebar-accent-foreground: 240 10% 6%;
+  --sidebar-border: 240 10% 20%;
+  --sidebar-ring: 142 71% 45%;
 }
 
 @layer base {
   * {
-    border-color: var(--border);
-  }
-  body {
-    background-color: var(--background);
-    color: var(--foreground);
+    border-color: hsl(var(--border));
   }
   html {
-    background-color: var(--background);
+    background-color: hsl(var(--background));
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+  body {
+    min-height: 100vh;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  p {
+    line-height: 1.7;
+    letter-spacing: -0.005em;
+  }
+
+  ::selection {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
   }
 }
 
 @layer components {
+  .font-display {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
   .card-premium {
-    @apply bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-shadow;
+    @apply rounded-xl border border-border/40 bg-card shadow-sm transition-all duration-200 hover:border-border/60 hover:shadow-md;
   }
-  
+
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-lg font-medium transition-colors;
+    @apply rounded-lg bg-gradient-to-r from-primary to-primary/90 px-6 py-2.5 font-semibold text-primary-foreground shadow-md transition-all hover:shadow-lg hover:shadow-primary/30 active:scale-95;
   }
-  
+
   .heading-lg {
-    @apply text-4xl font-bold text-foreground tracking-tight;
+    @apply text-6xl font-bold tracking-tight text-foreground;
   }
-  
+
   .heading-md {
-    @apply text-2xl font-semibold text-foreground;
+    @apply text-2xl font-bold text-foreground;
   }
-  
+
   .text-muted-sm {
     @apply text-sm text-muted-foreground;
+  }
+
+  .premium-chip {
+    @apply inline-flex items-center gap-2 rounded-full border border-border/50 bg-secondary px-3 py-1.5 text-xs font-medium text-muted-foreground;
+  }
+
+  .premium-shell {
+    @apply relative overflow-hidden rounded-xl border border-border/40 bg-card shadow-md;
+  }
+
+  .premium-grid {
+    background-image:
+      linear-gradient(to right, hsl(var(--border) / 0.15) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border) / 0.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent;
   }
 }

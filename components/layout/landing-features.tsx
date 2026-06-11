@@ -3,22 +3,26 @@ import { FeatureCard } from '@/components/shared/feature-card'
 
 export function LandingFeatures() {
   return (
-    <div className="py-20 md:py-32">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-semibold mb-4">Designed for Your Workflow</h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            Every feature is built around one principle: you own your resume. AI assists, but never
-            overwrites. Every save creates a version. Nothing is ever lost.
+    <section className="relative py-20 md:py-28">
+      <div className="absolute inset-x-0 top-0 -z-10 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto mb-14 max-w-3xl text-center">
+          <span className="premium-chip">Designed around control</span>
+          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
+            A workflow that feels calm, sharp, and expensive
+          </h2>
+          <p className="mt-4 text-base leading-7 text-muted-foreground sm:text-lg">
+            Every step is built so you can move quickly without losing confidence in the final
+            result. AI helps, but you stay in charge.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           {landingFeatures.map((feature) => (
             <FeatureCard key={feature.title} {...feature} />
           ))}
         </div>
       </div>
-    </div>
+    </section>
   )
 }

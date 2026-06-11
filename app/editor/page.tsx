@@ -120,12 +120,12 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
       <Navbar />
       <div className="flex flex-col h-[calc(100vh-4rem)] bg-background overflow-hidden">
         {/* Top Action Bar */}
-        <div className="bg-card border-b border-border shrink-0 z-20">
+        <div className="border-b border-border/50 shrink-0 z-20 bg-background/80 backdrop-blur-sm">
           <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-2xl font-bold">{resumeName}</h1>
-                <p className="text-sm text-muted-foreground">
+                <h1 className="text-3xl font-semibold tracking-tight">{resumeName}</h1>
+                <p className="text-sm text-muted-foreground mt-1">
                   {lastSaved ? `Saved at ${lastSaved.toLocaleTimeString()}` : 'Last edited 2 hours ago'}
                 </p>
               </div>

@@ -125,10 +125,13 @@ export default function Upload() {
       <>
         <Navbar />
         <div className="min-h-screen bg-background">
+          <div className="absolute inset-0 -z-10 premium-grid opacity-25" />
+          <div className="absolute left-[-8rem] top-20 -z-10 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
+          <div className="absolute right-[-6rem] top-40 -z-10 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="mb-12">
-              <h1 className="text-4xl font-bold mb-2">Upload Resume</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-5xl font-semibold tracking-tight mb-2">Upload Resume</h1>
+              <p className="text-lg text-muted-foreground">
                 Import your resume and we&apos;ll extract the content into an editable format.
               </p>
             </div>
@@ -138,10 +141,10 @@ export default function Upload() {
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
-              className={`card-premium p-12 border-2 border-dashed transition-all ${
+              className={`premium-shell p-12 border-2 border-dashed transition-all ${
                 dragActive
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border hover:border-primary/50'
+                  ? 'border-primary bg-primary/10 border-solid'
+                  : 'border-border/50 hover:border-primary/50 hover:bg-card/60'
               }`}
             >
               <div className="flex flex-col items-center gap-4 text-center">
@@ -175,28 +178,29 @@ export default function Upload() {
               </div>
             </div>
 
-            <div className="card-premium p-6 mt-12 bg-secondary">
+            <div className="premium-chip mt-12 p-4 inline-flex flex-col gap-2">
               <p className="text-sm text-muted-foreground">
-                CareerCommit extracts your resume content and rebuilds it into a clean editable format.
-                It does not edit the original PDF/DOCX directly.
+                <span className="font-semibold text-foreground">💡 Smart Extraction:</span> CareerCommit extracts your content and rebuilds it into an editable format. Original files stay untouched.
               </p>
             </div>
 
             {recentUploads.length > 0 && (
               <div className="mt-12">
-                <h3 className="text-lg font-semibold mb-4">Recently Uploaded</h3>
-                <div className="space-y-2">
+                <h3 className="text-2xl font-semibold mb-6">Recently Uploaded</h3>
+                <div className="grid gap-3">
                   {recentUploads.map((file) => (
-                    <div key={file.id} className="card-premium p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {file.type === 'PDF' ? (
-                          <FileText className="w-5 h-5 text-red-500" />
-                        ) : (
-                          <File className="w-5 h-5 text-blue-500" />
-                        )}
+                    <div key={file.id} className="card-premium p-5 flex items-center justify-between hover:shadow-lg transition-shadow">
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-background/60">
+                          {file.type === 'PDF' ? (
+                            <FileText className="w-6 h-6 text-red-500" />
+                          ) : (
+                            <File className="w-6 h-6 text-blue-500" />
+                          )}
+                        </div>
                         <div>
-                          <p className="text-sm font-medium">{file.name}</p>
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-sm font-semibold">{file.name}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
                             {file.type} • {(file.size / 1024).toFixed(0)} KB • {file.uploadedAt.split('T')[0]}
                           </p>
                         </div>
@@ -219,22 +223,26 @@ export default function Upload() {
     return (
       <>
         <Navbar />
-        <div className="min-h-screen bg-background">
-          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="card-premium p-8">
-              <div className="flex flex-col items-center gap-6 py-12">
-                <Loader2 className="w-12 h-12 text-primary animate-spin" />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="absolute inset-0 -z-10 premium-grid opacity-20" />
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="premium-shell p-12">
+              <div className="flex flex-col items-center gap-8">
+                <div className="relative">
+                  <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl animate-pulse" />
+                  <Loader2 className="w-16 h-16 text-primary animate-spin relative" />
+                </div>
                 <div className="text-center">
-                  <h2 className="text-2xl font-semibold mb-2">{getStatusMessage(uploadState)}</h2>
-                  <p className="text-sm text-muted-foreground">
+                  <h2 className="text-3xl font-semibold mb-2">{getStatusMessage(uploadState)}</h2>
+                  <p className="text-base text-muted-foreground">
                     {uploadState === 'uploading'
                       ? `Processing ${uploadedFile?.name}...`
                       : 'Analyzing your resume content...'}
                   </p>
                 </div>
-                <div className="w-full bg-secondary rounded-full h-1">
+                <div className="w-full max-w-xs bg-background/60 rounded-full h-2">
                   <div
-                    className="bg-primary h-1 rounded-full transition-all duration-500"
+                    className="bg-gradient-to-r from-primary to-accent h-2 rounded-full transition-all duration-500"
                     style={{ width: uploadState === 'uploading' ? '40%' : '80%' }}
                   />
                 </div>
@@ -277,13 +285,18 @@ export default function Upload() {
       <>
         <Navbar />
         <div className="min-h-screen bg-background">
+          <div className="absolute inset-0 -z-10 premium-grid opacity-25" />
+          <div className="absolute left-[-8rem] top-20 -z-10 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl" />
+          <div className="absolute right-[-6rem] top-40 -z-10 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="mb-12">
-              <div className="flex items-start gap-3 mb-4">
-                <CheckCircle2 className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-4 mb-4">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 flex-shrink-0">
+                  <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+                </div>
                 <div>
-                  <h1 className="text-3xl font-bold">Extraction Completed</h1>
-                  <p className="text-muted-foreground mt-1">
+                  <h1 className="text-4xl font-semibold tracking-tight">Extraction Completed</h1>
+                  <p className="text-muted-foreground mt-2">
                     Review the extracted information below. Confidence badges show extraction reliability.
                   </p>
                 </div>
@@ -293,7 +306,7 @@ export default function Upload() {
             <div className="grid lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2 space-y-6">
                 {/* Header Info */}
-                <div className="card-premium p-6">
+                <div className="premium-shell p-7">
                   <h3 className="text-lg font-semibold mb-4">Header Information</h3>
                   <div className="space-y-3">
                     <div className="flex items-start justify-between">
@@ -328,7 +341,7 @@ export default function Upload() {
                 </div>
 
                 {/* Experience */}
-                <div className="card-premium p-6">
+                <div className="premium-shell p-7">
                   <h3 className="text-lg font-semibold mb-4">
                     Experience ({extracted.experience.length})
                   </h3>
@@ -355,7 +368,7 @@ export default function Upload() {
 
                 {/* Projects */}
                 {extracted.projects.length > 0 && (
-                  <div className="card-premium p-6">
+                  <div className="premium-shell p-7">
                     <h3 className="text-lg font-semibold mb-4">Projects ({extracted.projects.length})</h3>
                     <div className="space-y-3">
                       {extracted.projects.map((proj, idx) => (
@@ -377,7 +390,7 @@ export default function Upload() {
 
                 {/* Education */}
                 {extracted.education.length > 0 && (
-                  <div className="card-premium p-6">
+                  <div className="premium-shell p-7">
                     <h3 className="text-lg font-semibold mb-4">Education</h3>
                     <div className="space-y-3">
                       {extracted.education.map((edu, idx) => (
@@ -402,7 +415,7 @@ export default function Upload() {
 
               {/* Right Column - Summary */}
               <div className="space-y-6">
-                <div className="card-premium p-6">
+                <div className="premium-shell p-7">
                   <h3 className="text-lg font-semibold mb-4">Extraction Summary</h3>
                   <div className="space-y-3 text-sm">
                     <div>
@@ -429,7 +442,7 @@ export default function Upload() {
                   </div>
                 </div>
 
-                <div className="card-premium p-6">
+                <div className="premium-shell p-7">
                   <h3 className="text-lg font-semibold mb-3">Skills</h3>
                   <div className="flex flex-wrap gap-2">
                     {extracted.skills.map((skill) => (
