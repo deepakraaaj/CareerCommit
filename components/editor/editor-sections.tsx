@@ -1,15 +1,44 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Check, ChevronDown, Edit2, X } from 'lucide-react'
+import { Check, ChevronDown, Edit2, X, Trash2, ArrowUp, ArrowDown, Sparkles, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { AISuggestionModal } from './ai-suggestion-modal'
 import { BulletEditor } from './bullet-editor'
 
-interface Section {
-  title: string
-  expanded: boolean
+interface Bullet {
+  id: string
+  text: string
+}
+
+interface ExperienceEntry {
+  id: string
+  company: string
+  position: string
+  duration: string
+  bullets: Bullet[]
+  expanded?: boolean
+}
+
+interface EducationEntry {
+  id: string
+  school: string
+  degree: string
+  duration: string
+  expanded?: boolean
+}
+
+interface SkillGroup {
+  id: string
+  label: string
+  items: string[]
+}
+
+interface CustomField {
+  id: string
+  label: string
+  value: string
 }
 
 interface EditorContent {
@@ -21,69 +50,92 @@ interface EditorContent {
   github: string
   sectionTitles: Record<'summary' | 'experience' | 'education' | 'skills', string>
   summary: string
-  company: string
-  position: string
-  duration: string
-  bullets: { id: string; text: string }[]
-  educationEntries: { id: string; school: string; degree: string; duration: string }[]
-  skills: { id: string; label: string; items: string[] }[]
-  customFields: { id: string; label: string; value: string }[]
+  experiences: ExperienceEntry[]
+  educationEntries: EducationEntry[]
+  skills: SkillGroup[]
+  customFields: CustomField[]
 }
 
 interface EditorSectionsProps {
+  initialContent: EditorContent | null
   onContentChange?: (content: EditorContent) => void
 }
 
-export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
+const COMMON_SKILLS = [
+  'React', 'Next.js', 'TypeScript', 'Node.js', 
+  'Python', 'AWS', 'TailwindCSS', 'Docker', 
+  'GraphQL', 'PostgreSQL', 'Git', 'Agile'
+]
+
+export function EditorSections({ initialContent, onContentChange }: EditorSectionsProps) {
   const [personalInfoExpanded, setPersonalInfoExpanded] = useState(true)
-  const [sections, setSections] = useState<Record<string, Section>>({
-    summary: { title: 'Professional Summary', expanded: true },
-    experience: { title: 'Experience', expanded: true },
-    education: { title: 'Education', expanded: false },
-    skills: { title: 'Skills', expanded: false },
+  const [sections, setSections] = useState<Record<string, { title: string; expanded: boolean }>>({
+    summary: { title: initialContent?.sectionTitles?.summary || 'Professional Summary', expanded: true },
+    experience: { title: initialContent?.sectionTitles?.experience || 'Experience', expanded: true },
+    education: { title: initialContent?.sectionTitles?.education || 'Education', expanded: false },
+    skills: { title: initialContent?.sectionTitles?.skills || 'Skills', expanded: false },
   })
 
-  const [editingBullet, setEditingBullet] = useState<string | null>(null)
+  const [editingBullet, setEditingBullet] = useState<{ expId: string; bulletId: string } | null>(null)
   const [renamingSection, setRenamingSection] = useState<string | null>(null)
+  
   const [aiModal, setAiModal] = useState<{
     isOpen: boolean
     type: 'improve' | 'shorten' | 'fix_grammar'
     original: string
+    expId: string | null
     bulletId: string | null
   }>({
     isOpen: false,
     type: 'improve',
     original: '',
+    expId: null,
     bulletId: null,
   })
-  const [bullets, setBullets] = useState<Record<string, { id: string; text: string }[]>>({
-    experience: [],
-  })
 
-  const [name, setName] = useState('')
-  const [title, setTitle] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [linkedin, setLinkedin] = useState('')
-  const [github, setGithub] = useState('')
-  const [summary, setSummary] = useState('')
-  const [company, setCompany] = useState('')
-  const [position, setPosition] = useState('')
-  const [duration, setDuration] = useState('')
-  const [educationEntries, setEducationEntries] = useState<
-    { id: string; school: string; degree: string; duration: string }[]
-  >([
-    { id: 'education-1', school: '', degree: '', duration: '' },
-  ])
+  // Core Identity State
+  const [name, setName] = useState(initialContent?.name || '')
+  const [title, setTitle] = useState(initialContent?.title || '')
+  const [email, setEmail] = useState(initialContent?.email || '')
+  const [phone, setPhone] = useState(initialContent?.phone || '')
+  const [linkedin, setLinkedin] = useState(initialContent?.linkedin || '')
+  const [github, setGithub] = useState(initialContent?.github || '')
+  
+  // Professional Summary State
+  const [summary, setSummary] = useState(initialContent?.summary || '')
+  
+  // Experiences State
+  const [experiences, setExperiences] = useState<ExperienceEntry[]>(
+    initialContent?.experiences?.length 
+      ? initialContent.experiences.map((exp, i) => ({ ...exp, expanded: i === 0 }))
+      : [{ id: 'exp-1', company: '', position: '', duration: '', bullets: [], expanded: true }]
+  )
+
+  // Education State
+  const [educationEntries, setEducationEntries] = useState<EducationEntry[]>(
+    initialContent?.educationEntries?.length
+      ? initialContent.educationEntries.map((edu, i) => ({ ...edu, expanded: i === 0 }))
+      : [{ id: 'edu-1', school: '', degree: '', duration: '', expanded: true }]
+  )
+
+  // Skills State
+  const [skills, setSkills] = useState<SkillGroup[]>(
+    initialContent?.skills?.length
+      ? initialContent.skills
+      : [
+          { id: 'skills-1', label: 'Languages', items: [] },
+          { id: 'skills-2', label: 'Frameworks', items: [] },
+          { id: 'skills-3', label: 'Tools & Cloud', items: [] },
+        ]
+  )
   const [skillInputs, setSkillInputs] = useState<Record<string, string>>({})
-  const [skills, setSkills] = useState<{ id: string; label: string; items: string[] }[]>([
-    { id: 'skills-1', label: 'Languages', items: [] },
-    { id: 'skills-2', label: 'Frameworks', items: [] },
-    { id: 'skills-3', label: 'Tools', items: [] },
-  ])
-  const [customFields, setCustomFields] = useState<{ id: string; label: string; value: string }[]>([])
 
-  // Emit changes after state updates complete
+  // Custom Fields State
+  const [customFields, setCustomFields] = useState<CustomField[]>(
+    initialContent?.customFields || []
+  )
+
+  // Sync to Parent Callback
   useEffect(() => {
     const content: EditorContent = {
       name,
@@ -99,10 +151,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
         skills: sections.skills.title,
       },
       summary,
-      company,
-      position,
-      duration,
-      bullets: bullets.experience || [],
+      experiences,
       educationEntries,
       skills,
       customFields,
@@ -120,50 +169,54 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
     sections.education.title,
     sections.skills.title,
     summary,
-    company,
-    position,
-    duration,
-    bullets,
+    experiences,
     educationEntries,
     skills,
     customFields,
     onContentChange,
   ])
 
+  // AI Helper functions
   const getSuggestedText = (original: string, type: 'improve' | 'shorten' | 'fix_grammar') => {
     const suggestions = {
-      improve: `${original} while improving measurable impact, clarity, and team outcomes`,
-      shorten: `${original.substring(0, Math.max(20, original.length - 30))}...`,
-      fix_grammar: original.replace(/reducing/gi, 'reducing'),
+      improve: `${original} resulting in measurable growth, key milestone execution, and seamless team alignment`,
+      shorten: original.length > 50 ? `${original.substring(0, Math.max(30, original.length - 25))}...` : original,
+      fix_grammar: original.replace(/reducing/gi, 'reducing').replace(/building/gi, 'building'),
     }
-
     return suggestions[type]
   }
 
-  const openAiSuggestion = (type: 'improve' | 'shorten' | 'fix_grammar', id: string, text: string) => {
+  const openAiSuggestion = (type: 'improve' | 'shorten' | 'fix_grammar', expId: string, bulletId: string, text: string) => {
     setAiModal({
       isOpen: true,
       type,
       original: text,
-      bulletId: id,
+      expId,
+      bulletId,
     })
   }
 
   const applyAiSuggestion = (text: string) => {
-    if (!aiModal.bulletId) return
+    if (!aiModal.expId || !aiModal.bulletId) return
 
-    setBullets((prev) => ({
-      ...prev,
-      experience: prev.experience.map((bullet) =>
-        bullet.id === aiModal.bulletId ? { ...bullet, text } : bullet
-      ),
-    }))
+    setExperiences((prev) =>
+      prev.map((exp) => {
+        if (exp.id === aiModal.expId) {
+          return {
+            ...exp,
+            bullets: exp.bullets.map((b) => (b.id === aiModal.bulletId ? { ...b, text } : b)),
+          }
+        }
+        return exp
+      })
+    )
 
     setEditingBullet(null)
     setAiModal({
       isOpen: false,
       type: 'improve',
       original: '',
+      expId: null,
       bulletId: null,
     })
   }
@@ -182,61 +235,155 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
     }))
   }
 
-  const handleEditBullet = (id: string, text: string) => {
-    if (editingBullet === id) {
+  // --- MULTIPLE EXPERIENCE OPERATIONS ---
+  const handleAddExperience = () => {
+    const id = `exp-${Date.now()}`
+    setExperiences((prev) => [
+      ...prev.map(e => ({ ...e, expanded: false })),
+      { id, company: '', position: '', duration: '', bullets: [], expanded: true }
+    ])
+  }
+
+  const handleUpdateExperience = (id: string, patch: Partial<Omit<ExperienceEntry, 'id' | 'bullets'>>) => {
+    setExperiences((prev) =>
+      prev.map((exp) => (exp.id === id ? { ...exp, ...patch } : exp))
+    )
+  }
+
+  const handleDeleteExperience = (id: string) => {
+    setExperiences((prev) => prev.filter((exp) => exp.id !== id))
+  }
+
+  const handleMoveExperience = (idx: number, direction: 'up' | 'down') => {
+    setExperiences((prev) => {
+      const next = [...prev]
+      if (direction === 'up' && idx > 0) {
+        ;[next[idx], next[idx - 1]] = [next[idx - 1], next[idx]]
+      } else if (direction === 'down' && idx < next.length - 1) {
+        ;[next[idx], next[idx + 1]] = [next[idx + 1], next[idx]]
+      }
+      return next
+    })
+  }
+
+  const toggleExperienceExpand = (id: string) => {
+    setExperiences((prev) =>
+      prev.map((exp) => (exp.id === id ? { ...exp, expanded: !exp.expanded } : exp))
+    )
+  }
+
+  // --- BULLET OPERATIONS (PER EXPERIENCE) ---
+  const handleAddBullet = (expId: string) => {
+    const bulletId = `bullet-${Date.now()}`
+    setExperiences((prev) =>
+      prev.map((exp) => {
+        if (exp.id === expId) {
+          return {
+            ...exp,
+            bullets: [...exp.bullets, { id: bulletId, text: '' }],
+          }
+        }
+        return exp
+      })
+    )
+    setEditingBullet({ expId, bulletId })
+  }
+
+  const handleUpdateBullet = (expId: string, bulletId: string, text: string) => {
+    setExperiences((prev) =>
+      prev.map((exp) => {
+        if (exp.id === expId) {
+          return {
+            ...exp,
+            bullets: exp.bullets.map((b) => (b.id === bulletId ? { ...b, text } : b)),
+          }
+        }
+        return exp
+      })
+    )
+    setEditingBullet(null)
+  }
+
+  const handleDeleteBullet = (expId: string, bulletId: string) => {
+    setExperiences((prev) =>
+      prev.map((exp) => {
+        if (exp.id === expId) {
+          return {
+            ...exp,
+            bullets: exp.bullets.filter((b) => b.id !== bulletId),
+          }
+        }
+        return exp
+      })
+    )
+    if (editingBullet?.bulletId === bulletId) {
       setEditingBullet(null)
-      setBullets((prev) => ({
-        ...prev,
-        experience: prev.experience.map((b) => (b.id === id ? { ...b, text } : b)),
-      }))
-    } else {
-      setEditingBullet(id)
     }
   }
 
-  const handleDeleteBullet = (id: string) => {
-    if (editingBullet === id) {
-      setEditingBullet(null)
-    }
-    setBullets((prev) => ({
-      ...prev,
-      experience: prev.experience.filter((b) => b.id !== id),
-    }))
+  const handleMoveBullet = (expId: string, bulletId: string, direction: 'up' | 'down') => {
+    setExperiences((prev) =>
+      prev.map((exp) => {
+        if (exp.id === expId) {
+          const list = [...exp.bullets]
+          const idx = list.findIndex((b) => b.id === bulletId)
+          if (direction === 'up' && idx > 0) {
+            ;[list[idx], list[idx - 1]] = [list[idx - 1], list[idx]]
+          } else if (direction === 'down' && idx < list.length - 1) {
+            ;[list[idx], list[idx + 1]] = [list[idx + 1], list[idx]]
+          }
+          return { ...exp, bullets: list }
+        }
+        return exp
+      })
+    )
   }
 
-  const handleAddBullet = () => {
-    const id =
-      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : `${Date.now()}`
-
-    setBullets((prev) => ({
-      ...prev,
-      experience: [...prev.experience, { id, text: '' }],
-    }))
-    setEditingBullet(id)
+  // --- EDUCATION OPERATIONS ---
+  const handleAddEducationEntry = () => {
+    const id = `edu-${Date.now()}`
+    setEducationEntries((prev) => [
+      ...prev.map(e => ({ ...e, expanded: false })),
+      { id, school: '', degree: '', duration: '', expanded: true }
+    ])
   }
 
-  const handleAddCustomField = () => {
-    const id =
-      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : `${Date.now()}`
-
-    setCustomFields((prev) => [...prev, { id, label: '', value: '' }])
+  const handleUpdateEducationEntry = (id: string, patch: Partial<Omit<EducationEntry, 'id'>>) => {
+    setEducationEntries((prev) =>
+      prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry))
+    )
   }
 
+  const handleDeleteEducationEntry = (id: string) => {
+    setEducationEntries((prev) => prev.filter((entry) => entry.id !== id))
+  }
+
+  const handleMoveEducation = (idx: number, direction: 'up' | 'down') => {
+    setEducationEntries((prev) => {
+      const next = [...prev]
+      if (direction === 'up' && idx > 0) {
+        ;[next[idx], next[idx - 1]] = [next[idx - 1], next[idx]]
+      } else if (direction === 'down' && idx < next.length - 1) {
+        ;[next[idx], next[idx + 1]] = [next[idx + 1], next[idx]]
+      }
+      return next
+    })
+  }
+
+  const toggleEducationExpand = (id: string) => {
+    setEducationEntries((prev) =>
+      prev.map((edu) => (edu.id === id ? { ...edu, expanded: !edu.expanded } : edu))
+    )
+  }
+
+  // --- SKILLS OPERATIONS ---
   const handleAddSkillGroup = () => {
-    const id =
-      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : `${Date.now()}`
-
+    const id = `skills-${Date.now()}`
     setSkills((prev) => [...prev, { id, label: 'New Category', items: [] }])
     setSkillInputs((prev) => ({ ...prev, [id]: '' }))
   }
 
-  const handleUpdateSkillGroup = (id: string, patch: Partial<{ label: string; items: string[] }>) => {
+  const handleUpdateSkillGroup = (id: string, patch: Partial<Omit<SkillGroup, 'id'>>) => {
     setSkills((prev) => prev.map((group) => (group.id === id ? { ...group, ...patch } : group)))
   }
 
@@ -249,14 +396,18 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
     })
   }
 
-  const handleAddSkillToGroup = (groupId: string) => {
-    const value = (skillInputs[groupId] ?? '').trim()
+  const handleAddSkillToGroup = (groupId: string, explicitValue?: string) => {
+    const value = (explicitValue || skillInputs[groupId] || '').trim()
     if (!value) return
 
     setSkills((prev) =>
-      prev.map((group) =>
-        group.id === groupId ? { ...group, items: [...group.items, value] } : group
-      )
+      prev.map((group) => {
+        if (group.id === groupId) {
+          if (group.items.includes(value)) return group
+          return { ...group, items: [...group.items, value] }
+        }
+        return group
+      })
     )
     setSkillInputs((prev) => ({ ...prev, [groupId]: '' }))
   }
@@ -269,29 +420,13 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
     )
   }
 
-  const handleAddEducationEntry = () => {
-    const id =
-      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
-        ? crypto.randomUUID()
-        : `${Date.now()}`
-
-    setEducationEntries((prev) => [...prev, { id, school: '', degree: '', duration: '' }])
+  // --- CUSTOM FIELD OPERATIONS ---
+  const handleAddCustomField = () => {
+    const id = `cf-${Date.now()}`
+    setCustomFields((prev) => [...prev, { id, label: '', value: '' }])
   }
 
-  const handleUpdateEducationEntry = (
-    id: string,
-    patch: Partial<{ school: string; degree: string; duration: string }>
-  ) => {
-    setEducationEntries((prev) =>
-      prev.map((entry) => (entry.id === id ? { ...entry, ...patch } : entry))
-    )
-  }
-
-  const handleDeleteEducationEntry = (id: string) => {
-    setEducationEntries((prev) => prev.filter((entry) => entry.id !== id))
-  }
-
-  const handleUpdateCustomField = (id: string, patch: Partial<{ label: string; value: string }>) => {
+  const handleUpdateCustomField = (id: string, patch: Partial<Omit<CustomField, 'id'>>) => {
     setCustomFields((prev) =>
       prev.map((field) => (field.id === id ? { ...field, ...patch } : field))
     )
@@ -301,34 +436,29 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
     setCustomFields((prev) => prev.filter((field) => field.id !== id))
   }
 
-  const handleMoveBullet = (id: string, direction: 'up' | 'down') => {
-    setBullets((prev) => {
-      const items = [...prev.experience]
-      const idx = items.findIndex((b) => b.id === id)
-      if (direction === 'up' && idx > 0) {
-        ;[items[idx], items[idx - 1]] = [items[idx - 1], items[idx]]
-      } else if (direction === 'down' && idx < items.length - 1) {
-        ;[items[idx], items[idx + 1]] = [items[idx + 1], items[idx]]
-      }
-      return { ...prev, experience: items }
-    })
-  }
+  // Light Mode Layout Constants
+  const panelShell = 'overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs transition-all duration-300'
+  const panelHeader = 'flex items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/40 px-5 py-4'
+  const panelTitle = 'text-[11px] font-bold tracking-wider text-slate-700 uppercase'
+  const panelSubtitle = 'mt-1 text-[11px] text-slate-500 font-medium'
+  const fieldLabel = 'text-[10px] font-bold uppercase tracking-wider text-slate-500'
+  const inputClass = 'w-full rounded-lg border border-slate-200 bg-slate-50/30 px-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none transition-all focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10'
 
-  const SectionHeader = ({ sectionKey }: { sectionKey: string }) =>
+  const SectionHeader = ({ sectionKey, counts }: { sectionKey: string; counts: string }) =>
     renamingSection === sectionKey ? (
-      <div className="w-full flex items-center gap-2.5 p-4 bg-gray-50 border-b border-gray-200">
+      <div className={panelHeader}>
         <input
           autoFocus
           value={sections[sectionKey].title}
           onChange={(e) => handleSectionTitleChange(sectionKey, e.target.value)}
-          className="flex-1 min-w-0 px-3 py-2 rounded-md bg-white border border-gray-300 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-800 outline-none focus:border-indigo-500 transition-all"
         />
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={() => setRenamingSection(null)}
           title="Save"
-          className="text-green-600 hover:text-green-700 hover:bg-green-50"
+          className="rounded-lg text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 ml-2"
         >
           <Check className="w-4 h-4" />
         </Button>
@@ -337,398 +467,573 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
           size="icon-sm"
           onClick={() => setRenamingSection(null)}
           title="Cancel"
-          className="text-gray-600 hover:text-gray-700 hover:bg-gray-100"
+          className="rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"
         >
           <X className="w-4 h-4" />
         </Button>
       </div>
     ) : (
-      <div className="w-full flex items-center justify-between gap-3 p-4 bg-gray-50 border-b border-gray-200 hover:bg-gray-100 transition-colors">
+      <div className={panelHeader}>
         <button
           type="button"
           onClick={() => toggleSection(sectionKey)}
-          className="flex items-center justify-between flex-1 min-w-0 text-left gap-3 group"
+          className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left group"
         >
-          <h3 className="font-semibold text-gray-900 truncate text-sm">{sections[sectionKey].title}</h3>
+          <div className="min-w-0">
+            <h3 className={panelTitle}>{sections[sectionKey].title}</h3>
+            <p className={panelSubtitle}>{counts}</p>
+          </div>
           <ChevronDown
-            className={`w-4 h-4 text-gray-400 transition-transform flex-shrink-0 group-hover:text-gray-600 ${sections[sectionKey].expanded ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-300 group-hover:text-slate-600 ${sections[sectionKey].expanded ? 'rotate-180' : ''}`}
           />
         </button>
         <Button
           variant="ghost"
           size="icon-sm"
           onClick={() => setRenamingSection(sectionKey)}
-          title="Rename"
-          className="text-gray-400 hover:text-gray-600 hover:bg-gray-200"
+          title="Rename Section"
+          className="rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"
         >
-          <Edit2 className="w-4 h-4" />
+          <Edit2 className="w-3.5 h-3.5" />
         </Button>
       </div>
     )
 
   return (
-    <div className="space-y-6">
-      {/* Header Section - Personal Info */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center justify-between gap-4 p-4 bg-gray-50 border-b border-gray-200">
+    <div className="space-y-6 pr-1">
+      {/* 1. Personal Info */}
+      <div className={panelShell}>
+        <div className={panelHeader}>
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 text-sm">Personal Information</h3>
-            <p className="text-xs text-gray-500 mt-1">Your core identity and contact details</p>
+            <h3 className={panelTitle}>Personal Information</h3>
+            <p className={panelSubtitle}>Your identity and professional contacts</p>
           </div>
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={() => setPersonalInfoExpanded((prev) => !prev)}
             title={personalInfoExpanded ? 'Collapse' : 'Expand'}
-            className="text-gray-400 hover:text-gray-600 hover:bg-gray-200"
+            className="rounded-lg text-slate-400 hover:bg-slate-100"
           >
             <ChevronDown
-              className={`w-4 h-4 transition-transform ${personalInfoExpanded ? 'rotate-180' : ''}`}
+              className={`h-4 w-4 transition-transform duration-300 ${personalInfoExpanded ? 'rotate-180' : ''}`}
             />
           </Button>
         </div>
         {personalInfoExpanded && (
-          <div className="p-6 space-y-5 bg-white">
-          <div className="grid gap-2">
-            <label className="text-xs font-semibold text-gray-700">Full Name</label>
-            <input
-              type="text"
-              placeholder="Enter your full name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-            />
-          </div>
-          <div className="grid gap-2">
-            <label className="text-xs font-semibold text-gray-700">Professional Title</label>
-            <input
-              type="text"
-              placeholder="e.g., Senior Full Stack Developer"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="grid gap-2">
-              <label className="text-xs font-semibold text-gray-700">Email</label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-              />
+          <div className="grid gap-4 p-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <label className={fieldLabel}>Full Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Alex Morgan"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <label className={fieldLabel}>Professional Title</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Senior Frontend Developer"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
             </div>
-            <div className="grid gap-2">
-              <label className="text-xs font-semibold text-gray-700">Phone</label>
-              <input
-                type="tel"
-                placeholder="+1 555 123 4567"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-              />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <label className={fieldLabel}>Email Address</label>
+                <input
+                  type="email"
+                  placeholder="alex.morgan@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <label className={fieldLabel}>Phone Number</label>
+                <input
+                  type="tel"
+                  placeholder="+1 (555) 019-2834"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
             </div>
-          </div>
-          <div className="grid gap-2">
-            <label className="text-xs font-semibold text-gray-700">LinkedIn URL</label>
-            <input
-              type="url"
-              placeholder="https://linkedin.com/in/yourname"
-              value={linkedin}
-              onChange={(e) => setLinkedin(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-            />
-          </div>
-          <div className="grid gap-2">
-            <label className="text-xs font-semibold text-gray-700">GitHub URL</label>
-            <input
-              type="url"
-              placeholder="https://github.com/yourname"
-              value={github}
-              onChange={(e) => setGithub(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-            />
-          </div>
-          </div>
-        )}
-      </div>
 
-      {/* Summary Section */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-        <SectionHeader sectionKey="summary" />
-        {sections.summary.expanded && (
-          <div className="p-5 space-y-4 bg-white">
-            <textarea
-              value={summary}
-              onChange={(e) => setSummary(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none placeholder:text-gray-400"
-              rows={4}
-              placeholder="Write a compelling professional summary..."
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Experience Section */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-        <SectionHeader sectionKey="experience" />
-        {sections.experience.expanded && (
-          <div className="p-5 space-y-5 bg-white">
-            <div className="space-y-5">
-              <div className="space-y-4 p-5 bg-gray-50 border border-gray-200 rounded-lg">
-                <div className="grid gap-2">
-                  <label className="text-xs font-semibold text-gray-700">Company</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Tech Corporation"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label className="text-xs font-semibold text-gray-700">Position</label>
-                  <input
-                    type="text"
-                    placeholder="e.g., Senior Software Engineer"
-                    value={position}
-                    onChange={(e) => setPosition(e.target.value)}
-                    className="w-full px-3 py-2.5 rounded-md bg-white border border-gray-300 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <label className="text-xs font-semibold text-gray-700">Duration</label>
-                  <DateRangePicker
-                    value={duration}
-                    onChange={setDuration}
-                    presentLabel="I currently work here"
-                  />
-                </div>
-
-                <div className="space-y-3 pt-2">
-                  {bullets.experience.map((bullet, idx) => (
-                    <BulletEditor
-                      key={bullet.id}
-                      bullet={bullet}
-                      onEdit={handleEditBullet}
-                      onImprove={() => openAiSuggestion('improve', bullet.id, bullet.text)}
-                      onShorten={() => openAiSuggestion('shorten', bullet.id, bullet.text)}
-                      onDelete={handleDeleteBullet}
-                      onMoveUp={() => handleMoveBullet(bullet.id, 'up')}
-                      onMoveDown={() => handleMoveBullet(bullet.id, 'down')}
-                      isEditing={editingBullet === bullet.id}
-                      canMoveUp={idx > 0}
-                      canMoveDown={idx < bullets.experience.length - 1}
-                    />
-                  ))}
-                </div>
-
-                <Button variant="outline" size="sm" className="w-full font-medium" onClick={handleAddBullet}>
-                  + Add Bullet Point
-                </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid gap-1.5">
+                <label className={fieldLabel}>LinkedIn Profile URL</label>
+                <input
+                  type="url"
+                  placeholder="https://linkedin.com/in/username"
+                  value={linkedin}
+                  onChange={(e) => setLinkedin(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <label className={fieldLabel}>GitHub URL</label>
+                <input
+                  type="url"
+                  placeholder="https://github.com/username"
+                  value={github}
+                  onChange={(e) => setGithub(e.target.value)}
+                  className={inputClass}
+                />
               </div>
             </div>
           </div>
         )}
       </div>
 
-      {/* Education Section */}
-      <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-        <SectionHeader sectionKey="education" />
-        {sections.education.expanded && (
-          <div className="p-5 space-y-4 bg-white">
-            <div className="space-y-4">
-              {educationEntries.map((entry, idx) => (
-                <div key={entry.id} className="rounded-lg border border-gray-200 bg-gray-50 p-5 space-y-4 hover:shadow-sm hover:border-gray-300 transition-all">
-                  <div className="flex items-center justify-between gap-3">
-                    <h4 className="text-sm font-semibold text-gray-900">Education {idx + 1}</h4>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteEducationEntry(entry.id)}
-                      disabled={educationEntries.length === 1}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 font-medium text-xs"
-                    >
-                      Remove
-                    </Button>
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="grid gap-2">
-                      <label className="text-xs font-semibold text-gray-700">School</label>
-                      <input
-                        value={entry.school}
-                        onChange={(e) =>
-                          handleUpdateEducationEntry(entry.id, { school: e.target.value })
-                        }
-                        placeholder="e.g., State University"
-                        className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-                      />
-                    </div>
-                    <div className="grid gap-2">
-                      <label className="text-xs font-semibold text-gray-700">Degree</label>
-                      <input
-                        value={entry.degree}
-                        onChange={(e) =>
-                          handleUpdateEducationEntry(entry.id, { degree: e.target.value })
-                        }
-                        placeholder="e.g., B.S. Computer Science"
-                        className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid gap-2">
-                    <label className="text-xs font-semibold text-gray-700">Duration</label>
-                    <DateRangePicker
-                      value={entry.duration}
-                      onChange={(value) => handleUpdateEducationEntry(entry.id, { duration: value })}
-                      presentLabel="I'm currently studying here"
-                    />
-                  </div>
-                </div>
-              ))}
-              <Button variant="outline" size="sm" onClick={handleAddEducationEntry} className="w-full font-medium text-gray-900 border-gray-300 hover:bg-gray-50">
-                + Add Education
-              </Button>
+      {/* 2. Professional Summary */}
+      <div className={panelShell}>
+        <SectionHeader 
+          sectionKey="summary" 
+          counts={summary.trim() ? `${summary.trim().split(/\s+/).length} words` : 'No summary written yet'} 
+        />
+        {sections.summary.expanded && (
+          <div className="p-5">
+            <div className="relative">
+              <textarea
+                value={summary}
+                onChange={(e) => setSummary(e.target.value)}
+                className={`${inputClass} resize-none min-h-[100px] pb-10`}
+                placeholder="Write a compelling summary highlighting your core skills, years of experience, and achievements..."
+              />
+              <div className="absolute bottom-2.5 right-3 text-[10px] text-slate-400 font-bold uppercase">
+                {summary.trim() ? summary.trim().split(/\s+/).length : 0} Words
+              </div>
             </div>
           </div>
         )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Skills Section */}
-        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-          <SectionHeader sectionKey="skills" />
-          {sections.skills.expanded && (
-            <div className="p-5 space-y-4 bg-white">
-              <div className="grid gap-4">
-                {skills.map((group) => (
-                  <div key={group.id} className="rounded-lg border border-gray-200 bg-gray-50 p-5 space-y-4 hover:shadow-sm hover:border-gray-300 transition-all">
-                    <div className="flex items-center gap-3">
-                      <input
-                        value={group.label}
-                        onChange={(e) => handleUpdateSkillGroup(group.id, { label: e.target.value })}
-                        placeholder="Category name"
-                        className="flex-1 min-w-0 px-3 py-2 rounded-md border border-gray-300 bg-white text-gray-900 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-                      />
-                      <span className="text-xs text-gray-600 font-semibold whitespace-nowrap bg-blue-100 text-blue-700 px-2.5 py-1 rounded-md">
-                        {group.items.length}
+      {/* 3. Work Experience */}
+      <div className={panelShell}>
+        <SectionHeader 
+          sectionKey="experience" 
+          counts={`${experiences.length} positions · ${experiences.reduce((acc, exp) => acc + exp.bullets.length, 0)} bullets`} 
+        />
+        {sections.experience.expanded && (
+          <div className="p-5 space-y-5">
+            {experiences.map((exp, idx) => (
+              <div key={exp.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-300">
+                {/* Collapsible Sub-Header */}
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => toggleExperienceExpand(exp.id)}
+                      className="flex items-center gap-2 text-left"
+                    >
+                      <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${exp.expanded ? 'rotate-180' : ''}`} />
+                      <span className="text-sm font-semibold text-slate-700">
+                        {exp.position || exp.company ? (
+                          <>
+                            {exp.position || 'Position'} <span className="text-slate-400">at</span> {exp.company || 'Company'}
+                          </>
+                        ) : (
+                          `Work Experience ${idx + 1}`
+                        )}
                       </span>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => handleDeleteSkillGroup(group.id)}
-                        title="Remove category"
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                    {idx > 0 && (
+                      <button
+                        title="Move Up"
+                        onClick={() => handleMoveExperience(idx, 'up')}
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
                       >
-                        <X className="w-4 h-4" />
-                      </Button>
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {idx < experiences.length - 1 && (
+                      <button
+                        title="Move Down"
+                        onClick={() => handleMoveExperience(idx, 'down')}
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button
+                      title="Remove Position"
+                      onClick={() => handleDeleteExperience(exp.id)}
+                      disabled={experiences.length === 1}
+                      className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md disabled:opacity-40"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {exp.expanded && (
+                  <div className="space-y-4 pt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid gap-1.5">
+                        <label className={fieldLabel}>Company Name</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. InnovateTech Solutions"
+                          value={exp.company}
+                          onChange={(e) => handleUpdateExperience(exp.id, { company: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <label className={fieldLabel}>Role / Position</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Lead Software Engineer"
+                          value={exp.position}
+                          onChange={(e) => handleUpdateExperience(exp.id, { position: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
                     </div>
-                    {group.items.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {group.items.map((skill) => (
-                          <button
-                            key={skill}
-                            type="button"
-                            onClick={() => handleDeleteSkill(group.id, skill)}
-                            className="rounded-full border border-blue-300 bg-blue-100 px-3 py-1 text-xs font-medium text-blue-900 hover:bg-red-100 hover:border-red-300 hover:text-red-900 transition-all"
-                            title="Click to remove"
-                          >
-                            {skill} ×
-                          </button>
+
+                    <div className="grid gap-1.5">
+                      <label className={fieldLabel}>Duration</label>
+                      <DateRangePicker
+                        value={exp.duration}
+                        onChange={(val) => handleUpdateExperience(exp.id, { duration: val })}
+                        presentLabel="I currently work here"
+                      />
+                    </div>
+
+                    {/* Bullet Points */}
+                    <div className="space-y-2.5 pt-3 border-t border-slate-100">
+                      <label className={fieldLabel}>Core Achievements & Responsibilities</label>
+                      
+                      <div className="space-y-2.5">
+                        {exp.bullets.map((bullet, bIdx) => (
+                          <BulletEditor
+                            key={bullet.id}
+                            bullet={bullet}
+                            onEdit={(id, text) => handleUpdateBullet(exp.id, id, text)}
+                            onImprove={() => openAiSuggestion('improve', exp.id, bullet.id, bullet.text)}
+                            onShorten={() => openAiSuggestion('shorten', exp.id, bullet.id, bullet.text)}
+                            onDelete={(id) => handleDeleteBullet(exp.id, id)}
+                            onMoveUp={() => handleMoveBullet(exp.id, bullet.id, 'up')}
+                            onMoveDown={() => handleMoveBullet(exp.id, bullet.id, 'down')}
+                            isEditing={editingBullet?.expId === exp.id && editingBullet?.bulletId === bullet.id}
+                            canMoveUp={bIdx > 0}
+                            canMoveDown={bIdx < exp.bullets.length - 1}
+                          />
                         ))}
                       </div>
-                    )}
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <input
-                        value={skillInputs[group.id] ?? ''}
-                        onChange={(e) =>
-                          setSkillInputs((prev) => ({ ...prev, [group.id]: e.target.value }))
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault()
-                            handleAddSkillToGroup(group.id)
-                          }
-                        }}
-                        placeholder="Add skill and press Enter"
-                        className="flex-1 px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
-                      />
+
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => handleAddSkillToGroup(group.id)}
-                        className="font-medium text-gray-900 border-gray-300 hover:bg-gray-50"
+                        onClick={() => handleAddBullet(exp.id)}
+                        className="w-full border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg py-1.5 font-medium transition-all shadow-xs"
                       >
-                        Add
+                        <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Bullet Point
                       </Button>
                     </div>
                   </div>
-                ))}
-                <Button variant="outline" size="sm" onClick={handleAddSkillGroup} className="w-full font-medium text-gray-900 border-gray-300 hover:bg-gray-50">
-                  + Add Category
-                </Button>
+                )}
               </div>
-            </div>
-          )}
-        </div>
+            ))}
 
-        {/* Custom Fields */}
-        <div className="border border-gray-200 rounded-lg overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow">
-          <div className="p-4 bg-gray-50 border-b border-gray-200">
-            <h3 className="font-semibold text-gray-900 text-sm">Custom Fields</h3>
-            <p className="text-xs text-gray-500 mt-1">Portfolio, location, awards, certifications, etc.</p>
+            <Button
+              onClick={handleAddExperience}
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Professional Experience
+            </Button>
           </div>
-          <div className="p-5 space-y-4 bg-white">
-            {customFields.length > 0 ? (
-              customFields.map((field, idx) => (
-                <div key={field.id} className="rounded-lg border border-gray-200 bg-gray-50 p-5 space-y-4 hover:shadow-sm hover:border-gray-300 transition-all">
-                  <div className="flex items-center justify-between gap-3">
-                    <h4 className="text-sm font-semibold text-gray-900">Field {idx + 1}</h4>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteCustomField(field.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 font-medium text-xs"
+        )}
+      </div>
+
+      {/* 4. Education */}
+      <div className={panelShell}>
+        <SectionHeader 
+          sectionKey="education" 
+          counts={`${educationEntries.length} entries`} 
+        />
+        {sections.education.expanded && (
+          <div className="p-5 space-y-5">
+            {educationEntries.map((entry, idx) => (
+              <div key={entry.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-300">
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => toggleEducationExpand(entry.id)}
+                    className="flex items-center gap-2 text-left"
+                  >
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${entry.expanded ? 'rotate-180' : ''}`} />
+                    <span className="text-sm font-semibold text-slate-700">
+                      {entry.school || entry.degree ? (
+                        <>
+                          {entry.degree || 'Degree'} <span className="text-slate-400">at</span> {entry.school || 'School'}
+                        </>
+                      ) : (
+                        `Education ${idx + 1}`
+                      )}
+                    </span>
+                  </button>
+
+                  <div className="flex items-center gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                    {idx > 0 && (
+                      <button
+                        title="Move Up"
+                        onClick={() => handleMoveEducation(idx, 'up')}
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {idx < educationEntries.length - 1 && (
+                      <button
+                        title="Move Down"
+                        onClick={() => handleMoveEducation(idx, 'down')}
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button
+                      title="Remove Education"
+                      onClick={() => handleDeleteEducationEntry(entry.id)}
+                      disabled={educationEntries.length === 1}
+                      className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md disabled:opacity-40"
                     >
-                      Remove
-                    </Button>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                  <div className="grid gap-3">
-                    <div className="grid gap-2">
-                      <label className="text-xs font-semibold text-gray-700">Label</label>
+                </div>
+
+                {entry.expanded && (
+                  <div className="space-y-4 pt-1">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid gap-1.5">
+                        <label className={fieldLabel}>School / University</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. Stanford University"
+                          value={entry.school}
+                          onChange={(e) => handleUpdateEducationEntry(entry.id, { school: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <label className={fieldLabel}>Degree / Certificate</label>
+                        <input
+                          type="text"
+                          placeholder="e.g. B.S. in Computer Science"
+                          value={entry.degree}
+                          onChange={(e) => handleUpdateEducationEntry(entry.id, { degree: e.target.value })}
+                          className={inputClass}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid gap-1.5">
+                      <label className={fieldLabel}>Duration / Dates</label>
+                      <DateRangePicker
+                        value={entry.duration}
+                        onChange={(val) => handleUpdateEducationEntry(entry.id, { duration: val })}
+                        presentLabel="I'm currently studying here"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <Button
+              onClick={handleAddEducationEntry}
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Education
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* 5. Skills */}
+      <div className={panelShell}>
+        <SectionHeader 
+          sectionKey="skills" 
+          counts={`${skills.reduce((sum, group) => sum + group.items.length, 0)} skills across ${skills.length} categories`} 
+        />
+        {sections.skills.expanded && (
+          <div className="p-5 space-y-6">
+            {skills.map((group) => (
+              <div key={group.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 transition-all hover:border-slate-350">
+                <div className="flex items-center gap-3 justify-between mb-4">
+                  <div className="flex items-center gap-2 flex-1 max-w-[240px]">
+                    <input
+                      value={group.label}
+                      onChange={(e) => handleUpdateSkillGroup(group.id, { label: e.target.value })}
+                      placeholder="Category name"
+                      className="bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 text-sm font-semibold text-slate-800 outline-none pb-0.5 transition-all w-full"
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 ring-1 ring-indigo-500/15">
+                      {group.items.length} items
+                    </span>
+                    <button
+                      title="Delete Category"
+                      onClick={() => handleDeleteSkillGroup(group.id)}
+                      className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Skill Tags */}
+                {group.items.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mb-4 p-3 rounded-lg bg-white border border-slate-200/60 shadow-inner-sm">
+                    {group.items.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => handleDeleteSkill(group.id, item)}
+                        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                        title="Click to remove"
+                      >
+                        {item}
+                        <X className="w-3 h-3 text-slate-400 group-hover:text-rose-500" />
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Tag Input */}
+                <div className="flex gap-2">
+                  <input
+                    value={skillInputs[group.id] ?? ''}
+                    onChange={(e) =>
+                      setSkillInputs((prev) => ({ ...prev, [group.id]: e.target.value }))
+                    }
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleAddSkillToGroup(group.id)
+                      }
+                    }}
+                    placeholder="Type skill and press Enter"
+                    className="flex-1 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                  />
+                  <Button
+                    variant="outline"
+                    onClick={() => handleAddSkillToGroup(group.id)}
+                    className="border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg px-4 shadow-xs"
+                  >
+                    Add
+                  </Button>
+                </div>
+
+                {/* Quick Add Pills */}
+                <div className="mt-3.5">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Quick Add Suggestions</p>
+                  <div className="flex flex-wrap gap-1">
+                    {COMMON_SKILLS.filter(s => !group.items.includes(s)).slice(0, 7).map(skill => (
+                      <button
+                        key={skill}
+                        type="button"
+                        onClick={() => handleAddSkillToGroup(group.id, skill)}
+                        className="text-[11px] font-semibold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 px-2.5 py-0.5 rounded-md border border-slate-200 bg-white transition-colors shadow-xxs"
+                      >
+                        + {skill}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <Button
+              onClick={handleAddSkillGroup}
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Skill Category
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* 6. Custom Fields */}
+      <div className={panelShell}>
+        <div className="border-b border-slate-100 bg-slate-50/40 px-5 py-4 flex items-center justify-between">
+          <div>
+            <h3 className={panelTitle}>Custom Sections</h3>
+            <p className={panelSubtitle}>Add custom key-value metadata like Certifications or Languages</p>
+          </div>
+          <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 ring-1 ring-indigo-500/15">
+            {customFields.length} fields
+          </span>
+        </div>
+        <div className="p-5 space-y-4">
+          {customFields.length > 0 ? (
+            <div className="space-y-4">
+              {customFields.map((field, idx) => (
+                <div key={field.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-350">
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <span className="text-xs font-semibold text-slate-500">Custom Field {idx + 1}</span>
+                    <button
+                      onClick={() => handleDeleteCustomField(field.id)}
+                      className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid gap-1.5">
+                      <label className={fieldLabel}>Label</label>
                       <input
                         type="text"
                         value={field.label}
                         onChange={(e) => handleUpdateCustomField(field.id, { label: e.target.value })}
-                        placeholder="e.g., Certifications"
-                        className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
+                        placeholder="e.g. Certifications"
+                        className={inputClass}
                       />
                     </div>
-                    <div className="grid gap-2">
-                      <label className="text-xs font-semibold text-gray-700">Value</label>
+                    <div className="grid gap-1.5">
+                      <label className={fieldLabel}>Value</label>
                       <input
                         type="text"
                         value={field.value}
                         onChange={(e) => handleUpdateCustomField(field.id, { value: e.target.value })}
-                        placeholder="Enter the value"
-                        className="w-full px-3 py-2.5 rounded-md border border-gray-300 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all placeholder:text-gray-400"
+                        placeholder="e.g. AWS Solutions Architect (2024)"
+                        className={inputClass}
                       />
                     </div>
                   </div>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-sm text-gray-600">No custom fields yet</p>
-                <p className="text-xs text-gray-500 mt-1">Add fields to showcase achievements</p>
-              </div>
-            )}
-            <Button variant="outline" size="sm" onClick={handleAddCustomField} className="w-full font-medium text-gray-900 border-gray-300 hover:bg-gray-50">
-              + Add Field
-            </Button>
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center">
+              <p className="text-sm font-semibold text-slate-400">No Custom Sections Added Yet</p>
+              <p className="mt-1 text-xs text-slate-500 max-w-[280px] mx-auto">Create custom sections to show certifications, languages, awards, or links.</p>
+            </div>
+          )}
+          
+          <Button
+            onClick={handleAddCustomField}
+            className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+          >
+            <Plus className="w-4 h-4 mr-2" /> Add Custom Field
+          </Button>
         </div>
       </div>
 
@@ -743,6 +1048,7 @@ export function EditorSections({ onContentChange }: EditorSectionsProps = {}) {
             isOpen: false,
             type: 'improve',
             original: '',
+            expId: null,
             bulletId: null,
           })
         }

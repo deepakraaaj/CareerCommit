@@ -151,12 +151,78 @@ const THEMES: Record<TemplateType, Theme> = {
   },
 }
 
+const ACCENT_COLORS_PDF = {
+  blue: {
+    text: '#2563eb', // blue-600
+    textDark: '#1e40af', // blue-800
+    textLight: '#3b82f6', // blue-500
+    border: '#2563eb',
+    borderLight: '#bfdbfe',
+    bullet: '#2563eb',
+    sidebar: '#2563eb',
+  },
+  indigo: {
+    text: '#4f46e5', // indigo-600
+    textDark: '#3730a3', // indigo-800
+    textLight: '#6366f1', // indigo-500
+    border: '#4f46e5',
+    borderLight: '#c7d2fe',
+    bullet: '#4f46e5',
+    sidebar: '#4f46e5',
+  },
+  emerald: {
+    text: '#059669', // emerald-600
+    textDark: '#065f46', // emerald-800
+    textLight: '#10b981', // emerald-500
+    border: '#059669',
+    borderLight: '#a7f3d0',
+    bullet: '#059669',
+    sidebar: '#059669',
+  },
+  amber: {
+    text: '#d97706', // amber-600
+    textDark: '#92400e', // amber-800
+    textLight: '#f59e0b', // amber-500
+    border: '#d97706',
+    borderLight: '#fde68a',
+    bullet: '#d97706',
+    sidebar: '#d97706',
+  },
+  rose: {
+    text: '#e11d48', // rose-600
+    textDark: '#9f1239', // rose-800
+    textLight: '#f43f5e', // rose-500
+    border: '#e11d48',
+    borderLight: '#fecdd3',
+    bullet: '#e11d48',
+    sidebar: '#e11d48',
+  },
+  violet: {
+    text: '#7c3aed', // violet-600
+    textDark: '#5b21b6', // violet-800
+    textLight: '#8b5cf6', // violet-500
+    border: '#7c3aed',
+    borderLight: '#ddd6fe',
+    bullet: '#7c3aed',
+    sidebar: '#7c3aed',
+  },
+  slate: {
+    text: '#475569', // slate-600
+    textDark: '#1e293b', // slate-800
+    textLight: '#64748b', // slate-500
+    border: '#475569',
+    borderLight: '#cbd5e1',
+    bullet: '#475569',
+    sidebar: '#475569',
+  },
+}
+
 function BlockPdf({ block, t, size }: { block: Block; t: Theme; size: number }) {
   const base = { fontSize: size, color: t.text, lineHeight: 1.45 }
   switch (block.kind) {
     case 'bullet':
       return (
-        <View style={{ flexDirection: 'row', gap: 4, paddingLeft: 2 }}>
+        <View style={{ flexDirection: 'row', gap: 4, paddingLeft: 2 }} wrap={false}>
           <Text style={{ ...base, color: t.bulletColor }}>•</Text>
           <Text style={{ ...base, flex: 1, maxWidth: '95%' }}>{block.text}</Text>
         </View>
@@ -184,8 +250,16 @@ function BlockPdf({ block, t, size }: { block: Block; t: Theme; size: number }) 
           {block.text}
         </Text>
       )
-    case 'para':
-      return <Text style={base}>{block.text}</Text>
+    case 'para': {
+      const sentences = block.text.match(/[^.!?]+[.!?]+(\s|$)/g) || [block.text]
+      return (
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
+          {sentences.map((s, idx) => (
+            <Text key={idx} style={base}>{s}</Text>
+          ))}
+        </View>
+      )
+    }
   }
 }
 
@@ -199,11 +273,47 @@ function formatContactLabel(value: string) {
   return value
 }
 
-export function ResumePDF({ parsed, template }: { parsed: ParsedResume; template: TemplateType }) {
-  const t = THEMES[template]
-  const bodySize = parsed.lineCount <= 20 ? 10.5 : parsed.lineCount <= 45 ? 10 : 9
-  const sectionGap = parsed.lineCount <= 20 ? 16 : parsed.lineCount <= 45 ? 13 : 10
-  const blockGap = parsed.lineCount <= 20 ? 5 : 4
+export function ResumePDF({
+  parsed,
+  template,
+  accentColor = 'blue',
+  density = 'auto',
+  fontFamily = 'sans',
+}: {
+  parsed: ParsedResume
+  template: TemplateType
+  accentColor?: string
+  density?: 'airy' | 'normal' | 'compact' | 'auto'
+  fontFamily?: 'sans' | 'serif' | 'mono'
+}) {
+  const defaultTheme = THEMES[template]
+  const accent = ACCENT_COLORS_PDF[accentColor as keyof typeof ACCENT_COLORS_PDF] || ACCENT_COLORS_PDF.blue
+
+  const bodyFont = fontFamily === 'serif' ? 'Times-Roman' : fontFamily === 'mono' ? 'Courier' : 'Helvetica'
+  const boldFont = fontFamily === 'serif' ? 'Times-Bold' : fontFamily === 'mono' ? 'Courier-Bold' : 'Helvetica-Bold'
+  const italicFont = fontFamily === 'serif' ? 'Times-Italic' : fontFamily === 'mono' ? 'Courier-Oblique' : 'Helvetica-Oblique'
+
+  const t = {
+    ...defaultTheme,
+    body: bodyFont,
+    bold: boldFont,
+    italic: italicFont,
+    roleColor: accent.text,
+    headingColor: accent.textDark,
+    bulletColor: accent.bullet,
+    dateColor: accent.text,
+    headerRule: defaultTheme.headerRule ? { ...defaultTheme.headerRule, color: accent.border } : null,
+    headingRule: defaultTheme.headingRule ? accent.borderLight : null,
+    sidebar: defaultTheme.sidebar ? accent.sidebar : null,
+  }
+
+  const resolvedDensity = density === 'auto'
+    ? (parsed.lineCount <= 22 ? 'airy' : parsed.lineCount <= 38 ? 'normal' : 'compact')
+    : density
+
+  const bodySize = resolvedDensity === 'airy' ? 10.5 : resolvedDensity === 'normal' ? 10 : 9
+  const sectionGap = resolvedDensity === 'airy' ? 16 : resolvedDensity === 'normal' ? 13 : 10
+  const blockGap = resolvedDensity === 'airy' ? 5 : 4
 
   return (
     <Document title={parsed.name || 'Resume'} author={parsed.name || undefined}>
