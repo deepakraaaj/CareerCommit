@@ -622,40 +622,23 @@ export function ResumePreview({
 
   return (
     <div className="flex flex-col h-full gap-3">
-      <div className="shrink-0 rounded-2xl border border-border/70 bg-card/95 shadow-sm px-4 py-3">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-              Resume Preview
-            </p>
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-              <h3 className="truncate text-base font-semibold text-foreground">{name}</h3>
-              <span className="text-xs text-muted-foreground">v{currentVersion}</span>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <span className={`text-xs font-medium px-2.5 py-1 rounded-full whitespace-nowrap ${getDraftBadgeColor()}`}>
-              {getDraftLabel()}
-            </span>
-            <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-2">
-              Download PDF
-            </Button>
-            <select
-              value={template}
-              onChange={(e) => setTemplate(e.target.value as TemplateType)}
-              className="h-7 rounded-md border border-border bg-background px-2 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
-            >
-              <option value="modern">Modern</option>
-              <option value="classic">Classic</option>
-              <option value="minimalist">Minimal</option>
-              <option value="creative">Creative</option>
-              <option value="elegant">Elegant</option>
-              <option value="bold">Bold</option>
-              <option value="technical">Technical</option>
-            </select>
-          </div>
-        </div>
+      <div className="shrink-0 flex items-center justify-between gap-3">
+        <Button variant="outline" size="sm" onClick={handleDownloadPDF} className="gap-2">
+          Download PDF
+        </Button>
+        <select
+          value={template}
+          onChange={(e) => setTemplate(e.target.value as TemplateType)}
+          className="h-8 rounded-lg border border-border bg-background px-3 text-xs text-foreground shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+        >
+          <option value="modern">Modern</option>
+          <option value="classic">Classic</option>
+          <option value="minimalist">Minimal</option>
+          <option value="creative">Creative</option>
+          <option value="elegant">Elegant</option>
+          <option value="bold">Bold</option>
+          <option value="technical">Technical</option>
+        </select>
       </div>
 
       <div className="flex-1 min-h-0 rounded-lg border border-border shadow-sm bg-muted overflow-y-auto">
