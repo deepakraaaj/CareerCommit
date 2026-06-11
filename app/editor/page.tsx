@@ -119,23 +119,23 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
   return (
     <>
       <Navbar />
-      <div className="flex flex-col h-[calc(100vh-4rem)] bg-gradient-to-b from-background to-background/95 overflow-hidden">
-        {/* Top Action Bar - Modern Design */}
-        <div className="border-b border-border/30 shrink-0 z-20 bg-background/95 backdrop-blur-md">
-          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex-1 flex items-center gap-2">
-                <h2 className="text-sm font-semibold text-foreground">Resume Editor</h2>
-                <div className="h-4 w-px bg-border/30"></div>
-                <span className="text-xs text-muted-foreground">{resumeName}</span>
+      <div className="flex flex-col h-[calc(100vh-4rem)] bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-800 dark:to-blue-900/20 overflow-hidden">
+        {/* Premium Top Bar */}
+        <div className="border-b border-slate-200/50 dark:border-slate-700/50 shrink-0 z-20 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl">
+          <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-10 py-4">
+            <div className="flex items-center justify-between gap-6">
+              <div className="flex-1 flex items-center gap-3">
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Resume Editor</h2>
+                <div className="h-5 w-px bg-slate-300/50 dark:bg-slate-600/50"></div>
+                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{resumeName}</span>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-secondary/40 border border-border/30">
-                  <span className="text-xs font-medium text-muted-foreground">Template:</span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2.5 px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600/50 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                  <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Template</span>
                   <select
                     value={template}
                     onChange={(e) => setTemplate(e.target.value as TemplateType)}
-                    className="bg-transparent text-xs text-foreground focus:outline-none cursor-pointer font-medium"
+                    className="bg-transparent text-xs text-slate-900 dark:text-white focus:outline-none cursor-pointer font-medium"
                   >
                     <option value="modern">Modern</option>
                     <option value="classic">Classic</option>
@@ -146,11 +146,10 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     <option value="technical">Technical</option>
                   </select>
                 </div>
-                <div className="h-4 w-px bg-border/30"></div>
                 <Button
                   size="sm"
                   onClick={handleDraftSave}
-                  className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium"
+                  className="gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold shadow-lg shadow-blue-200 dark:shadow-blue-900/50 hover:shadow-xl transition-all"
                   title={user ? 'Save changes' : 'Sign in to save'}
                 >
                   <Save className="w-4 h-4" />
@@ -163,7 +162,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     const element = document.getElementById('download-pdf-btn')
                     element?.click()
                   }}
-                  className="gap-2 font-medium"
+                  className="gap-2 font-semibold border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700/50 text-slate-900 dark:text-white"
                 >
                   <Download className="w-4 h-4" />
                   Export PDF
@@ -175,14 +174,14 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
 
         {/* Main Editor Area */}
         <div className="flex-1 overflow-hidden">
-          <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col lg:flex-row gap-6 py-6">
+          <div className="max-w-screen-2xl mx-auto px-6 sm:px-8 lg:px-10 h-full flex flex-col lg:flex-row gap-8 py-8">
             {/* Left: Editor - scrollable */}
-            <div className="flex-1 overflow-y-auto pr-2 space-y-6 pb-20">
+            <div className="flex-1 overflow-y-auto pr-3 space-y-5 pb-20 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
               <EditorSections onContentChange={handleEditorChange} />
             </div>
 
             {/* Right: Preview - fits in viewport, no scroll */}
-            <div className="w-full lg:w-[45%] lg:min-w-112.5 flex flex-col gap-3 pr-2">
+            <div className="w-full lg:w-[48%] lg:min-w-112.5 flex flex-col gap-4 pr-2">
               <div className="flex-1 overflow-hidden">
                 <ResumePreview
                   name={resumeName}
