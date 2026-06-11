@@ -102,64 +102,48 @@ export function LandingHero() {
               <div className="bg-white/80 backdrop-blur border border-border/40 rounded-2xl p-6 h-fit shadow-sm">
                 <h3 className="text-sm font-bold text-slate-900 mb-6 uppercase tracking-wider">For managing multiple versions</h3>
 
-                <div className="space-y-4">
-                  {/* Row 1 */}
-                  <div className="flex items-center justify-between py-3 border-b border-border/20">
-                    <span className="text-sm text-slate-800 font-medium">Name each version</span>
-                    <div className="flex gap-3">
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✓</div>
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
-                    </div>
-                  </div>
-
-                  {/* Row 2 */}
-                  <div className="flex items-center justify-between py-3 border-b border-border/20">
-                    <span className="text-sm text-slate-800 font-medium">Edit separately</span>
-                    <div className="flex gap-3">
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✓</div>
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">⚠</div>
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
-                    </div>
-                  </div>
-
-                  {/* Row 3 */}
-                  <div className="flex items-center justify-between py-3 border-b border-border/20">
-                    <span className="text-sm text-slate-800 font-medium">See all at once</span>
-                    <div className="flex gap-3">
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✓</div>
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
-                    </div>
-                  </div>
-
-                  {/* Row 4 */}
-                  <div className="flex items-center justify-between py-3 border-b border-border/20">
-                    <span className="text-sm text-slate-800 font-medium">Never mix them up</span>
-                    <div className="flex gap-3">
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">✓</div>
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">⚠</div>
-                      <div className="w-6 h-6 flex items-center justify-center text-lg">⚠</div>
-                    </div>
-                  </div>
-
-                  {/* Price Row */}
-                  <div className="flex items-center justify-between py-3 pt-4">
-                    <span className="text-sm font-bold text-slate-900">Price</span>
-                    <div className="flex gap-3 text-sm font-bold">
-                      <span className="text-emerald-700">Free</span>
-                      <span className="text-slate-400">Free</span>
-                      <span className="text-slate-400">$5/mo</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Legend */}
-                <div className="mt-6 pt-4 border-t border-border/20 flex gap-4 justify-center text-xs">
-                  <span className="text-slate-700 font-semibold">Us</span>
-                  <span className="text-slate-400">Google Docs</span>
-                  <span className="text-slate-400">Canva</span>
-                </div>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b-2 border-slate-300">
+                      <th className="text-left py-3 px-2 font-semibold text-slate-900 w-1/2"></th>
+                      <th className="text-center py-3 px-2 font-bold text-slate-900">Us</th>
+                      <th className="text-center py-3 px-2 font-medium text-slate-500">Google</th>
+                      <th className="text-center py-3 px-2 font-medium text-slate-500">Canva</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-slate-200 hover:bg-slate-50 transition">
+                      <td className="py-3 px-2 text-slate-800 font-medium">Name each version</td>
+                      <td className="text-center py-3 text-emerald-600 text-lg">✓</td>
+                      <td className="text-center py-3 text-slate-400 text-lg">✕</td>
+                      <td className="text-center py-3 text-slate-400 text-lg">✕</td>
+                    </tr>
+                    <tr className="border-b border-slate-200 hover:bg-slate-50 transition">
+                      <td className="py-3 px-2 text-slate-800 font-medium">Edit separately</td>
+                      <td className="text-center py-3 text-emerald-600 text-lg">✓</td>
+                      <td className="text-center py-3 text-amber-600 text-lg">⚠</td>
+                      <td className="text-center py-3 text-slate-400 text-lg">✕</td>
+                    </tr>
+                    <tr className="border-b border-slate-200 hover:bg-slate-50 transition">
+                      <td className="py-3 px-2 text-slate-800 font-medium">See all at once</td>
+                      <td className="text-center py-3 text-emerald-600 text-lg">✓</td>
+                      <td className="text-center py-3 text-slate-400 text-lg">✕</td>
+                      <td className="text-center py-3 text-slate-400 text-lg">✕</td>
+                    </tr>
+                    <tr className="border-b border-slate-200 hover:bg-slate-50 transition">
+                      <td className="py-3 px-2 text-slate-800 font-medium">Never mix them up</td>
+                      <td className="text-center py-3 text-emerald-600 text-lg">✓</td>
+                      <td className="text-center py-3 text-amber-600 text-lg">⚠</td>
+                      <td className="text-center py-3 text-amber-600 text-lg">⚠</td>
+                    </tr>
+                    <tr className="font-bold">
+                      <td className="py-3 px-2 text-slate-900">Price</td>
+                      <td className="text-center py-3 text-emerald-700">Free</td>
+                      <td className="text-center py-3 text-slate-500">Free</td>
+                      <td className="text-center py-3 text-slate-500">$5/mo</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
