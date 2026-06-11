@@ -495,9 +495,9 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
   }
 
   // Light Mode Layout Constants (Classic Modernized Theme)
-  const panelHeader = 'flex items-center justify-between gap-4 border-b border-slate-100 bg-white px-6 py-5'
-  const panelTitle = 'font-serif text-lg font-bold text-slate-800'
-  const panelSubtitle = 'mt-0.5 text-[9px] uppercase font-extrabold tracking-widest text-slate-400'
+  const panelHeader = 'flex flex-row items-center justify-between gap-4 border-b border-slate-100/80 bg-white px-8 py-7'
+  const panelTitle = 'font-serif text-3xl font-light tracking-tight text-slate-900'
+  const panelSubtitle = 'font-serif italic text-[15px] text-slate-500'
   const fieldLabel = 'text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-slate-650 transition-colors duration-300'
   const inputClass = 'w-full bg-transparent pt-1 text-sm text-slate-850 placeholder-slate-350 outline-none border-none'
   const formFieldClass = 'group relative rounded-xl border border-slate-200 bg-slate-50/20 px-4 py-2 transition-all duration-300 focus-within:bg-white focus-within:border-slate-800 focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.03)]'
@@ -588,15 +588,11 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
       </div>
     ) : (
       <div className={panelHeader}>
-        <div className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-serif text-sm font-black shadow-inner shrink-0 ${getSectionIconBg(sectionKey)}`}>
-              {getSectionMonogram(sectionKey)}
-            </div>
-            <div className="min-w-0">
-              <h3 className={panelTitle}>{sections[sectionKey].title}</h3>
-              <p className={panelSubtitle}>{counts}</p>
-            </div>
+        <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 text-left">
+          <h3 className={panelTitle}>{sections[sectionKey].title}</h3>
+          <div className="flex items-center gap-4">
+            <span className="hidden sm:block w-8 h-[1px] bg-slate-200" />
+            <p className={panelSubtitle}>{counts}</p>
           </div>
         </div>
         <Button
@@ -690,15 +686,11 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
       {activeSection === 'personal' && (
         <div id="sec-personal" className="animate-in fade-in duration-300">
           <div className={panelHeader}>
-            <div className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-serif text-sm font-black shadow-inner shrink-0 ${getSectionIconBg('personal')}`}>
-                  {getSectionMonogram('personal')}
-                </div>
-                <div className="min-w-0">
-                  <h3 className={panelTitle}>Personal Information</h3>
-                  <p className={panelSubtitle}>Your identity and professional contacts</p>
-                </div>
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 text-left">
+              <h3 className={panelTitle}>Personal Information</h3>
+              <div className="flex items-center gap-4">
+                <span className="hidden sm:block w-8 h-[1px] bg-slate-200" />
+                <p className={panelSubtitle}>Your identity and professional contacts</p>
               </div>
             </div>
           </div>
@@ -1167,17 +1159,15 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
       {/* 6. Custom Fields */}
       {activeSection === 'custom' && (
         <div id="sec-custom" className="animate-in fade-in duration-300">
-          <div className="border-b border-slate-100 bg-white px-6 py-5 flex items-center justify-between">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className={`w-9 h-9 rounded-xl border flex items-center justify-center font-serif text-sm font-black shadow-inner shrink-0 ${getSectionIconBg('custom')}`}>
-                {getSectionMonogram('custom')}
-              </div>
-              <div className="min-w-0">
-                <h3 className={panelTitle}>Custom Sections</h3>
-                <p className={panelSubtitle}>Add custom key-value metadata like Certifications or Languages</p>
+          <div className={panelHeader}>
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 text-left">
+              <h3 className={panelTitle}>Custom Sections</h3>
+              <div className="flex items-center gap-4">
+                <span className="hidden sm:block w-8 h-[1px] bg-slate-200" />
+                <p className={panelSubtitle}>Add custom metadata</p>
               </div>
             </div>
-            <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-655 ring-1 ring-rose-500/15">
+            <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-serif italic text-rose-700 ring-1 ring-rose-500/20">
               {customFields.length} fields
             </span>
           </div>
