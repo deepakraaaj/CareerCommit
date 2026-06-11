@@ -31,6 +31,7 @@ export interface ResumeVersion {
   template: string
   fitStatus: number
   isActive?: boolean
+  contentSnapshot?: Record<string, unknown>
 }
 
 export interface VersionChange {

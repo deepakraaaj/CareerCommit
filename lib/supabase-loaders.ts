@@ -43,18 +43,24 @@ function mapResume(
 }
 
 function mapVersion(row: Partial<DbResumeVersion>): ResumeVersion {
-  const created = row.created_at?.split('T')[0] ?? new Date().toISOString().split('T')[0]
+  const dateObj = row.created_at ? new Date(row.created_at) : new Date()
+  const created = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const time = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+
+  const changes = row.change_notes || (row.title ? `Saved as: ${row.title}` : 'Saved version')
+
   return {
     id: row.id ?? 0,
     name: `Version ${row.version_number ?? 1}`,
     title: row.title ?? `Version ${row.version_number ?? 1}`,
     date: created,
-    time: '12:00 PM',
-    changes: row.title ? `Saved version: ${row.title}` : 'Saved version',
+    time,
+    changes,
     savedBy: row.saved_by ?? 'Manual',
     template: 'Modern',
     fitStatus: Number(row.fit_score ?? 0),
     isActive: Number(row.version_number ?? 0) === 1,
+    contentSnapshot: row.content_snapshot as Record<string, unknown> | undefined,
   }
 }
 
@@ -104,7 +110,10 @@ export async function loadResumes(userId?: string): Promise<Resume[]> {
 
 export async function loadVersions(resumeId?: string, userId?: string): Promise<ResumeVersion[]> {
   const rows = await supabasePlaceholder.getVersions(resumeId, userId)
-  return rows.map(mapVersion)
+  console.log('[loadVersions] Raw rows:', rows)
+  const mapped = rows.map(mapVersion)
+  console.log('[loadVersions] Mapped versions:', mapped)
+  return mapped
 }
 
 export async function loadAchievements(userId?: string): Promise<AchievementNote[]> {

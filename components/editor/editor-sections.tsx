@@ -193,6 +193,32 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
     initialContent?.customFields || []
   )
 
+  // Sync initialContent changes to local state
+  const contentKey = initialContent ? `${initialContent.name}|${initialContent.title}|${initialContent.email}` : null
+  useEffect(() => {
+    if (initialContent) {
+      console.log('[EditorSections] Syncing initialContent:', initialContent.title)
+      setName(initialContent.name || '')
+      setTitle(initialContent.title || '')
+      setEmail(initialContent.email || '')
+      setPhone(initialContent.phone || '')
+      setLinkedin(initialContent.linkedin || '')
+      setGithub(initialContent.github || '')
+      setSummary(initialContent.summary || '')
+      setExperiences(initialContent.experiences || [])
+      setEducationEntries(initialContent.educationEntries || [])
+      setSkills(initialContent.skills || [])
+      setCustomFields(initialContent.customFields || [])
+      setSections(prev => ({
+        ...prev,
+        summary: { ...prev.summary, title: initialContent.sectionTitles?.summary || prev.summary.title },
+        experience: { ...prev.experience, title: initialContent.sectionTitles?.experience || prev.experience.title },
+        education: { ...prev.education, title: initialContent.sectionTitles?.education || prev.education.title },
+        skills: { ...prev.skills, title: initialContent.sectionTitles?.skills || prev.skills.title },
+      }))
+    }
+  }, [contentKey])
+
   // Sync to Parent Callback
   useEffect(() => {
     const content: EditorContent = {

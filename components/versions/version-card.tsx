@@ -28,6 +28,7 @@ export function VersionCard({
   isLatest,
   index,
   total,
+  contentSnapshot,
   onRestore,
   onCompare,
   onDuplicate,
@@ -35,7 +36,15 @@ export function VersionCard({
   const router = useRouter()
 
   const handleOpen = () => {
-    router.push('/editor')
+    console.log('[VersionCard] Opening:', title, 'contentSnapshot:', contentSnapshot)
+    if (contentSnapshot && Object.keys(contentSnapshot).length > 0) {
+      // Pass version ID via URL instead of localStorage
+      router.push(`/editor?versionId=${id}`)
+    } else {
+      console.log('[VersionCard] ⚠️ No content snapshot available for this version')
+      alert('This version does not have content snapshot saved. Create a new version to test.')
+      router.push('/editor')
+    }
   }
 
   const handleDownload = () => {

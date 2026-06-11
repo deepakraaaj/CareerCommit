@@ -1,13 +1,15 @@
 'use client'
 
-import { useEffect, useMemo, useState, useCallback } from 'react'
-import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown } from 'lucide-react'
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { EditorSections } from '@/components/editor/editor-sections'
+import { supabasePlaceholder, type DbResume } from '@/lib/supabase-placeholder'
 import { ResumePreview, type TemplateType } from '@/components/editor/resume-preview'
-import { SaveVersionModal } from '@/components/versions/save-version-modal'
 import { LoginModal } from '@/components/auth/login-modal'
+import { SaveVersionModal, type SaveVersionData } from '@/components/versions/save-version-modal'
 import { useAuth } from '@/components/auth/auth-provider'
 import { loadResumes } from '@/lib/supabase-loaders'
 
@@ -120,47 +122,97 @@ const COLOR_OPTIONS = [
   { name: 'slate', class: 'bg-slate-500 ring-slate-500/30' },
 ]
 
+// Initialize resume ID synchronously before component render
+function getOrCreateResumeId(): string {
+  const stored = typeof window !== 'undefined' ? localStorage.getItem('career-commit-resume-id') : null
+  if (stored) return stored
+
+  const newId = crypto.randomUUID()
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('career-commit-resume-id', newId)
+  }
+  return newId
+}
+
 export default function Editor() {
-  const { user, signOut } = useAuth()
+  const { user, profile, signOut } = useAuth()
+  const router = useRouter()
+  const [versionId, setVersionId] = useState<string | null>(null)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [resumeName, setResumeName] = useState('My Resume')
   const [isEditingName, setIsEditingName] = useState(false)
   const [tempName, setTempName] = useState('My Resume')
+  const resumeId = getOrCreateResumeId()
 
   const [draftStatus, setDraftStatus] = useState<'unsaved' | 'draft_saved' | 'ready_to_save'>(
     'draft_saved'
   )
-  const [currentVersion, setCurrentVersion] = useState(1)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
-  
+
   // Customization Options
   const [template, setTemplate] = useState<TemplateType>('modern')
   const [accentColor, setAccentColor] = useState<string>('blue')
   const [density, setDensity] = useState<'airy' | 'normal' | 'compact' | 'auto'>('auto')
   const [fontFamily, setFontFamily] = useState<'sans' | 'serif' | 'mono'>('sans')
-  
+
   const [preview, setPreview] = useState('')
-  const [editorContent, setEditorContent] = useState<EditorContent | null>(null)
-  const [saveVersionModalOpen, setSaveVersionModalOpen] = useState(false)
+  const [editorContent, setEditorContent] = useState<EditorContent>(DEFAULT_RESUME_DATA)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [versionModalOpen, setVersionModalOpen] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const userMenuRef = useRef<HTMLDivElement | null>(null)
+
+  const displayName = profile?.name || user?.email?.split('@')[0] || 'Account'
+  const displayEmail = user?.email || 'No email available'
+
+  // Extract versionId from URL
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    setVersionId(params.get('versionId'))
+  }, [])
 
   // Load Initial State
   useEffect(() => {
+    // If versionId is in URL, fetch that version
+    if (versionId) {
+      console.log('[Editor] Loading version:', versionId)
+      fetch(`/api/resumes/versions?userId=${user?.id}`)
+        .then(r => r.json())
+        .then(result => {
+          const version = result.data?.find((v: any) => String(v.id) === String(versionId))
+          if (version && version.content_snapshot) {
+            console.log('[Editor] ✅ Loaded version from API:', version.content_snapshot.title)
+            const snapshot = version.content_snapshot as EditorContent
+            setEditorContent(snapshot)
+            setResumeName(snapshot.name ? `${snapshot.name}'s Resume` : 'My Resume')
+            if (snapshot.accentColor) setAccentColor(snapshot.accentColor)
+            if (snapshot.density) setDensity(snapshot.density)
+            if (snapshot.fontFamily) setFontFamily(snapshot.fontFamily)
+            triggerPreviewUpdate(snapshot)
+          }
+        })
+        .catch(err => console.error('[Editor] Error loading version:', err))
+      return
+    }
+
     // Client-side initialization
     const local = localStorage.getItem('career-commit-editor-state')
+    console.log('[Editor] Initialization - localStorage content:', local ? 'Found' : 'Not found')
+
     if (local) {
       try {
         const parsed = JSON.parse(local)
+        console.log('[Editor] Loaded from localStorage:', parsed.title)
         setEditorContent(parsed)
         setResumeName(parsed.name ? `${parsed.name}'s Resume` : 'My Resume')
         if (parsed.accentColor) setAccentColor(parsed.accentColor)
         if (parsed.density) setDensity(parsed.density)
         if (parsed.fontFamily) setFontFamily(parsed.fontFamily)
-        
+
         triggerPreviewUpdate(parsed)
         return
       } catch (e) {
-        console.error(e)
+        console.error('[Editor] Error parsing localStorage:', e)
       }
     }
 
@@ -174,7 +226,33 @@ export default function Editor() {
         triggerPreviewUpdate(DEFAULT_RESUME_DATA)
       }
     })
-  }, [])
+  }, [versionId, user?.id])
+
+  useEffect(() => {
+    if (!userMenuOpen) return
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setUserMenuOpen(false)
+      }
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setUserMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('touchstart', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('touchstart', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [userMenuOpen])
 
   const handleSaveName = () => {
     setIsEditingName(false)
@@ -240,13 +318,94 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
     localStorage.setItem('career-commit-editor-state', JSON.stringify(content))
   }, [])
 
-  const handleDraftSave = () => {
+  const handleDraftSave = async () => {
+    console.log('[Save] Button clicked. User:', user?.email)
+
     if (!user) {
       setLoginModalOpen(true)
       return
     }
-    setDraftStatus('draft_saved')
-    setLastSaved(new Date())
+
+    setIsSaving(true)
+    try {
+      const resume: DbResume = {
+        id: resumeId,
+        user_id: user.id,
+        name: resumeName,
+        title: editorContent.title,
+        template: 'modern',
+        content_text: preview || 'Resume content',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      }
+
+      console.log('[Save] Saving to Supabase...')
+
+      // Add 15 second timeout to Supabase call
+      const savePromise = supabasePlaceholder.saveResume(user.id, resume)
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Supabase query timed out after 15 seconds. Check Supabase status.')), 15000)
+      )
+
+      const result = await Promise.race([savePromise, timeoutPromise as any])
+
+      if (result) {
+        setDraftStatus('draft_saved')
+        setLastSaved(new Date())
+        console.log('[Save] ✅ Success')
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error('[Save] ❌ Failed:', message)
+      alert(`Error: ${message}`)
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  const handleSaveVersionClick = () => {
+    if (!user) {
+      setLoginModalOpen(true)
+      return
+    }
+    setVersionModalOpen(true)
+  }
+
+  const handleSaveVersion = async (data: SaveVersionData) => {
+    if (!user) {
+      setLoginModalOpen(true)
+      return
+    }
+
+    setIsSaving(true)
+    try {
+      const response = await fetch('/api/resumes/versions/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          resume_id: resumeId,
+          user_id: user.id,
+          title: data.title,
+          content_snapshot: editorContent,
+          change_notes: data.description,
+          saved_by: data.source,
+          fit_score: 0,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save version')
+      }
+
+      setVersionModalOpen(false)
+      alert('✅ Version saved successfully!')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      console.error('[SaveVersion] Error:', message)
+      alert(`Error saving version: ${message}`)
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   const handleSignOut = async () => {
@@ -254,11 +413,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
     setUserMenuOpen(false)
   }
 
-  const handleSaveVersionConfirm = (_data: { title: string; changeNote: string; source: string }) => {
-    setCurrentVersion(currentVersion + 1)
-    setDraftStatus('ready_to_save')
-    setSaveVersionModalOpen(false)
-  }
 
   const resumeStrength = useMemo(() => {
     if (!editorContent) return 0
@@ -340,8 +494,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   </div>
                 )}
                 <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[10px] text-slate-500 font-medium">
-                  <span>v{currentVersion}</span>
-                  <span className="w-1 h-1 rounded-full bg-slate-300" />
                   <span>{formatRelativeTime(lastSaved)}</span>
                 </div>
               </div>
@@ -458,12 +610,26 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
               <Button
                 size="sm"
                 onClick={handleDraftSave}
-                className="gap-1.5 rounded-lg bg-indigo-600 px-4 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/10 transition-all font-semibold"
-                title={user ? 'Save Draft' : 'Sign in to save'}
+                disabled={isSaving}
+                className="gap-1.5 rounded-lg bg-indigo-600 px-4 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/10 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                title={user ? (isSaving ? 'Saving...' : 'Save Draft') : 'Sign in to save'}
               >
                 <Save className="h-3.5 w-3.5" />
-                Save
+                {isSaving ? 'Saving...' : 'Save'}
               </Button>
+
+              <Button
+                size="sm"
+                onClick={handleSaveVersionClick}
+                disabled={isSaving}
+                variant="outline"
+                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                title={user ? 'Save a version snapshot' : 'Sign in to save versions'}
+              >
+                <Archive className="h-3.5 w-3.5" />
+                Version
+              </Button>
+
               <Button
                 variant="outline"
                 size="sm"
@@ -480,30 +646,40 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
               <div className="h-6 w-px bg-slate-200 mx-1" />
 
               {user ? (
-                <div className="relative">
+                <div ref={userMenuRef} className="relative z-30">
                   <button
+                    type="button"
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    aria-expanded={userMenuOpen}
+                    aria-haspopup="menu"
                     className="flex items-center gap-1.5 p-1 rounded-lg text-sm text-slate-650 hover:bg-slate-50 border border-slate-200 transition-colors group"
                   >
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
-                      {user.email?.charAt(0).toUpperCase()}
+                      {displayName.charAt(0).toUpperCase()}
                     </div>
                     <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-colors" />
                   </button>
 
                   {userMenuOpen && (
-                    <div className="absolute top-full right-0 mt-2 w-48 rounded-xl border border-slate-200 bg-white shadow-xl p-2 z-50">
-                      <div className="px-3 py-2 text-[10px] font-semibold text-slate-400 border-b border-slate-100 mb-1.5 truncate">
-                        {user.email}
+                    <div
+                      role="menu"
+                      className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl z-[60]"
+                    >
+                      <div className="rounded-xl bg-slate-50 px-3 py-3 border border-slate-100 mb-2">
+                        <div className="truncate text-sm font-semibold text-slate-800">{displayName}</div>
+                        <div className="truncate text-xs text-slate-500">{displayEmail}</div>
                       </div>
-                      <Link href="/dashboard">
-                        <button className="w-full px-3 py-2 rounded-lg text-xs font-semibold text-left text-slate-600 hover:bg-slate-50 transition-colors">
-                          📊 My Resumes
-                        </button>
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+                      >
+                        📊 My Resumes
                       </Link>
                       <button
+                        type="button"
                         onClick={handleSignOut}
-                        className="w-full px-3 py-2 rounded-lg text-xs font-semibold text-left text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors mt-1"
+                        className="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
                       >
                         ↗ Sign out
                       </button>
@@ -541,7 +717,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
           <div className="w-full lg:w-[45%] h-full overflow-y-hidden bg-slate-100">
             <ResumePreview
               name={resumeName}
-              currentVersion={currentVersion}
               draftStatus={draftStatus}
               preview={preview}
               template={template}
@@ -556,10 +731,10 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
 
       {/* Save Version Modal */}
       <SaveVersionModal
-        isOpen={saveVersionModalOpen}
-        currentVersion={currentVersion}
-        onClose={() => setSaveVersionModalOpen(false)}
-        onSave={handleSaveVersionConfirm}
+        isOpen={versionModalOpen}
+        onClose={() => setVersionModalOpen(false)}
+        onSave={handleSaveVersion}
+        isSaving={isSaving}
       />
 
       {/* Login Modal */}

@@ -35,6 +35,7 @@ export default function Versions() {
   })
   const [statusMessage, setStatusMessage] = useState('')
   const [versions, setVersions] = useState<ResumeVersion[]>([])
+  const [selectedVersionForRestore, setSelectedVersionForRestore] = useState<ResumeVersion | null>(null)
 
   useEffect(() => {
     let active = true
@@ -56,24 +57,27 @@ export default function Versions() {
   }, [resumeId, user])
 
   const handleRestore = (id: string | number, title: string) => {
+    const version = versions.find(v => v.id === id)
+    setSelectedVersionForRestore(version || null)
     setRestoreModal({ isOpen: true, versionTitle: title })
   }
 
   const handleConfirmRestore = () => {
-    setRestoreModal({ isOpen: false, versionTitle: '' })
-    setStatusMessage('Restore completed locally in this demo.')
-    if (resumeId && user) {
-      void supabasePlaceholder.saveVersion({
-        id: crypto.randomUUID(),
-        resume_id: resumeId,
-        user_id: user.id,
-        title: `Restored ${restoreModal.versionTitle}`,
-        version_number: versions.length + 1,
-        saved_by: 'Manual',
-        fit_score: 0,
-        created_at: new Date().toISOString(),
-      })
+    if (selectedVersionForRestore?.contentSnapshot) {
+      // Save the version content to localStorage
+      localStorage.setItem('career-commit-editor-state', JSON.stringify(selectedVersionForRestore.contentSnapshot))
+      setStatusMessage('✅ Version restored! Redirecting to editor...')
+
+      // Redirect to editor
+      setTimeout(() => {
+        window.location.href = '/editor'
+      }, 1000)
+    } else {
+      setStatusMessage('❌ Could not restore version - no content snapshot found')
     }
+
+    setRestoreModal({ isOpen: false, versionTitle: '' })
+    setSelectedVersionForRestore(null)
   }
 
   const handleCompare = (versionA: string, versionB: string) => {
