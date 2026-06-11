@@ -45,9 +45,9 @@ export function LandingHero() {
             {/* Left: Content */}
             <div className="flex-1 space-y-6 pt-4">
               {/* Real Problem Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-amber-300/40 bg-amber-50/60 w-fit">
-                <span className="text-lg">😴</span>
-                <span className="text-xs font-semibold text-amber-800">For people who hate formatting resumes</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-300/40 bg-slate-100/60 w-fit">
+                <div className="w-1.5 h-1.5 rounded-full bg-slate-600"></div>
+                <span className="text-xs font-semibold text-slate-700">For people who hate formatting resumes</span>
               </div>
 
               {/* Headline - Problem Focused */}
@@ -161,7 +161,9 @@ export function LandingHero() {
             {/* Card 1 */}
             <div className="bg-white/50 backdrop-blur border border-border/30 rounded-lg p-4 h-fit">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">⚡</span>
+                <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">
+                  <div className="w-4 h-0.5 bg-slate-600"></div>
+                </div>
                 <h3 className="font-bold text-sm text-slate-900">Edit in 5 minutes</h3>
               </div>
               <p className="text-xs text-slate-700">
@@ -172,7 +174,9 @@ export function LandingHero() {
             {/* Card 2 */}
             <div className="bg-white/50 backdrop-blur border border-border/30 rounded-lg p-4 h-fit">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">📱</span>
+                <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">
+                  <div className="w-3 h-4 border-l-2 border-b-2 border-slate-600"></div>
+                </div>
                 <h3 className="font-bold text-sm text-slate-900">Works on your phone</h3>
               </div>
               <p className="text-xs text-slate-700">
@@ -183,7 +187,9 @@ export function LandingHero() {
             {/* Card 3 */}
             <div className="bg-white/50 backdrop-blur border border-border/30 rounded-lg p-4 h-fit">
               <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">💾</span>
+                <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">
+                  <div className="w-3 h-3 border-2 border-slate-600 rounded"></div>
+                </div>
                 <h3 className="font-bold text-sm text-slate-900">Save every draft</h3>
               </div>
               <p className="text-xs text-slate-700">
