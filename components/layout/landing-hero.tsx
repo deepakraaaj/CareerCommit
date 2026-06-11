@@ -47,16 +47,16 @@ export function LandingHero() {
               {/* Real Problem Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-300/40 bg-slate-100/60 w-fit">
                 <div className="w-1.5 h-1.5 rounded-full bg-slate-600"></div>
-                <span className="text-xs font-semibold text-slate-700">For people who hate formatting resumes</span>
+                <span className="text-xs font-semibold text-slate-700">One resume. Infinite jobs.</span>
               </div>
 
-              {/* Headline - Problem Focused */}
+              {/* Headline - Multi-Role Focus */}
               <div>
                 <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight text-foreground">
-                  Update your resume.<br/>Without the pain.
+                  Stop managing resume versions.
                 </h1>
                 <p className="text-base md:text-lg text-foreground/60 mt-4 max-w-lg">
-                  No alignment. No font drama. No margin tweaking. Just write your stuff and it looks professional.
+                  Apply to Amazon, Google, and 5 startups with tailored resumes. One dashboard, perfect version control, zero chaos.
                 </p>
               </div>
 
@@ -80,19 +80,19 @@ export function LandingHero() {
                 </Button>
               </div>
 
-              {/* Social Proof - Effort/Laziness */}
+              {/* Social Proof - Multi-Role Reality */}
               <div className="flex gap-8 pt-4 text-xs border-t border-border/30">
                 <div>
-                  <div className="font-bold text-sm text-slate-900">5 min to update</div>
-                  <div className="text-foreground/60">Edit, done</div>
+                  <div className="font-bold text-sm text-slate-900">10+ versions</div>
+                  <div className="text-foreground/60">Organized, not chaos</div>
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-slate-900">Zero formatting</div>
-                  <div className="text-foreground/60">We handle it</div>
+                  <div className="font-bold text-sm text-slate-900">Edit separately</div>
+                  <div className="text-foreground/60">No mix-ups</div>
                 </div>
                 <div>
-                  <div className="font-bold text-sm text-slate-900">Looks amazing</div>
-                  <div className="text-foreground/60">Every time</div>
+                  <div className="font-bold text-sm text-slate-900">See all at once</div>
+                  <div className="text-foreground/60">One place</div>
                 </div>
               </div>
             </div>
@@ -100,18 +100,10 @@ export function LandingHero() {
             {/* Right: Comparison Grid */}
             <div className="flex-1 lg:pt-4">
               <div className="bg-white/70 backdrop-blur border border-border/30 rounded-xl p-5 h-fit shadow-sm">
-                <h3 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wide">Stop wasting time on formatting</h3>
+                <h3 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wide">For managing multiple versions</h3>
                 <div className="space-y-3 text-xs">
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-slate-700 font-medium">Just write content</span>
-                    <div className="flex gap-2">
-                      <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
-                      <div className="w-6 h-6 bg-orange-200/40 rounded flex items-center justify-center text-xs">⚠</div>
-                      <div className="w-6 h-6 bg-orange-200/40 rounded flex items-center justify-center text-xs">⚠</div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-slate-700 font-medium">Auto-formatted & styled</span>
+                    <span className="text-slate-700 font-medium">Name each version clearly</span>
                     <div className="flex gap-2">
                       <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
                       <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
@@ -119,15 +111,23 @@ export function LandingHero() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-slate-700 font-medium">Works great on mobile</span>
+                    <span className="text-slate-700 font-medium">Edit each one separately</span>
                     <div className="flex gap-2">
                       <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
-                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
                       <div className="w-6 h-6 bg-orange-200/40 rounded flex items-center justify-center text-xs">⚠</div>
+                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
                     </div>
                   </div>
                   <div className="flex items-center justify-between gap-4">
-                    <span className="text-slate-700 font-medium">Never breaks when you update</span>
+                    <span className="text-slate-700 font-medium">See all versions at once</span>
+                    <div className="flex gap-2">
+                      <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
+                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
+                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <span className="text-slate-700 font-medium">Never lose or mix up versions</span>
                     <div className="flex gap-2">
                       <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
                       <div className="w-6 h-6 bg-orange-200/40 rounded flex items-center justify-center text-xs">⚠</div>
@@ -156,18 +156,18 @@ export function LandingHero() {
             </div>
           </div>
 
-          {/* Bottom: Lazy Features */}
+          {/* Bottom: Multi-Version Workflow */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pb-4">
             {/* Card 1 */}
             <div className="bg-white/50 backdrop-blur border border-border/30 rounded-lg p-4 h-fit">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">
-                  <div className="w-4 h-0.5 bg-slate-600"></div>
+                  <div className="w-4 h-4 border-l-2 border-t-2 border-slate-600"></div>
                 </div>
-                <h3 className="font-bold text-sm text-slate-900">Edit in 5 minutes</h3>
+                <h3 className="font-bold text-sm text-slate-900">Create variants instantly</h3>
               </div>
               <p className="text-xs text-slate-700">
-                No re-formatting. No re-aligning. Update your job, boom—resume looks perfect. Done.
+                Base resume → Amazon version → Google version → Startup version. One click each. No copy-paste chaos.
               </p>
             </div>
 
@@ -175,12 +175,16 @@ export function LandingHero() {
             <div className="bg-white/50 backdrop-blur border border-border/30 rounded-lg p-4 h-fit">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">
-                  <div className="w-3 h-4 border-l-2 border-b-2 border-slate-600"></div>
+                  <div className="space-y-0.5">
+                    <div className="w-3 h-0.5 bg-slate-600"></div>
+                    <div className="w-3 h-0.5 bg-slate-600"></div>
+                    <div className="w-3 h-0.5 bg-slate-600"></div>
+                  </div>
                 </div>
-                <h3 className="font-bold text-sm text-slate-900">Works on your phone</h3>
+                <h3 className="font-bold text-sm text-slate-900">Everything organized</h3>
               </div>
               <p className="text-xs text-slate-700">
-                Update your resume from anywhere. Not stuck to your computer with Word open.
+                All your versions in one dashboard. See which is for which job. Never send the wrong resume.
               </p>
             </div>
 
@@ -188,12 +192,12 @@ export function LandingHero() {
             <div className="bg-white/50 backdrop-blur border border-border/30 rounded-lg p-4 h-fit">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center">
-                  <div className="w-3 h-3 border-2 border-slate-600 rounded"></div>
+                  <div className="w-4 h-4 border-2 border-slate-600 rounded-full"></div>
                 </div>
-                <h3 className="font-bold text-sm text-slate-900">Save every draft</h3>
+                <h3 className="font-bold text-sm text-slate-900">Tweak each independently</h3>
               </div>
               <p className="text-xs text-slate-700">
-                Tried something? Didn't like it? Go back to the old version. No more "undo" panic.
+                Update Amazon resume without touching Google version. All changes stay separate and safe.
               </p>
             </div>
           </div>
