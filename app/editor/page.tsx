@@ -123,51 +123,26 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         <div className="border-b border-border/50 shrink-0 z-20 bg-background/80 backdrop-blur-sm">
           <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
             <div className="flex items-center justify-end gap-2">
+              <Button
+                size="sm"
+                onClick={handleDraftSave}
+                className="gap-2"
+                title={user ? 'Save changes' : 'Sign in to save'}
+              >
+                <Save className="w-4 h-4" />
+                Save
+              </Button>
+
+              <Link href="/export">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleDraftSave}
                   className="gap-2"
-                  title={user ? 'Save your draft' : 'Sign in to save drafts'}
                 >
-                  <Save className="w-4 h-4" />
-                  Save Draft
+                  <Download className="w-4 h-4" />
+                  Export PDF
                 </Button>
-
-                <Button
-                  size="sm"
-                  onClick={handleVersionSave}
-                  className="gap-2"
-                  title={user ? 'Save a new version' : 'Sign in to save versions'}
-                >
-                  <Plus className="w-4 h-4" />
-                  Save New Version
-                </Button>
-
-                {user && (
-                  <Link href="/resumes/1/versions">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                    >
-                      <History className="w-4 h-4" />
-                      History
-                    </Button>
-                  </Link>
-                )}
-
-                <Link href="/export">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    Export PDF
-                  </Button>
-                </Link>
-              </div>
+              </Link>
             </div>
           </div>
         </div>
