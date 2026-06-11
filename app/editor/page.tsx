@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useState, useCallback } from 'react'
-import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles } from 'lucide-react'
-import { Navbar } from '@/components/navbar'
+import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { EditorSections } from '@/components/editor/editor-sections'
 import { ResumePreview, type TemplateType } from '@/components/editor/resume-preview'
@@ -121,7 +121,8 @@ const COLOR_OPTIONS = [
 ]
 
 export default function Editor() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
+  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [resumeName, setResumeName] = useState('My Resume')
   const [isEditingName, setIsEditingName] = useState(false)
   const [tempName, setTempName] = useState('My Resume')
@@ -230,7 +231,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
     setPreview(previewText)
   }
 
-  const handleEditorChange = useCallback((content: EditorContent) => {
+  const handleEditorChange = useCallback((content: any) => {
     setEditorContent(content)
     setDraftStatus('unsaved')
     triggerPreviewUpdate(content)
@@ -246,6 +247,11 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
     }
     setDraftStatus('draft_saved')
     setLastSaved(new Date())
+  }
+
+  const handleSignOut = async () => {
+    await signOut()
+    setUserMenuOpen(false)
   }
 
   const handleSaveVersionConfirm = (_data: { title: string; changeNote: string; source: string }) => {
@@ -286,20 +292,28 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
 
   return (
     <>
-      <Navbar />
       
       {/* Redesigned Premium Editor Workspace Panel - Light Mode Theme */}
-      <div className="h-[calc(100vh-4rem)] overflow-hidden flex flex-col bg-slate-50 text-slate-800">
+      <div className="h-screen overflow-hidden flex flex-col bg-slate-50 text-slate-800">
         
         {/* Workspace Toolbar (Controls) */}
-        <div className="shrink-0 border-b border-slate-200/80 bg-white px-6 py-4 flex flex-col md:flex-row gap-4 items-center justify-between z-10 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+        <div className="shrink-0 border-b border-slate-200/80 bg-white px-6 py-3.5 flex flex-col md:flex-row gap-4 items-center justify-between z-10 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
           
-          {/* Left: Rename field, Version status, Save State */}
-          <div className="flex flex-wrap items-center gap-4 min-w-0 w-full md:w-auto">
-            <div className="flex items-center gap-2.5">
-              <div className="p-2 bg-slate-50 border border-slate-200 rounded-lg text-indigo-600">
-                <FileText className="h-4.5 w-4.5" />
+          {/* Left: Logo, Separator, Document Details, Save Status Badge */}
+          <div className="flex items-center gap-4 min-w-0 w-full md:w-auto">
+            <Link href="/" className="flex items-center gap-2 group shrink-0">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                <FileText className="w-4.5 h-4.5 text-white" />
               </div>
+              <div className="hidden sm:block">
+                <div className="font-extrabold text-sm text-slate-800 tracking-tight leading-tight">CareerCommit</div>
+                <div className="text-[10px] text-slate-400 font-medium -mt-0.5">Workspace</div>
+              </div>
+            </Link>
+            
+            <div className="h-6 w-px bg-slate-200 hidden sm:block" />
+            
+            <div className="flex items-center gap-3 min-w-0">
               <div className="min-w-0">
                 {isEditingName ? (
                   <input
@@ -325,42 +339,30 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     <Edit2 className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </div>
                 )}
-                <div className="mt-0.5 flex flex-wrap items-center gap-2.5 text-[10px] text-slate-500 font-medium">
+                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[10px] text-slate-500 font-medium">
                   <span>v{currentVersion}</span>
                   <span className="w-1 h-1 rounded-full bg-slate-300" />
                   <span>{formatRelativeTime(lastSaved)}</span>
                 </div>
               </div>
-            </div>
 
-            {/* Save Status Badge */}
-            <div className="flex items-center">
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
-                  draftStatus === 'unsaved'
-                    ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
-                    : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                }`}
-              >
-                {draftStatus === 'unsaved' ? (
-                  <Clock3 className="h-3 w-3" />
-                ) : (
-                  <CheckCircle2 className="h-3 w-3" />
-                )}
-                {draftCopy}
-              </span>
-            </div>
-
-            {/* Resume Strength Score Progress */}
-            <div className="hidden lg:flex items-center gap-2.5 pl-4 border-l border-slate-200">
-              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Strength:</span>
-              <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200/50">
-                <div 
-                  className={`h-full bg-gradient-to-r ${strengthColor} transition-all duration-500`}
-                  style={{ width: `${resumeStrength}%` }}
-                />
+              {/* Save Status Badge */}
+              <div className="flex items-center ml-1 shrink-0">
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                    draftStatus === 'unsaved'
+                      ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                      : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                  }`}
+                >
+                  {draftStatus === 'unsaved' ? (
+                    <Clock3 className="h-2.5 w-2.5" />
+                  ) : (
+                    <CheckCircle2 className="h-2.5 w-2.5" />
+                  )}
+                  {draftCopy}
+                </span>
               </div>
-              <span className="text-[11px] font-bold text-slate-700">{resumeStrength}%</span>
             </div>
           </div>
 
@@ -452,7 +454,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
               </select>
             </div>
 
-            <div className="flex items-center gap-1.5 ml-2">
+            <div className="flex items-center gap-2 ml-2">
               <Button
                 size="sm"
                 onClick={handleDraftSave}
@@ -474,6 +476,50 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                 <Download className="h-3.5 w-3.5" />
                 PDF
               </Button>
+
+              <div className="h-6 w-px bg-slate-200 mx-1" />
+
+              {user ? (
+                <div className="relative">
+                  <button
+                    onClick={() => setUserMenuOpen(!userMenuOpen)}
+                    className="flex items-center gap-1.5 p-1 rounded-lg text-sm text-slate-650 hover:bg-slate-50 border border-slate-200 transition-colors group"
+                  >
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
+                      {user.email?.charAt(0).toUpperCase()}
+                    </div>
+                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-colors" />
+                  </button>
+
+                  {userMenuOpen && (
+                    <div className="absolute top-full right-0 mt-2 w-48 rounded-xl border border-slate-200 bg-white shadow-xl p-2 z-50">
+                      <div className="px-3 py-2 text-[10px] font-semibold text-slate-400 border-b border-slate-100 mb-1.5 truncate">
+                        {user.email}
+                      </div>
+                      <Link href="/dashboard">
+                        <button className="w-full px-3 py-2 rounded-lg text-xs font-semibold text-left text-slate-600 hover:bg-slate-50 transition-colors">
+                          📊 My Resumes
+                        </button>
+                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full px-3 py-2 rounded-lg text-xs font-semibold text-left text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors mt-1"
+                      >
+                        ↗ Sign out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setLoginModalOpen(true)}
+                  className="text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-slate-800 rounded-lg px-3 py-1.5 h-8.5"
+                >
+                  Sign in
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -482,7 +528,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
           
           {/* Left Side: Scrollable Input Form */}
-          <div className="w-full lg:w-[55%] h-full overflow-y-auto px-6 py-6 border-r border-slate-200/80 bg-white custom-scrollbar">
+          <div className="w-full lg:w-[55%] h-full overflow-y-auto px-6 py-6 border-r border-slate-200/80 bg-slate-50 custom-scrollbar">
             {editorContent && (
               <EditorSections
                 initialContent={editorContent}

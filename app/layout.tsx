@@ -47,6 +47,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${figtree.variable} ${jetbrainsMono.variable}`}
+      suppressHydrationWarning
     >
       <body className="font-sans antialiased">
         <AuthProvider>{children}</AuthProvider>

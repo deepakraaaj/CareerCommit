@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Check, ChevronDown, Edit2, X, Trash2, ArrowUp, ArrowDown, Sparkles, Plus } from 'lucide-react'
+import { Check, ChevronDown, Edit2, X, Trash2, ArrowUp, ArrowDown, Sparkles, Plus, User, Briefcase, GraduationCap, Code2, PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { AISuggestionModal } from './ai-suggestion-modal'
@@ -68,13 +68,71 @@ const COMMON_SKILLS = [
 ]
 
 export function EditorSections({ initialContent, onContentChange }: EditorSectionsProps) {
-  const [personalInfoExpanded, setPersonalInfoExpanded] = useState(true)
+  const [activeSection, setActiveSection] = useState<'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'custom'>('personal')
   const [sections, setSections] = useState<Record<string, { title: string; expanded: boolean }>>({
     summary: { title: initialContent?.sectionTitles?.summary || 'Professional Summary', expanded: true },
     experience: { title: initialContent?.sectionTitles?.experience || 'Experience', expanded: true },
-    education: { title: initialContent?.sectionTitles?.education || 'Education', expanded: false },
-    skills: { title: initialContent?.sectionTitles?.skills || 'Skills', expanded: false },
+    education: { title: initialContent?.sectionTitles?.education || 'Education', expanded: true },
+    skills: { title: initialContent?.sectionTitles?.skills || 'Skills', expanded: true },
   })
+
+  const handleSectionSwitch = (section: 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'custom') => {
+    setActiveSection(section)
+    const container = document.querySelector('.custom-scrollbar')
+    if (container) {
+      container.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const SectionFooter = ({ current }: { current: 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'custom' }) => {
+    const list: ('personal' | 'summary' | 'experience' | 'education' | 'skills' | 'custom')[] = [
+      'personal', 'summary', 'experience', 'education', 'skills', 'custom'
+    ]
+    const idx = list.indexOf(current)
+    const prev = idx > 0 ? list[idx - 1] : null
+    const next = idx < list.length - 1 ? list[idx + 1] : null
+
+    const getLabel = (key: string) => {
+      switch (key) {
+        case 'personal': return 'Personal Info'
+        case 'summary': return 'Summary'
+        case 'experience': return 'Experience'
+        case 'education': return 'Education'
+        case 'skills': return 'Skills'
+        case 'custom': return 'Custom'
+        default: return ''
+      }
+    }
+
+    return (
+      <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/30 px-5 py-4 mt-6">
+        <div>
+          {prev && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleSectionSwitch(prev)}
+              className="text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg"
+            >
+              ← Back to {getLabel(prev)}
+            </Button>
+          )}
+        </div>
+        <div>
+          {next && (
+            <Button
+              type="button"
+              onClick={() => handleSectionSwitch(next)}
+              className="text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm rounded-lg px-4"
+            >
+              Next: {getLabel(next)} →
+            </Button>
+          )}
+        </div>
+      </div>
+    )
+  }
 
   const [editingBullet, setEditingBullet] = useState<{ expId: string; bulletId: string } | null>(null)
   const [renamingSection, setRenamingSection] = useState<string | null>(null)
@@ -437,12 +495,56 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
   }
 
   // Light Mode Layout Constants
-  const panelShell = 'overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs transition-all duration-300'
   const panelHeader = 'flex items-center justify-between gap-4 border-b border-slate-100 bg-slate-50/40 px-5 py-4'
   const panelTitle = 'text-[11px] font-bold tracking-wider text-slate-700 uppercase'
   const panelSubtitle = 'mt-1 text-[11px] text-slate-500 font-medium'
   const fieldLabel = 'text-[10px] font-bold uppercase tracking-wider text-slate-500'
   const inputClass = 'w-full rounded-lg border border-slate-200 bg-slate-50/30 px-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none transition-all focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10'
+
+  const getPanelShellClass = (isExpanded: boolean, colorKey: string) => {
+    const activeBorders: Record<string, string> = {
+      personal: 'border-l-[5px] border-l-indigo-500 border-slate-300 ring-1 ring-slate-100 shadow-md',
+      summary: 'border-l-[5px] border-l-violet-500 border-slate-300 ring-1 ring-slate-100 shadow-md',
+      experience: 'border-l-[5px] border-l-blue-500 border-slate-300 ring-1 ring-slate-100 shadow-md',
+      education: 'border-l-[5px] border-l-emerald-500 border-slate-300 ring-1 ring-slate-100 shadow-md',
+      skills: 'border-l-[5px] border-l-amber-500 border-slate-300 ring-1 ring-slate-100 shadow-md',
+      custom: 'border-l-[5px] border-l-rose-500 border-slate-300 ring-1 ring-slate-100 shadow-md',
+    }
+    return `overflow-hidden rounded-2xl border bg-white transition-all duration-300 shadow-sm hover:shadow-md ${
+      isExpanded ? activeBorders[colorKey] : 'border-slate-200 hover:border-slate-300'
+    }`
+  }
+
+  const getSectionIcon = (key: string) => {
+    switch (key) {
+      case 'personal':
+        return <User className="w-4 h-4 text-indigo-600" />
+      case 'summary':
+        return <Sparkles className="w-4 h-4 text-violet-600" />
+      case 'experience':
+        return <Briefcase className="w-4 h-4 text-blue-600" />
+      case 'education':
+        return <GraduationCap className="w-4 h-4 text-emerald-600" />
+      case 'skills':
+        return <Code2 className="w-4 h-4 text-amber-600" />
+      case 'custom':
+        return <PlusCircle className="w-4 h-4 text-rose-600" />
+      default:
+        return <PlusCircle className="w-4 h-4 text-slate-600" />
+    }
+  }
+
+  const getSectionIconBg = (key: string) => {
+    switch (key) {
+      case 'personal': return 'bg-indigo-50 border border-indigo-100'
+      case 'summary': return 'bg-violet-50 border border-violet-100'
+      case 'experience': return 'bg-blue-50 border border-blue-100'
+      case 'education': return 'bg-emerald-50 border border-emerald-100'
+      case 'skills': return 'bg-amber-50 border border-amber-100'
+      case 'custom': return 'bg-rose-50 border border-rose-100'
+      default: return 'bg-slate-50 border border-slate-100'
+    }
+  }
 
   const SectionHeader = ({ sectionKey, counts }: { sectionKey: string; counts: string }) =>
     renamingSection === sectionKey ? (
@@ -474,19 +576,17 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
       </div>
     ) : (
       <div className={panelHeader}>
-        <button
-          type="button"
-          onClick={() => toggleSection(sectionKey)}
-          className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left group"
-        >
-          <div className="min-w-0">
-            <h3 className={panelTitle}>{sections[sectionKey].title}</h3>
-            <p className={panelSubtitle}>{counts}</p>
+        <div className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className={`p-2 rounded-xl shrink-0 ${getSectionIconBg(sectionKey)}`}>
+              {getSectionIcon(sectionKey)}
+            </div>
+            <div className="min-w-0">
+              <h3 className="text-xs font-bold tracking-wider text-slate-800 uppercase">{sections[sectionKey].title}</h3>
+              <p className={panelSubtitle}>{counts}</p>
+            </div>
           </div>
-          <ChevronDown
-            className={`h-4 w-4 flex-shrink-0 text-slate-400 transition-transform duration-300 group-hover:text-slate-600 ${sections[sectionKey].expanded ? 'rotate-180' : ''}`}
-          />
-        </button>
+        </div>
         <Button
           variant="ghost"
           size="icon-sm"
@@ -501,27 +601,99 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
 
   return (
     <div className="space-y-6 pr-1">
+      {/* Quick Navigation Tabs */}
+      <div className="sticky top-0 z-30 bg-white/85 backdrop-blur-md pb-4 pt-1 mb-2 border-b border-slate-200/65 flex items-center gap-2 overflow-x-auto no-scrollbar shadow-[0_4px_12px_-4px_rgba(0,0,0,0.04)]">
+        <button
+          type="button"
+          onClick={() => handleSectionSwitch('personal')}
+          className={`shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all border ${
+            activeSection === 'personal'
+              ? 'bg-indigo-50/90 border-indigo-200 text-indigo-600 ring-2 ring-indigo-500/10 shadow-sm'
+              : 'bg-white border-slate-200 text-slate-600 hover:border-indigo-200 hover:bg-indigo-50/30'
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+          Personal Info
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSectionSwitch('summary')}
+          className={`shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all border ${
+            activeSection === 'summary'
+              ? 'bg-violet-50/90 border-violet-200 text-violet-600 ring-2 ring-violet-500/10 shadow-sm'
+              : 'bg-white border-slate-200 text-slate-600 hover:border-violet-200 hover:bg-violet-50/30'
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+          Summary
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSectionSwitch('experience')}
+          className={`shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all border ${
+            activeSection === 'experience'
+              ? 'bg-blue-50/90 border-blue-200 text-blue-600 ring-2 ring-blue-500/10 shadow-sm'
+              : 'bg-white border-slate-200 text-slate-600 hover:border-blue-200 hover:bg-blue-50/30'
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+          Experience
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSectionSwitch('education')}
+          className={`shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all border ${
+            activeSection === 'education'
+              ? 'bg-emerald-50/90 border-emerald-200 text-emerald-600 ring-2 ring-emerald-500/10 shadow-sm'
+              : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-200 hover:bg-emerald-50/30'
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+          Education
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSectionSwitch('skills')}
+          className={`shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all border ${
+            activeSection === 'skills'
+              ? 'bg-amber-50/90 border-amber-200 text-amber-600 ring-2 ring-amber-500/10 shadow-sm'
+              : 'bg-white border-slate-200 text-slate-600 hover:border-amber-200 hover:bg-amber-50/30'
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+          Skills
+        </button>
+        <button
+          type="button"
+          onClick={() => handleSectionSwitch('custom')}
+          className={`shrink-0 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold transition-all border ${
+            activeSection === 'custom'
+              ? 'bg-rose-50/90 border-rose-200 text-rose-600 ring-2 ring-rose-500/10 shadow-sm'
+              : 'bg-white border-slate-200 text-slate-600 hover:border-rose-200 hover:bg-rose-50/30'
+          }`}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+          Custom
+        </button>
+      </div>
+
       {/* 1. Personal Info */}
-      <div className={panelShell}>
-        <div className={panelHeader}>
-          <div className="flex-1">
-            <h3 className={panelTitle}>Personal Information</h3>
-            <p className={panelSubtitle}>Your identity and professional contacts</p>
+      {activeSection === 'personal' && (
+        <div className={getPanelShellClass(true, 'personal')} id="sec-personal">
+          <div className={panelHeader}>
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className={`p-2 rounded-xl shrink-0 ${getSectionIconBg('personal')}`}>
+                  {getSectionIcon('personal')}
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-xs font-bold tracking-wider text-slate-800 uppercase">Personal Information</h3>
+                  <p className={panelSubtitle}>Your identity and professional contacts</p>
+                </div>
+              </div>
+            </div>
           </div>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => setPersonalInfoExpanded((prev) => !prev)}
-            title={personalInfoExpanded ? 'Collapse' : 'Expand'}
-            className="rounded-lg text-slate-400 hover:bg-slate-100"
-          >
-            <ChevronDown
-              className={`h-4 w-4 transition-transform duration-300 ${personalInfoExpanded ? 'rotate-180' : ''}`}
-            />
-          </Button>
-        </div>
-        {personalInfoExpanded && (
-          <div className="grid gap-4 p-5">
+          <div className="grid gap-4 p-5 pb-0">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="grid gap-1.5">
                 <label className={fieldLabel}>Full Name</label>
@@ -591,22 +763,23 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
               </div>
             </div>
           </div>
-        )}
-      </div>
+          <SectionFooter current="personal" />
+        </div>
+      )}
 
       {/* 2. Professional Summary */}
-      <div className={panelShell}>
-        <SectionHeader 
-          sectionKey="summary" 
-          counts={summary.trim() ? `${summary.trim().split(/\s+/).length} words` : 'No summary written yet'} 
-        />
-        {sections.summary.expanded && (
-          <div className="p-5">
+      {activeSection === 'summary' && (
+        <div className={getPanelShellClass(true, 'summary')} id="sec-summary">
+          <SectionHeader 
+            sectionKey="summary" 
+            counts={summary.trim() ? `${summary.trim().split(/\s+/).length} words` : 'No summary written yet'} 
+          />
+          <div className="p-5 pb-0">
             <div className="relative">
               <textarea
                 value={summary}
                 onChange={(e) => setSummary(e.target.value)}
-                className={`${inputClass} resize-none min-h-[100px] pb-10`}
+                className={`${inputClass} resize-none min-h-[150px] pb-10`}
                 placeholder="Write a compelling summary highlighting your core skills, years of experience, and achievements..."
               />
               <div className="absolute bottom-2.5 right-3 text-[10px] text-slate-400 font-bold uppercase">
@@ -614,19 +787,20 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
               </div>
             </div>
           </div>
-        )}
-      </div>
+          <SectionFooter current="summary" />
+        </div>
+      )}
 
       {/* 3. Work Experience */}
-      <div className={panelShell}>
-        <SectionHeader 
-          sectionKey="experience" 
-          counts={`${experiences.length} positions · ${experiences.reduce((acc, exp) => acc + exp.bullets.length, 0)} bullets`} 
-        />
-        {sections.experience.expanded && (
-          <div className="p-5 space-y-5">
+      {activeSection === 'experience' && (
+        <div className={getPanelShellClass(true, 'experience')} id="sec-experience">
+          <SectionHeader 
+            sectionKey="experience" 
+            counts={`${experiences.length} positions · ${experiences.reduce((acc, exp) => acc + exp.bullets.length, 0)} bullets`} 
+          />
+          <div className="p-5 pb-0 space-y-5">
             {experiences.map((exp, idx) => (
-              <div key={exp.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-300">
+              <div key={exp.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-350">
                 {/* Collapsible Sub-Header */}
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
@@ -755,19 +929,24 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
               <Plus className="w-4 h-4 mr-2" /> Add Professional Experience
             </Button>
           </div>
-        )}
-      </div>
+          <SectionFooter current="experience" />
+        </div>
+      )}
 
       {/* 4. Education */}
-      <div className={panelShell}>
-        <SectionHeader 
-          sectionKey="education" 
-          counts={`${educationEntries.length} entries`} 
-        />
-        {sections.education.expanded && (
-          <div className="p-5 space-y-5">
+      {activeSection === 'education' && (
+        <div className={getPanelShellClass(true, 'education')} id="sec-education">
+          <SectionHeader 
+            sectionKey="education" 
+            counts={`${educationEntries.length} entries`} 
+          />
+          <div className="p-5 pb-0 space-y-5">
             {educationEntries.map((entry, idx) => (
-              <div key={entry.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-300">
+              <div key={entry.id} className={`rounded-xl border transition-all p-5 relative group/card ${
+                entry.expanded 
+                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100' 
+                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300'
+              }`}>
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <button
                     type="button"
@@ -861,17 +1040,18 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
               <Plus className="w-4 h-4 mr-2" /> Add Education
             </Button>
           </div>
-        )}
-      </div>
+          <SectionFooter current="education" />
+        </div>
+      )}
 
       {/* 5. Skills */}
-      <div className={panelShell}>
-        <SectionHeader 
-          sectionKey="skills" 
-          counts={`${skills.reduce((sum, group) => sum + group.items.length, 0)} skills across ${skills.length} categories`} 
-        />
-        {sections.skills.expanded && (
-          <div className="p-5 space-y-6">
+      {activeSection === 'skills' && (
+        <div className={getPanelShellClass(true, 'skills')} id="sec-skills">
+          <SectionHeader 
+            sectionKey="skills" 
+            counts={`${skills.reduce((sum, group) => sum + group.items.length, 0)} skills across ${skills.length} categories`} 
+          />
+          <div className="p-5 pb-0 space-y-6">
             {skills.map((group) => (
               <div key={group.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 transition-all hover:border-slate-350">
                 <div className="flex items-center gap-3 justify-between mb-4">
@@ -967,75 +1147,84 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
               <Plus className="w-4 h-4 mr-2" /> Add Skill Category
             </Button>
           </div>
-        )}
-      </div>
+          <SectionFooter current="skills" />
+        </div>
+      )}
 
       {/* 6. Custom Fields */}
-      <div className={panelShell}>
-        <div className="border-b border-slate-100 bg-slate-50/40 px-5 py-4 flex items-center justify-between">
-          <div>
-            <h3 className={panelTitle}>Custom Sections</h3>
-            <p className={panelSubtitle}>Add custom key-value metadata like Certifications or Languages</p>
+      {activeSection === 'custom' && (
+        <div className={getPanelShellClass(true, 'custom')} id="sec-custom">
+          <div className="border-b border-slate-100 bg-slate-50/40 px-5 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className={`p-2 rounded-xl shrink-0 ${getSectionIconBg('custom')}`}>
+                {getSectionIcon('custom')}
+              </div>
+              <div className="min-w-0">
+                <h3 className="text-xs font-bold tracking-wider text-slate-800 uppercase">Custom Sections</h3>
+                <p className={panelSubtitle}>Add custom key-value metadata like Certifications or Languages</p>
+              </div>
+            </div>
+            <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-xs font-semibold text-rose-600 ring-1 ring-rose-500/15">
+              {customFields.length} fields
+            </span>
           </div>
-          <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 ring-1 ring-indigo-500/15">
-            {customFields.length} fields
-          </span>
-        </div>
-        <div className="p-5 space-y-4">
-          {customFields.length > 0 ? (
-            <div className="space-y-4">
-              {customFields.map((field, idx) => (
-                <div key={field.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-350">
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <span className="text-xs font-semibold text-slate-500">Custom Field {idx + 1}</span>
-                    <button
-                      onClick={() => handleDeleteCustomField(field.id)}
-                      className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="grid gap-1.5">
-                      <label className={fieldLabel}>Label</label>
-                      <input
-                        type="text"
-                        value={field.label}
-                        onChange={(e) => handleUpdateCustomField(field.id, { label: e.target.value })}
-                        placeholder="e.g. Certifications"
-                        className={inputClass}
-                      />
+          <div className="p-5 pb-0 space-y-4">
+            {customFields.length > 0 ? (
+              <div className="space-y-4">
+                {customFields.map((field, idx) => (
+                  <div key={field.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-350">
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="text-xs font-semibold text-slate-500">Custom Field {idx + 1}</span>
+                      <button
+                        onClick={() => handleDeleteCustomField(field.id)}
+                        className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                    <div className="grid gap-1.5">
-                      <label className={fieldLabel}>Value</label>
-                      <input
-                        type="text"
-                        value={field.value}
-                        onChange={(e) => handleUpdateCustomField(field.id, { value: e.target.value })}
-                        placeholder="e.g. AWS Solutions Architect (2024)"
-                        className={inputClass}
-                      />
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid gap-1.5">
+                        <label className={fieldLabel}>Label</label>
+                        <input
+                          type="text"
+                          value={field.label}
+                          onChange={(e) => handleUpdateCustomField(field.id, { label: e.target.value })}
+                          placeholder="e.g. Certifications"
+                          className={inputClass}
+                        />
+                      </div>
+                      <div className="grid gap-1.5">
+                        <label className={fieldLabel}>Value</label>
+                        <input
+                          type="text"
+                          value={field.value}
+                          onChange={(e) => handleUpdateCustomField(field.id, { value: e.target.value })}
+                          placeholder="e.g. AWS Solutions Architect (2024)"
+                          className={inputClass}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center">
-              <p className="text-sm font-semibold text-slate-400">No Custom Sections Added Yet</p>
-              <p className="mt-1 text-xs text-slate-500 max-w-[280px] mx-auto">Create custom sections to show certifications, languages, awards, or links.</p>
-            </div>
-          )}
-          
-          <Button
-            onClick={handleAddCustomField}
-            className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
-          >
-            <Plus className="w-4 h-4 mr-2" /> Add Custom Field
-          </Button>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center">
+                <p className="text-sm font-semibold text-slate-400">No Custom Sections Added Yet</p>
+                <p className="mt-1 text-xs text-slate-500 max-w-[280px] mx-auto">Create custom sections to show certifications, languages, awards, or links.</p>
+              </div>
+            )}
+            
+            <Button
+              onClick={handleAddCustomField}
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs mb-4"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Custom Field
+            </Button>
+          </div>
+          <SectionFooter current="custom" />
         </div>
-      </div>
+      )}
 
       <AISuggestionModal
         isOpen={aiModal.isOpen}

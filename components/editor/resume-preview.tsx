@@ -737,23 +737,61 @@ function PaginatedResume({
       const pageNum = Math.floor(Math.max(0, contentTop - paddingPx) / pageHeight)
       const boundary = paddingPx + (pageNum + 1) * pageHeight
 
+      // Detect widowed heading: heading is on Page N, but its first block is on Page N+1 (or later)
+      if (key.startsWith('sec-heading-')) {
+        const sectionHeadingName = key.replace('sec-heading-', '')
+        const firstBlockKey = `sec-block-${sectionHeadingName}-0`
+        const firstBlockElement = container.querySelector(`[data-page-block="${firstBlockKey}"]`) as HTMLElement
+        if (firstBlockElement) {
+          const firstBlockRect = firstBlockElement.getBoundingClientRect()
+          const firstBlockRelativeTop = firstBlockRect.top - containerRect.top
+          const firstBlockCurrentSpacer = spacers[firstBlockKey] || 0
+          const firstBlockContentTop = firstBlockRelativeTop + firstBlockCurrentSpacer
+          
+          const firstBlockPage = Math.floor(Math.max(0, firstBlockContentTop - paddingPx) / pageHeight)
+          
+          if (firstBlockPage > pageNum) {
+            // Heading is widowed! Push it to the first block's page
+            const headingBoundary = paddingPx + (pageNum + 1) * pageHeight
+            const additionalSpacer = headingBoundary - contentTop
+            if (additionalSpacer <= 160) {
+              const totalSpacer = Math.round(currentSpacer + additionalSpacer)
+              if (Math.abs(totalSpacer - currentSpacer) > 2) {
+                console.log(`PaginatedResume: Widowed heading detected for [${key}]. Pushing to page ${firstBlockPage}. Spacer from ${currentSpacer}px to ${totalSpacer}px.`)
+                newSpacers[key] = totalSpacer
+                changed = true
+                runCountRef.current += 1
+                break
+              }
+            }
+          }
+        }
+      }
+
       // Check if block content crosses boundary
       if (contentBottom > boundary && contentTop < boundary) {
         let targetKey = key
         let targetContentTop = contentTop
         let targetCurrentSpacer = currentSpacer
 
-        // If it's the first block of a section, push the heading instead to prevent widowed headings
+        // If it's the first block of a section, push the heading instead to prevent widowed headings,
+        // but ONLY if the heading's required push doesn't exceed the threshold.
         if (key.startsWith('sec-block-') && key.endsWith('-0')) {
           const sectionHeadingName = key.replace('sec-block-', '').replace(/-0$/, '')
           const headingKey = `sec-heading-${sectionHeadingName}`
           const headingElement = container.querySelector(`[data-page-block="${headingKey}"]`) as HTMLElement
           if (headingElement) {
-            targetKey = headingKey
             const headingRect = headingElement.getBoundingClientRect()
             const headingRelativeTop = headingRect.top - containerRect.top
-            targetCurrentSpacer = spacers[headingKey] || 0
-            targetContentTop = headingRelativeTop + targetCurrentSpacer
+            const headingCurrentSpacer = spacers[headingKey] || 0
+            const headingContentTop = headingRelativeTop + headingCurrentSpacer
+            const headingAdditionalSpacer = boundary - headingContentTop
+
+            if (headingAdditionalSpacer <= 160) {
+              targetKey = headingKey
+              targetContentTop = headingContentTop
+              targetCurrentSpacer = headingCurrentSpacer
+            }
           }
         }
 
