@@ -46,31 +46,33 @@ export function Navbar() {
             </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-1">
-            {dashboardItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={isActive(item.href) ? 'default' : 'ghost'}
-                  size="sm"
-                  className="text-sm"
-                >
-                  {item.label}
-                </Button>
-              </Link>
-            ))}
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <Button
-                  variant={isActive(item.href) ? 'default' : 'ghost'}
-                  size="sm"
-                  className="text-sm"
-                >
-                  {item.label}
-                </Button>
-              </Link>
-            ))}
-          </div>
+          {/* Desktop Navigation - Only show for logged in users */}
+          {user && (
+            <div className="hidden lg:flex items-center gap-1">
+              {dashboardItems.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant={isActive(item.href) ? 'default' : 'ghost'}
+                    size="sm"
+                    className="text-sm"
+                  >
+                    {item.label}
+                  </Button>
+                </Link>
+              ))}
+              {navItems.map((item) => (
+                <Link key={item.href} href={item.href}>
+                  <Button
+                    variant={isActive(item.href) ? 'default' : 'ghost'}
+                    size="sm"
+                    className="text-sm"
+                  >
+                    {item.label}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          )}
 
           {/* Right Side */}
           <div className="flex items-center gap-3">

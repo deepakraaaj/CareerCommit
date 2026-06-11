@@ -97,60 +97,68 @@ export function LandingHero() {
               </div>
             </div>
 
-            {/* Right: Comparison Grid */}
+            {/* Right: Comparison Table */}
             <div className="flex-1 lg:pt-4">
-              <div className="bg-white/70 backdrop-blur border border-border/30 rounded-xl p-5 h-fit shadow-sm">
-                <h3 className="text-xs font-bold text-slate-900 mb-4 uppercase tracking-wide">For managing multiple versions</h3>
-                <div className="space-y-3 text-xs">
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-slate-700 font-medium">Name each version clearly</span>
-                    <div className="flex gap-2">
-                      <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
-                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
-                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
+              <div className="bg-white/80 backdrop-blur border border-border/40 rounded-2xl p-6 h-fit shadow-sm">
+                <h3 className="text-sm font-bold text-slate-900 mb-6 uppercase tracking-wider">For managing multiple versions</h3>
+
+                <div className="space-y-4">
+                  {/* Row 1 */}
+                  <div className="flex items-center justify-between py-3 border-b border-border/20">
+                    <span className="text-sm text-slate-800 font-medium">Name each version</span>
+                    <div className="flex gap-3">
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✓</div>
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-slate-700 font-medium">Edit each one separately</span>
-                    <div className="flex gap-2">
-                      <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
-                      <div className="w-6 h-6 bg-orange-200/40 rounded flex items-center justify-center text-xs">⚠</div>
-                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
+
+                  {/* Row 2 */}
+                  <div className="flex items-center justify-between py-3 border-b border-border/20">
+                    <span className="text-sm text-slate-800 font-medium">Edit separately</span>
+                    <div className="flex gap-3">
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✓</div>
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">⚠</div>
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-slate-700 font-medium">See all versions at once</span>
-                    <div className="flex gap-2">
-                      <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
-                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
-                      <div className="w-6 h-6 bg-gray-200/40 rounded flex items-center justify-center"><X className="w-3.5 h-3.5 text-gray-400" /></div>
+
+                  {/* Row 3 */}
+                  <div className="flex items-center justify-between py-3 border-b border-border/20">
+                    <span className="text-sm text-slate-800 font-medium">See all at once</span>
+                    <div className="flex gap-3">
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✓</div>
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✕</div>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <span className="text-slate-700 font-medium">Never lose or mix up versions</span>
-                    <div className="flex gap-2">
-                      <div className="w-6 h-6 bg-emerald-500/15 rounded flex items-center justify-center"><Check className="w-3.5 h-3.5 text-emerald-600" /></div>
-                      <div className="w-6 h-6 bg-orange-200/40 rounded flex items-center justify-center text-xs">⚠</div>
-                      <div className="w-6 h-6 bg-orange-200/40 rounded flex items-center justify-center text-xs">⚠</div>
+
+                  {/* Row 4 */}
+                  <div className="flex items-center justify-between py-3 border-b border-border/20">
+                    <span className="text-sm text-slate-800 font-medium">Never mix them up</span>
+                    <div className="flex gap-3">
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">✓</div>
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">⚠</div>
+                      <div className="w-6 h-6 flex items-center justify-center text-lg">⚠</div>
                     </div>
                   </div>
-                  <div className="border-t border-border/30 pt-3 mt-3">
-                    <div className="flex items-center justify-between gap-4">
-                      <span className="font-bold text-slate-900">Price</span>
-                      <div className="flex gap-2 text-xs font-bold">
-                        <div className="text-emerald-700">Free</div>
-                        <div className="text-foreground/40">Free</div>
-                        <div className="text-foreground/40">$5/mo</div>
-                      </div>
+
+                  {/* Price Row */}
+                  <div className="flex items-center justify-between py-3 pt-4">
+                    <span className="text-sm font-bold text-slate-900">Price</span>
+                    <div className="flex gap-3 text-sm font-bold">
+                      <span className="text-emerald-700">Free</span>
+                      <span className="text-slate-400">Free</span>
+                      <span className="text-slate-400">$5/mo</span>
                     </div>
                   </div>
                 </div>
-                <div className="text-xs text-foreground/50 mt-4 flex gap-2 justify-center">
-                  <span className="text-slate-700 font-medium">Us</span>
-                  <span className="text-foreground/30">•</span>
-                  <span>Google Docs</span>
-                  <span className="text-foreground/30">•</span>
-                  <span>Canva</span>
+
+                {/* Legend */}
+                <div className="mt-6 pt-4 border-t border-border/20 flex gap-4 justify-center text-xs">
+                  <span className="text-slate-700 font-semibold">Us</span>
+                  <span className="text-slate-400">Google Docs</span>
+                  <span className="text-slate-400">Canva</span>
                 </div>
               </div>
             </div>
