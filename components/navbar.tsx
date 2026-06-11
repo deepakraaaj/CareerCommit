@@ -120,7 +120,7 @@ export function Navbar() {
                 <Button
                   size="sm"
                   onClick={() => router.push('/editor')}
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                  className="bg-slate-900 hover:bg-slate-800"
                 >
                   Start Free
                 </Button>
@@ -192,7 +192,7 @@ export function Navbar() {
                   Sign in
                 </Button>
                 <Button
-                  className="w-full bg-gradient-to-r from-blue-500 to-blue-600"
+                  className="w-full bg-slate-900 hover:bg-slate-800"
                   onClick={() => {
                     router.push('/editor')
                     setIsOpen(false)
