@@ -87,9 +87,13 @@ export default function LoginClient() {
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </Link>
-              <h1 className="mt-6 text-3xl font-bold">Welcome back</h1>
+              <h1 className="mt-6 text-3xl font-bold">
+                {mode === 'signin' ? 'Welcome back' : 'Get started'}
+              </h1>
               <p className="mt-2 text-sm text-muted-foreground">
-                Sign in to access your resumes and progress.
+                {mode === 'signin'
+                  ? 'Sign in to access your resumes and progress.'
+                  : 'Create an account to save your work and track versions.'}
               </p>
             </div>
 
