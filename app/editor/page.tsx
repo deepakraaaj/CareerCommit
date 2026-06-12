@@ -78,6 +78,24 @@ function createBlankResumeData(): EditorContent {
   }
 }
 
+function normalizeResumeContent(content: Partial<EditorContent> | null | undefined): EditorContent {
+  const blank = createBlankResumeData()
+
+  return {
+    ...blank,
+    ...content,
+    sectionTitles: {
+      ...blank.sectionTitles,
+      ...(content?.sectionTitles ?? {}),
+    },
+    experiences: content?.experiences ?? blank.experiences,
+    educationEntries: content?.educationEntries ?? blank.educationEntries,
+    projects: content?.projects ?? blank.projects,
+    skills: content?.skills ?? blank.skills,
+    customFields: content?.customFields ?? blank.customFields,
+  }
+}
+
 const COLOR_OPTIONS = [
   { name: 'blue', class: 'bg-blue-500 ring-blue-500/30' },
   { name: 'indigo', class: 'bg-indigo-500 ring-indigo-500/30' },
@@ -200,7 +218,7 @@ export default function Editor() {
           const version = result.data?.find((v: any) => String(v.id) === String(versionId))
           if (version && version.content_snapshot) {
             console.log('[Editor] ✅ Loaded version from API:', version.content_snapshot.title)
-            const snapshot = version.content_snapshot as EditorContent
+            const snapshot = normalizeResumeContent(version.content_snapshot as Partial<EditorContent>)
             setEditorContent(snapshot)
             setResumeName(snapshot.name ? `${snapshot.name}'s Resume` : 'My Resume')
             if (snapshot.accentColor) setAccentColor(snapshot.accentColor)
@@ -221,13 +239,14 @@ export default function Editor() {
       try {
         const parsed = JSON.parse(local)
         console.log('[Editor] Loaded from localStorage:', parsed.title)
-        setEditorContent(parsed)
-        setResumeName(parsed.name ? `${parsed.name}'s Resume` : 'My Resume')
-        if (parsed.accentColor) setAccentColor(parsed.accentColor)
-        if (parsed.density) setDensity(parsed.density)
-        if (parsed.fontFamily) setFontFamily(parsed.fontFamily)
+        const normalized = normalizeResumeContent(parsed)
+        setEditorContent(normalized)
+        setResumeName(normalized.name ? `${normalized.name}'s Resume` : 'My Resume')
+        if (normalized.accentColor) setAccentColor(normalized.accentColor)
+        if (normalized.density) setDensity(normalized.density)
+        if (normalized.fontFamily) setFontFamily(normalized.fontFamily)
 
-        triggerPreviewUpdate(parsed)
+        triggerPreviewUpdate(normalized)
         return
       } catch (e) {
         console.error('[Editor] Error parsing localStorage:', e)
@@ -260,21 +279,22 @@ export default function Editor() {
     }
   }
 
-  const triggerPreviewUpdate = (content: EditorContent) => {
-    const contactParts = [content.email, content.phone, content.linkedin, content.github].filter(Boolean)
-    const customFieldLines = content.customFields
+  const triggerPreviewUpdate = (content: Partial<EditorContent> | null | undefined) => {
+    const safe = normalizeResumeContent(content)
+    const contactParts = [safe.email, safe.phone, safe.linkedin, safe.github].filter(Boolean)
+    const customFieldLines = safe.customFields
       .filter((field) => field.label.trim() && field.value.trim())
       .map((field) => `${field.label.trim().toUpperCase()}\n${field.value.trim()}`)
-    const educationLines = content.educationEntries
+    const educationLines = safe.educationEntries
       .filter((entry) => entry.school.trim() || entry.degree.trim() || entry.duration.trim())
       .map((entry) =>
         [entry.school.trim(), entry.degree.trim(), entry.duration.trim()].filter(Boolean).join(' | ')
       )
-    const skillLines = content.skills
+    const skillLines = safe.skills
       .filter((group) => group.label.trim() && group.items.length > 0)
       .map((group) => `${group.label.trim()}: ${group.items.join(', ')}`)
 
-    const projectLines = content.projects
+    const projectLines = safe.projects
       .filter((proj) => proj.name.trim() || proj.description.trim())
       .map((proj) => {
         const title = proj.name.trim()
@@ -284,7 +304,7 @@ export default function Editor() {
       })
 
     // Format multiple experiences
-    const experienceLines = content.experiences
+    const experienceLines = safe.experiences
       .map((exp) => {
         const header = [exp.position.trim(), exp.company.trim(), exp.duration.trim()].filter(Boolean).join(' | ')
         const bulletsText = exp.bullets.map((b) => `- ${b.text.trim()}`).filter((t) => t !== '-').join('\n')
@@ -292,23 +312,23 @@ export default function Editor() {
       })
       .filter(Boolean)
 
-    const previewText = `${content.name}
-${content.title}
+    const previewText = `${safe.name}
+${safe.title}
 ${contactParts.join(' | ')}
 
-${content.sectionTitles.summary.toUpperCase()}
-${content.summary}
+${safe.sectionTitles.summary.toUpperCase()}
+${safe.summary}
 
-${content.sectionTitles.experience.toUpperCase()}
+${safe.sectionTitles.experience.toUpperCase()}
 ${experienceLines.join('\n')}
 
-${content.sectionTitles.education.toUpperCase()}
+${safe.sectionTitles.education.toUpperCase()}
 ${educationLines.join('\n')}
 
-${content.sectionTitles.projects.toUpperCase()}
+${safe.sectionTitles.projects.toUpperCase()}
 ${projectLines.join('\n')}
 
-${content.sectionTitles.skills.toUpperCase()}
+${safe.sectionTitles.skills.toUpperCase()}
 ${skillLines.join('\n')}
 ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim()
 
