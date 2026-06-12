@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive, Plus } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { EditorSections } from '@/components/editor/editor-sections'
 import { supabasePlaceholder, type DbResume } from '@/lib/supabase-placeholder'
@@ -12,7 +12,6 @@ import { LoginModal } from '@/components/auth/login-modal'
 import { SaveVersionModal, type SaveVersionData } from '@/components/versions/save-version-modal'
 import { useAuth } from '@/components/auth/auth-provider'
 import { loadResumes } from '@/lib/supabase-loaders'
-import { ResumeChatbot } from '@/components/upload/resume-chatbot'
 import { applyAgentActions, type EditorContent as ActionEditorContent } from '@/lib/resume-action-handler'
 import type { AgentAction } from '@/lib/resume-agent-actions'
 
@@ -120,7 +119,6 @@ function getOrCreateResumeId(forceNew = false): string {
 export default function Editor() {
   const { user, profile, signOut } = useAuth()
   const router = useRouter()
-  const pathname = usePathname()
   const [versionId, setVersionId] = useState<string | null>(null)
   const [isNewResume, setIsNewResume] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
@@ -153,7 +151,6 @@ export default function Editor() {
 
   const displayName = profile?.name || user?.email?.split('@')[0] || 'Account'
   const displayEmail = user?.email || 'No email available'
-  const isActiveRoute = (href: string) => pathname === href
 
   // Extract versionId from URL
   useEffect(() => {
@@ -519,291 +516,278 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
       
       {/* Redesigned Premium Editor Workspace Panel - Light Mode Theme */}
       <div className="h-screen overflow-hidden flex flex-col bg-slate-50 text-slate-800 dark:bg-[#0b1020] dark:text-slate-100">
-        
-        {/* Workspace Toolbar (Controls) */}
-        <div className="shrink-0 border-b border-slate-200/80 bg-white px-4 py-3.5 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-4 items-center justify-between z-10 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:border-slate-700/80 dark:bg-slate-950/90 dark:shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
-          
-          {/* Left: Logo, Separator, Document Details, Save Status Badge */}
-          <div className="flex items-center gap-4 min-w-0 w-full md:w-auto">
-            <Link href="/" className="flex items-center gap-2 group shrink-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-                <FileText className="w-4.5 h-4.5 text-white" />
-              </div>
-              <div className="hidden sm:block">
-                <div className="font-extrabold text-sm text-slate-800 tracking-tight leading-tight dark:text-slate-100">CareerCommit</div>
-                <div className="text-[10px] text-slate-400 font-medium -mt-0.5 dark:text-slate-500">Workspace</div>
-              </div>
-            </Link>
-            
-            <div className="h-6 w-px bg-slate-200 hidden sm:block dark:bg-slate-700" />
 
-            <div className="hidden xl:flex items-center gap-1">
-              <Link href="/resumes">
-                <Button
-                  variant={isActiveRoute('/resumes') ? 'default' : 'ghost'}
-                  size="sm"
-                  className="text-xs font-semibold"
-                >
-                  Resumes
-                </Button>
+        {/* Workspace Toolbar */}
+        <div className="shrink-0 border-b border-slate-200/80 bg-white/90 px-4 py-3.5 shadow-[0_2px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:px-6 lg:px-8 dark:border-slate-800 dark:bg-slate-950/90 dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex min-w-0 items-center gap-3 xl:flex-1">
+              <Link
+                href="/"
+                className="flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-3 py-2 shadow-sm transition-transform hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-900/80"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 shadow-sm">
+                  <FileText className="h-4.5 w-4.5 text-white" />
+                </div>
+                <div className="hidden sm:block">
+                  <div className="text-sm font-extrabold tracking-tight text-slate-800 dark:text-slate-100">CareerCommit</div>
+                  <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500">Workspace</div>
+                </div>
               </Link>
-              <Link href="/editor">
-                <Button
-                  variant={isActiveRoute('/editor') ? 'default' : 'ghost'}
-                  size="sm"
-                  className="text-xs font-semibold"
-                >
-                  Editor
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="flex items-center gap-3 min-w-0">
+
+              <div className="hidden h-11 w-px bg-slate-200/80 xl:block dark:bg-slate-800" />
+
               <div className="min-w-0">
-                {isEditingName ? (
-                  <input
-                    type="text"
-                    value={tempName}
-                    onChange={(e) => setTempName(e.target.value)}
-                    onBlur={handleSaveName}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleSaveName()
-                    }}
-                    className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-semibold text-slate-800 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:focus:border-indigo-400"
-                    autoFocus
-                  />
-                ) : (
-                  <div
-                    onClick={() => { setTempName(resumeName); setIsEditingName(true); }}
-                    className="flex items-center gap-1.5 cursor-pointer group"
-                    title="Click to rename"
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="inline-flex items-center rounded-full border border-indigo-500/15 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-300">
+                    Editor workspace
+                  </span>
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${
+                      draftStatus === 'unsaved'
+                        ? 'border border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300'
+                        : 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
+                    }`}
                   >
-                    <h2 className="truncate text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors dark:text-slate-100 dark:group-hover:text-indigo-300">
-                      {resumeName}
-                    </h2>
-                    <Edit2 className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity dark:text-slate-500" />
+                    {draftStatus === 'unsaved' ? (
+                      <Clock3 className="h-3 w-3" />
+                    ) : (
+                      <CheckCircle2 className="h-3 w-3" />
+                    )}
+                    {draftCopy}
+                  </span>
                 </div>
-                )}
-                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[10px] text-slate-500 font-medium dark:text-slate-400">
-                  <span>{formatRelativeTime(lastSaved)}</span>
-                </div>
-              </div>
 
-              {/* Save Status Badge */}
-              <div className="flex items-center ml-1 shrink-0">
-                <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                    draftStatus === 'unsaved'
-                      ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
-                      : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                  } dark:shadow-[0_0_0_1px_rgba(255,255,255,0.04)]`}
-                >
-                  {draftStatus === 'unsaved' ? (
-                    <Clock3 className="h-2.5 w-2.5" />
+                <div className="mt-1 flex min-w-0 items-center gap-2">
+                  {isEditingName ? (
+                    <input
+                      type="text"
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                      onBlur={handleSaveName}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSaveName()
+                      }}
+                      className="min-w-0 rounded-2xl border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400"
+                      autoFocus
+                    />
                   ) : (
-                    <CheckCircle2 className="h-2.5 w-2.5" />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempName(resumeName)
+                        setIsEditingName(true)
+                      }}
+                      className="group flex min-w-0 items-center gap-1.5 text-left"
+                      title="Click to rename"
+                    >
+                      <h2 className="truncate text-base font-bold tracking-tight text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-300">
+                        {resumeName}
+                      </h2>
+                      <Edit2 className="h-3.5 w-3.5 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500" />
+                    </button>
                   )}
-                  {draftCopy}
-                </span>
+                </div>
+
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  <span>{formatRelativeTime(lastSaved)}</span>
+                  <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                  <span>{user ? 'Synced to your account' : 'Local draft only'}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Right: Dynamic Styling & Action Controls */}
-          <div className="flex flex-wrap items-center gap-3 md:justify-end w-full md:w-auto">
-            
-            {/* Customizer: Accent Color Picker */}
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl dark:bg-slate-900/80 dark:border-slate-700">
-              <Palette className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-              <div className="flex items-center gap-1.5">
-                {COLOR_OPTIONS.map((c) => (
-                  <button
-                    key={c.name}
-                    type="button"
-                    onClick={() => {
-                      setAccentColor(c.name)
+            <div className="flex w-full flex-col gap-2 xl:w-auto xl:items-end">
+              <div className="flex flex-wrap items-center gap-2 rounded-[1.4rem] border border-slate-200/80 bg-slate-50/90 p-2 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/70">
+                <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 dark:border-slate-700 dark:bg-slate-950/80">
+                  <Palette className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  <div className="flex items-center gap-1.5">
+                    {COLOR_OPTIONS.map((c) => (
+                      <button
+                        key={c.name}
+                        type="button"
+                        onClick={() => {
+                          setAccentColor(c.name)
+                          if (editorContent) {
+                            const next = { ...editorContent, accentColor: c.name }
+                            localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
+                          }
+                        }}
+                        className={`h-3.5 w-3.5 rounded-full ${c.class} transition-transform hover:scale-125 ${
+                          accentColor === c.name ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-950' : ''
+                        }`}
+                        title={`Accent: ${c.name}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
+                  <Type className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  <select
+                    value={fontFamily}
+                    onChange={(e) => {
+                      const val = e.target.value as 'sans' | 'serif' | 'mono'
+                      setFontFamily(val)
                       if (editorContent) {
-                        const next = { ...editorContent, accentColor: c.name }
+                        const next = { ...editorContent, fontFamily: val }
                         localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
                       }
                     }}
-                    className={`w-3.5 h-3.5 rounded-full ${c.class} transition-all hover:scale-125 ${
-                      accentColor === c.name ? 'ring-2 ring-offset-2 ring-offset-white' : ''
-                    }`}
-                    title={`Accent: ${c.name}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Customizer: Font Picker */}
-              <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs dark:bg-slate-900/80 dark:border-slate-700">
-              <Type className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-              <select
-                value={fontFamily}
-                onChange={(e) => {
-                  const val = e.target.value as 'sans' | 'serif' | 'mono'
-                  setFontFamily(val)
-                  if (editorContent) {
-                    const next = { ...editorContent, fontFamily: val }
-                    localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
-                  }
-                }}
-                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1 dark:text-slate-200"
-              >
-                <option value="sans">Sans</option>
-                <option value="serif">Serif</option>
-                <option value="mono">Mono</option>
-              </select>
-            </div>
-
-            {/* Customizer: Spacing Picker */}
-            <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs dark:bg-slate-900/80 dark:border-slate-700">
-              <Space className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-              <select
-                value={density}
-                onChange={(e) => {
-                  const val = e.target.value as 'airy' | 'normal' | 'compact' | 'auto'
-                  setDensity(val)
-                  if (editorContent) {
-                    const next = { ...editorContent, density: val }
-                    localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
-                  }
-                }}
-                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1 dark:text-slate-200"
-              >
-                <option value="auto">Spacing: Auto</option>
-                <option value="compact">Compact</option>
-                <option value="normal">Normal</option>
-                <option value="airy">Airy</option>
-              </select>
-            </div>
-
-            {/* Customizer: Template Selector */}
-            <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs dark:bg-slate-900/80 dark:border-slate-700">
-              <Sparkles className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-              <select
-                value={template}
-                onChange={(e) => setTemplate(e.target.value as TemplateType)}
-                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1 dark:text-slate-200"
-              >
-                <option value="modern">Modern Theme</option>
-                <option value="classic">Classic Theme</option>
-                <option value="minimalist">Minimal Theme</option>
-                <option value="creative">Creative Theme</option>
-                <option value="elegant">Elegant Theme</option>
-                <option value="bold">Bold Theme</option>
-                <option value="technical">Technical Theme</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-2 ml-2">
-              <Button
-                size="sm"
-                onClick={handleDraftSave}
-                disabled={isSaving}
-                className="gap-1.5 rounded-lg bg-indigo-600 px-4 text-white hover:bg-indigo-500 shadow-md shadow-indigo-600/10 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                title={user ? (isSaving ? 'Saving...' : 'Save Draft') : 'Sign in to save'}
-              >
-                <Save className="h-3.5 w-3.5" />
-                {isSaving ? 'Saving...' : 'Save'}
-              </Button>
-
-              <Button
-                size="sm"
-                onClick={handleSaveVersionClick}
-                disabled={isSaving}
-                variant="outline"
-                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-                title={user ? 'Save a version snapshot' : 'Sign in to save versions'}
-              >
-                <Archive className="h-3.5 w-3.5" />
-                Version
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  const element = document.getElementById('download-pdf-btn')
-                  element?.click()
-                }}
-                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-              >
-                <Download className="h-3.5 w-3.5" />
-                PDF
-              </Button>
-
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleCreateNewResume}
-                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-              >
-                <Plus className="h-3.5 w-3.5" />
-                New
-              </Button>
-
-              <div className="h-6 w-px bg-slate-200 mx-1" />
-
-              {user ? (
-                <div ref={userMenuRef} className="relative z-30">
-                  <button
-                    type="button"
-                    onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    aria-expanded={userMenuOpen}
-                    aria-haspopup="menu"
-                    className="flex items-center gap-1.5 p-1 rounded-lg text-sm text-slate-650 hover:bg-slate-50 border border-slate-200 transition-colors group dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
+                    className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
                   >
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
-                      {displayName.charAt(0).toUpperCase()}
-                    </div>
-                    <ChevronDown className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 transition-colors" />
-                  </button>
-
-                  {userMenuOpen && (
-                    <div
-                      role="menu"
-                      className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl z-[60] dark:border-slate-700 dark:bg-slate-950"
-                    >
-                      <div className="rounded-xl bg-slate-50 px-3 py-3 border border-slate-100 mb-2 dark:bg-slate-900 dark:border-slate-800">
-                        <div className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</div>
-                        <div className="truncate text-xs text-slate-500 dark:text-slate-400">{displayEmail}</div>
-                      </div>
-                      <Link
-                        href="/resumes"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-                      >
-                        📊 Resumes
-                      </Link>
-                      <Link
-                        href="/editor"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-                      >
-                        ✏️ Editor
-                      </Link>
-                      <button
-                        type="button"
-                        onClick={handleSignOut}
-                        className="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
-                      >
-                        ↗ Sign out
-                      </button>
-                    </div>
-                  )}
+                    <option value="sans">Sans</option>
+                    <option value="serif">Serif</option>
+                    <option value="mono">Mono</option>
+                  </select>
                 </div>
-              ) : (
+
+                <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
+                  <Space className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  <select
+                    value={density}
+                    onChange={(e) => {
+                      const val = e.target.value as 'airy' | 'normal' | 'compact' | 'auto'
+                      setDensity(val)
+                      if (editorContent) {
+                        const next = { ...editorContent, density: val }
+                        localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
+                      }
+                    }}
+                    className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
+                  >
+                    <option value="auto">Spacing: Auto</option>
+                    <option value="compact">Compact</option>
+                    <option value="normal">Normal</option>
+                    <option value="airy">Airy</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
+                  <Sparkles className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                  <select
+                    value={template}
+                    onChange={(e) => setTemplate(e.target.value as TemplateType)}
+                    className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
+                  >
+                    <option value="modern">Modern Theme</option>
+                    <option value="classic">Classic Theme</option>
+                    <option value="minimalist">Minimal Theme</option>
+                    <option value="creative">Creative Theme</option>
+                    <option value="elegant">Elegant Theme</option>
+                    <option value="bold">Bold Theme</option>
+                    <option value="technical">Technical Theme</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center justify-start gap-2 xl:justify-end">
                 <Button
-                  variant="ghost"
                   size="sm"
-                  onClick={() => setLoginModalOpen(true)}
-                  className="text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-slate-800 rounded-lg px-3 py-1.5 h-8.5 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                  onClick={handleDraftSave}
+                  disabled={isSaving}
+                  className="h-9 gap-1.5 rounded-full bg-indigo-600 px-4 text-white shadow-md shadow-indigo-600/10 transition-all font-semibold hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                  title={user ? (isSaving ? 'Saving...' : 'Save Draft') : 'Sign in to save'}
                 >
-                  Sign in
+                  <Save className="h-3.5 w-3.5" />
+                  {isSaving ? 'Saving...' : 'Save'}
                 </Button>
-              )}
+
+                <Button
+                  size="sm"
+                  onClick={handleSaveVersionClick}
+                  disabled={isSaving}
+                  variant="outline"
+                  className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                  title={user ? 'Save a version snapshot' : 'Sign in to save versions'}
+                >
+                  <Archive className="h-3.5 w-3.5" />
+                  Version
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    const element = document.getElementById('download-pdf-btn')
+                    element?.click()
+                  }}
+                  className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  PDF
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCreateNewResume}
+                  className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  New
+                </Button>
+
+                <div className="hidden h-7 w-px bg-slate-200 xl:block dark:bg-slate-700" />
+
+                {user ? (
+                  <div ref={userMenuRef} className="relative z-30">
+                    <button
+                      type="button"
+                      onClick={() => setUserMenuOpen(!userMenuOpen)}
+                      aria-expanded={userMenuOpen}
+                      aria-haspopup="menu"
+                      className="group flex h-9 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                    >
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-[10px] font-bold text-white shadow-xs">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                      <ChevronDown className="h-3.5 w-3.5 text-slate-400 transition-colors group-hover:text-slate-600" />
+                    </button>
+
+                    {userMenuOpen && (
+                      <div
+                        role="menu"
+                        className="absolute right-0 top-full z-[60] mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-slate-700 dark:bg-slate-950"
+                      >
+                        <div className="mb-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-3 dark:border-slate-800 dark:bg-slate-900">
+                          <div className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</div>
+                          <div className="truncate text-xs text-slate-500 dark:text-slate-400">{displayEmail}</div>
+                        </div>
+                        <Link
+                          href="/resumes"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+                        >
+                          📊 Resumes
+                        </Link>
+                        <Link
+                          href="/editor"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+                        >
+                          ✏️ Editor
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={handleSignOut}
+                          className="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                        >
+                          ↗ Sign out
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setLoginModalOpen(true)}
+                    className="h-9 rounded-full px-4 text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                  >
+                    Sign in
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
