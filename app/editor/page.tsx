@@ -547,15 +547,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   Resumes
                 </Button>
               </Link>
-              <Link href="/jd-matcher">
-                <Button
-                  variant={isActiveRoute('/jd-matcher') ? 'default' : 'ghost'}
-                  size="sm"
-                  className="text-xs font-semibold"
-                >
-                  Job Matcher
-                </Button>
-              </Link>
               <Link href="/editor">
                 <Button
                   variant={isActiveRoute('/editor') ? 'default' : 'ghost'}
@@ -787,13 +778,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                         📊 Resumes
                       </Link>
                       <Link
-                        href="/jd-matcher"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-                      >
-                        🧩 Job Matcher
-                      </Link>
-                      <Link
                         href="/editor"
                         onClick={() => setUserMenuOpen(false)}
                         className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
@@ -840,11 +824,12 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
 
                 {user && (
                   <div className="pb-6">
-                    <ResumeChatbot
+                    {/* ResumeChatbot temporarily disabled */}
+                    {/* <ResumeChatbot
                       context={JSON.stringify(editorContent)}
                       sourceLabel="Editor"
                       onApplyActions={handleApplyAgentActions}
-                    />
+                    /> */}
                   </div>
                 )}
               </div>

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, X, ChevronDown, Shield, FileText, Sun, Moon } from 'lucide-react'
+import { Menu, X, ChevronDown, FileText, Sun, Moon } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
 import { useTheme } from '@/components/theme/theme-provider'
@@ -18,12 +18,11 @@ export function Navbar() {
 
   const isActive = (href: string) => pathname === href
 
-  const navItems = [
-    { href: '/editor', label: 'Editor', icon: FileText },
-    { href: '/jd-matcher', label: 'Job Matcher', icon: Shield },
+  const navTabs = [
+    { href: '/resumes', label: 'Resumes' },
+    { href: '/editor', label: 'Editor' },
   ]
 
-  const dashboardItems = user ? [{ href: '/resumes', label: 'Resumes' }] : []
   const displayName = profile?.name || user?.email?.split('@')[0] || 'Account'
   const displayInitial = displayName.charAt(0).toUpperCase()
 
@@ -51,29 +50,29 @@ export function Navbar() {
 
           {/* Desktop Navigation - Only show for logged in users */}
           {user && (
-            <div className="hidden lg:flex items-center gap-1">
-              {dashboardItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <Button
-                    variant={isActive(item.href) ? 'default' : 'ghost'}
-                    size="sm"
-                    className="text-sm"
-                  >
-                    {item.label}
-                  </Button>
-                </Link>
-              ))}
-              {navItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <Button
-                    variant={isActive(item.href) ? 'default' : 'ghost'}
-                    size="sm"
-                    className="text-sm"
-                  >
-                    {item.label}
-                  </Button>
-                </Link>
-              ))}
+            <div className="hidden lg:flex items-center rounded-full border border-border/70 bg-muted/40 p-1 shadow-sm backdrop-blur">
+              {navTabs.map((item) => {
+                const active = isActive(item.href)
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <span
+                      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                        active
+                          ? 'bg-background text-foreground shadow-sm ring-1 ring-border/60'
+                          : 'text-foreground/60 hover:bg-background/70 hover:text-foreground'
+                      }`}
+                      aria-current={active ? 'page' : undefined}
+                    >
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          active ? 'bg-primary' : 'bg-foreground/20'
+                        }`}
+                      />
+                      {item.label}
+                    </span>
+                  </Link>
+                )
+              })}
             </div>
           )}
 
@@ -161,7 +160,7 @@ export function Navbar() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="lg:hidden border-t border-border/50 py-4 space-y-2">
-            {dashboardItems.map((item) => (
+            {navTabs.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
@@ -171,21 +170,7 @@ export function Navbar() {
                     ? 'bg-primary/10 text-primary'
                     : 'text-foreground/70 hover:bg-secondary'
                 }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                className={`block px-4 py-2.5 text-sm font-medium rounded-lg transition-colors ${
-                  isActive(item.href)
-                    ? 'bg-primary/10 text-primary'
-                    : 'text-foreground/70 hover:bg-secondary'
-                }`}
-              >
+                >
                 {item.label}
               </Link>
             ))}
