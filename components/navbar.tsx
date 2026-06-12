@@ -111,7 +111,7 @@ export function Navbar() {
                       </div>
                       <Link href="/resumes">
                         <button className="w-full px-3 py-2 rounded-lg text-sm text-left text-foreground/70 hover:bg-secondary hover:text-foreground transition-colors">
-                          📊 Resumes
+                          Resumes
                         </button>
                       </Link>
                     </div>
@@ -172,7 +172,7 @@ export function Navbar() {
                   onClick={() => setIsOpen(false)}
                   className="block px-4 py-2.5 text-sm font-medium rounded-lg text-foreground/70 hover:bg-secondary hover:text-foreground transition-colors"
                 >
-                  📊 Resumes
+                  Resumes
                 </Link>
               </div>
             )}
