@@ -49,13 +49,22 @@ export function Navbar() {
       <div className="mx-auto max-w-7xl px-6 sm:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo + Tagline */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-white" />
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-md shadow-indigo-500/10 group-hover:scale-105 transition-transform duration-300">
+              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                <path d="M2 17l10 5 10-5" />
+                <path d="M2 12l10 5 10-5" />
+              </svg>
+              <span className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 opacity-20 blur-sm group-hover:opacity-40 transition duration-300 -z-10" />
             </div>
             <div>
-              <div className="font-bold text-lg group-hover:text-primary transition-colors">CareerCommit</div>
-              <div className="text-xs text-foreground/50 -mt-1">Resume. Perfected.</div>
+              <div className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-slate-950 via-slate-800 to-indigo-950 dark:from-white dark:via-slate-200 dark:to-indigo-200 bg-clip-text text-transparent group-hover:opacity-90 transition-opacity">
+                raceum
+              </div>
+              <div className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase -mt-0.5">
+                Resumes, Perfected.
+              </div>
             </div>
           </Link>
 
@@ -145,7 +154,7 @@ export function Navbar() {
                 <Button
                   size="sm"
                   onClick={() => router.push('/editor')}
-                  className="bg-slate-900 hover:bg-slate-800"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
                   Start Free
                 </Button>
@@ -203,7 +212,7 @@ export function Navbar() {
                   Sign in
                 </Button>
                 <Button
-                  className="w-full bg-slate-900 hover:bg-slate-800"
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   onClick={() => {
                     router.push('/editor')
                     setIsOpen(false)
