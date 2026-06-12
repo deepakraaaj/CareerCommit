@@ -1011,7 +1011,7 @@ export function ResumePreview({
       </button>
 
       {/* Premium Preview Control Header - Light Mode */}
-      <div className="shrink-0 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 sm:px-6">
+      <div className="sticky top-0 z-20 shrink-0 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 sm:px-6">
         <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-gradient-to-r from-white to-slate-50 px-4 py-3 shadow-sm dark:border-slate-800 dark:from-slate-950 dark:to-slate-900 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-indigo-500/15 bg-indigo-500/10 text-indigo-600 shadow-sm dark:border-indigo-400/15 dark:bg-indigo-400/10 dark:text-indigo-300">

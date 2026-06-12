@@ -496,9 +496,9 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
               </div>
             </div>
 
-            <div className="flex w-full flex-1 flex-col gap-2 xl:min-w-[780px]">
-              <div className="grid w-full gap-3 rounded-[1.4rem] border border-slate-200/80 bg-slate-50/90 p-2 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/70 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
-                <div className="flex w-full flex-wrap items-center gap-2">
+            <div className="flex w-full flex-1 flex-col gap-2">
+              <div className="grid w-full gap-3 rounded-[1.4rem] border border-slate-200/80 bg-slate-50/90 p-2 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/70 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center xl:justify-items-stretch">
+                <div className="flex w-full flex-wrap items-center gap-2 xl:justify-self-start">
                   <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 dark:border-slate-700 dark:bg-slate-950/80">
                     <Palette className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                     <div className="flex items-center gap-1.5">
@@ -581,7 +581,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   </div>
                 </div>
 
-                <div className="flex w-full flex-wrap items-center gap-2 xl:justify-end">
+                <div className="flex w-full flex-wrap items-center gap-2 xl:justify-self-end xl:justify-end">
                   <Button
                     size="sm"
                     onClick={handleDraftSave}
