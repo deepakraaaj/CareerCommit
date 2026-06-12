@@ -16,6 +16,11 @@ export function Navbar() {
   const { user, profile, signOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
 
+  // Hide navbar on login/signup page
+  if (pathname === '/login') {
+    return null
+  }
+
   const isActive = (href: string) => pathname === href
 
   const navTabs = [
