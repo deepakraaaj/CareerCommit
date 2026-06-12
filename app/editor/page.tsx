@@ -537,37 +537,35 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
             
             <div className="h-6 w-px bg-slate-200 hidden sm:block" />
 
-            {user && (
-              <div className="hidden xl:flex items-center gap-1">
-                <Link href="/resumes">
-                  <Button
-                    variant={isActiveRoute('/resumes') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="text-xs font-semibold"
-                  >
-                    Resumes
-                  </Button>
-                </Link>
-                <Link href="/jd-matcher">
-                  <Button
-                    variant={isActiveRoute('/jd-matcher') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="text-xs font-semibold"
-                  >
-                    Job Matcher
-                  </Button>
-                </Link>
-                <Link href="/editor">
-                  <Button
-                    variant={isActiveRoute('/editor') ? 'default' : 'ghost'}
-                    size="sm"
-                    className="text-xs font-semibold"
-                  >
-                    Editor
-                  </Button>
-                </Link>
-              </div>
-            )}
+            <div className="hidden xl:flex items-center gap-1">
+              <Link href="/resumes">
+                <Button
+                  variant={isActiveRoute('/resumes') ? 'default' : 'ghost'}
+                  size="sm"
+                  className="text-xs font-semibold"
+                >
+                  Resumes
+                </Button>
+              </Link>
+              <Link href="/jd-matcher">
+                <Button
+                  variant={isActiveRoute('/jd-matcher') ? 'default' : 'ghost'}
+                  size="sm"
+                  className="text-xs font-semibold"
+                >
+                  Job Matcher
+                </Button>
+              </Link>
+              <Link href="/editor">
+                <Button
+                  variant={isActiveRoute('/editor') ? 'default' : 'ghost'}
+                  size="sm"
+                  className="text-xs font-semibold"
+                >
+                  Editor
+                </Button>
+              </Link>
+            </div>
             
             <div className="flex items-center gap-3 min-w-0">
               <div className="min-w-0">
