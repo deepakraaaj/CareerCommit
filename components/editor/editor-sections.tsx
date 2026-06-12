@@ -665,11 +665,11 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
    const getUnifiedShellClass = (colorKey: string) => {
     const activeBorders: Record<string, string> = {
       personal: 'border-t-indigo-600',
-      summary: 'border-t-violet-650',
-      experience: 'border-t-blue-655',
-      education: 'border-t-emerald-650',
-      skills: 'border-t-amber-655',
-      custom: 'border-t-rose-650',
+      summary: 'border-t-violet-600',
+      experience: 'border-t-blue-600',
+      education: 'border-t-emerald-600',
+      skills: 'border-t-amber-600',
+      custom: 'border-t-rose-600',
     }
     
     return `rounded-2xl border border-slate-205 bg-white transition-all duration-300 relative shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] border-t-[4px] ${activeBorders[colorKey]} overflow-hidden dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.26)]`
