@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
-import { CheckCircle2, Clock3, Download, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive, Plus } from 'lucide-react'
+import { Download, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -49,22 +49,6 @@ type EditorContent = {
   accentColor: string
   density: 'airy' | 'normal' | 'compact' | 'auto'
   fontFamily: 'sans' | 'serif' | 'mono'
-}
-
-function formatRelativeTime(value: Date | null) {
-  if (!value) return 'Not saved yet'
-
-  const diffMs = Date.now() - value.getTime()
-  const diffMinutes = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMinutes / 60)
-  const diffDays = Math.floor(diffHours / 24)
-
-  if (diffMinutes < 1) return 'Saved just now'
-  if (diffMinutes < 60) return `Saved ${diffMinutes}m ago`
-  if (diffHours < 24) return `Saved ${diffHours}h ago`
-  if (diffDays < 7) return `Saved ${diffDays}d ago`
-
-  return `Saved ${value.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`
 }
 
 function createBlankResumeData(): EditorContent {
@@ -504,13 +488,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
 
   const strengthColor = resumeStrength < 50 ? 'from-rose-500 to-amber-500' : resumeStrength < 80 ? 'from-amber-500 to-emerald-500' : 'from-emerald-500 to-indigo-500'
 
-  const draftCopy =
-    draftStatus === 'unsaved'
-      ? 'Unsaved changes'
-      : draftStatus === 'draft_saved'
-        ? 'Draft saved'
-        : 'Version ready'
-
   return (
     <>
       
@@ -522,26 +499,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex min-w-0 items-center gap-3 xl:flex-1">
               <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="inline-flex items-center rounded-full border border-indigo-500/15 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-300">
-                    Editor workspace
-                  </span>
-                  <span
-                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] ${
-                      draftStatus === 'unsaved'
-                        ? 'border border-amber-500/20 bg-amber-500/10 text-amber-600 dark:text-amber-300'
-                        : 'border border-emerald-500/20 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300'
-                    }`}
-                  >
-                    {draftStatus === 'unsaved' ? (
-                      <Clock3 className="h-3 w-3" />
-                    ) : (
-                      <CheckCircle2 className="h-3 w-3" />
-                    )}
-                    {draftCopy}
-                  </span>
-                </div>
-
                 <div className="mt-1 flex min-w-0 items-center gap-2">
                   {isEditingName ? (
                     <input
@@ -572,206 +529,202 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     </button>
                   )}
                 </div>
-
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                  <span>{formatRelativeTime(lastSaved)}</span>
-                  <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600" />
-                  <span>{user ? 'Synced to your account' : 'Local draft only'}</span>
-                </div>
               </div>
             </div>
 
-            <div className="flex w-full flex-col gap-2 xl:w-auto xl:items-end">
-              <div className="flex flex-wrap items-center gap-2 rounded-[1.4rem] border border-slate-200/80 bg-slate-50/90 p-2 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/70">
-                <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 dark:border-slate-700 dark:bg-slate-950/80">
-                  <Palette className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-                  <div className="flex items-center gap-1.5">
-                    {COLOR_OPTIONS.map((c) => (
-                      <button
-                        key={c.name}
-                        type="button"
-                        onClick={() => {
-                          setAccentColor(c.name)
-                          if (editorContent) {
-                            const next = { ...editorContent, accentColor: c.name }
-                            localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
-                          }
-                        }}
-                        className={`h-3.5 w-3.5 rounded-full ${c.class} transition-transform hover:scale-125 ${
-                          accentColor === c.name ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-950' : ''
-                        }`}
-                        title={`Accent: ${c.name}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
-                  <Type className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-                  <select
-                    value={fontFamily}
-                    onChange={(e) => {
-                      const val = e.target.value as 'sans' | 'serif' | 'mono'
-                      setFontFamily(val)
-                      if (editorContent) {
-                        const next = { ...editorContent, fontFamily: val }
-                        localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
-                      }
-                    }}
-                    className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
-                  >
-                    <option value="sans">Sans</option>
-                    <option value="serif">Serif</option>
-                    <option value="mono">Mono</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
-                  <Space className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-                  <select
-                    value={density}
-                    onChange={(e) => {
-                      const val = e.target.value as 'airy' | 'normal' | 'compact' | 'auto'
-                      setDensity(val)
-                      if (editorContent) {
-                        const next = { ...editorContent, density: val }
-                        localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
-                      }
-                    }}
-                    className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
-                  >
-                    <option value="auto">Spacing: Auto</option>
-                    <option value="compact">Compact</option>
-                    <option value="normal">Normal</option>
-                    <option value="airy">Airy</option>
-                  </select>
-                </div>
-
-                <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
-                  <Sparkles className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
-                  <select
-                    value={template}
-                    onChange={(e) => setTemplate(e.target.value as TemplateType)}
-                    className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
-                  >
-                    <option value="modern">Modern Theme</option>
-                    <option value="classic">Classic Theme</option>
-                    <option value="minimalist">Minimal Theme</option>
-                    <option value="creative">Creative Theme</option>
-                    <option value="elegant">Elegant Theme</option>
-                    <option value="bold">Bold Theme</option>
-                    <option value="technical">Technical Theme</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-start gap-2 xl:justify-end">
-                <Button
-                  size="sm"
-                  onClick={handleDraftSave}
-                  disabled={isSaving}
-                  className="h-9 gap-1.5 rounded-full bg-indigo-600 px-4 text-white shadow-md shadow-indigo-600/10 transition-all font-semibold hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
-                  title={user ? (isSaving ? 'Saving...' : 'Save Draft') : 'Sign in to save'}
-                >
-                  <Save className="h-3.5 w-3.5" />
-                  {isSaving ? 'Saving...' : 'Save'}
-                </Button>
-
-                <Button
-                  size="sm"
-                  onClick={handleSaveVersionClick}
-                  disabled={isSaving}
-                  variant="outline"
-                  className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-                  title={user ? 'Save a version snapshot' : 'Sign in to save versions'}
-                >
-                  <Archive className="h-3.5 w-3.5" />
-                  Version
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const element = document.getElementById('download-pdf-btn')
-                    element?.click()
-                  }}
-                  className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-                >
-                  <Download className="h-3.5 w-3.5" />
-                  PDF
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCreateNewResume}
-                  className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  New
-                </Button>
-
-                <div className="hidden h-7 w-px bg-slate-200 xl:block dark:bg-slate-700" />
-
-                {user ? (
-                  <div ref={userMenuRef} className="relative z-30">
-                    <button
-                      type="button"
-                      onClick={() => setUserMenuOpen(!userMenuOpen)}
-                      aria-expanded={userMenuOpen}
-                      aria-haspopup="menu"
-                      className="group flex h-9 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-                    >
-                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-[10px] font-bold text-white shadow-xs">
-                        {displayName.charAt(0).toUpperCase()}
-                      </div>
-                      <ChevronDown className="h-3.5 w-3.5 text-slate-400 transition-colors group-hover:text-slate-600" />
-                    </button>
-
-                    {userMenuOpen && (
-                      <div
-                        role="menu"
-                        className="absolute right-0 top-full z-[60] mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-slate-700 dark:bg-slate-950"
-                      >
-                        <div className="mb-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-3 dark:border-slate-800 dark:bg-slate-900">
-                          <div className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</div>
-                          <div className="truncate text-xs text-slate-500 dark:text-slate-400">{displayEmail}</div>
-                        </div>
-                        <Link
-                          href="/resumes"
-                          onClick={() => setUserMenuOpen(false)}
-                          className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-                        >
-                          📊 Resumes
-                        </Link>
-                        <Link
-                          href="/editor"
-                          onClick={() => setUserMenuOpen(false)}
-                          className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-                        >
-                          ✏️ Editor
-                        </Link>
+            <div className="flex w-full flex-1 flex-col gap-2 xl:min-w-[780px]">
+              <div className="flex flex-col gap-2 rounded-[1.4rem] border border-slate-200/80 bg-slate-50/90 p-2 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/70 xl:flex-row xl:items-center xl:justify-between xl:gap-4">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 dark:border-slate-700 dark:bg-slate-950/80">
+                    <Palette className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                    <div className="flex items-center gap-1.5">
+                      {COLOR_OPTIONS.map((c) => (
                         <button
+                          key={c.name}
                           type="button"
-                          onClick={handleSignOut}
-                          className="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
-                        >
-                          ↗ Sign out
-                        </button>
-                      </div>
-                    )}
+                          onClick={() => {
+                            setAccentColor(c.name)
+                            if (editorContent) {
+                              const next = { ...editorContent, accentColor: c.name }
+                              localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
+                            }
+                          }}
+                          className={`h-3.5 w-3.5 rounded-full ${c.class} transition-transform hover:scale-125 ${
+                            accentColor === c.name ? 'ring-2 ring-offset-2 ring-offset-white dark:ring-offset-slate-950' : ''
+                          }`}
+                          title={`Accent: ${c.name}`}
+                        />
+                      ))}
+                    </div>
                   </div>
-                ) : (
+
+                  <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
+                    <Type className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                    <select
+                      value={fontFamily}
+                      onChange={(e) => {
+                        const val = e.target.value as 'sans' | 'serif' | 'mono'
+                        setFontFamily(val)
+                        if (editorContent) {
+                          const next = { ...editorContent, fontFamily: val }
+                          localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
+                        }
+                      }}
+                      className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
+                    >
+                      <option value="sans">Sans</option>
+                      <option value="serif">Serif</option>
+                      <option value="mono">Mono</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
+                    <Space className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                    <select
+                      value={density}
+                      onChange={(e) => {
+                        const val = e.target.value as 'airy' | 'normal' | 'compact' | 'auto'
+                        setDensity(val)
+                        if (editorContent) {
+                          const next = { ...editorContent, density: val }
+                          localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
+                        }
+                      }}
+                      className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
+                    >
+                      <option value="auto">Spacing: Auto</option>
+                      <option value="compact">Compact</option>
+                      <option value="normal">Normal</option>
+                      <option value="airy">Airy</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
+                    <Sparkles className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                    <select
+                      value={template}
+                      onChange={(e) => setTemplate(e.target.value as TemplateType)}
+                      className="cursor-pointer bg-transparent pr-1 text-xs font-semibold text-slate-700 outline-none border-none dark:text-slate-200"
+                    >
+                      <option value="modern">Modern Theme</option>
+                      <option value="classic">Classic Theme</option>
+                      <option value="minimalist">Minimal Theme</option>
+                      <option value="creative">Creative Theme</option>
+                      <option value="elegant">Elegant Theme</option>
+                      <option value="bold">Bold Theme</option>
+                      <option value="technical">Technical Theme</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 xl:justify-end">
                   <Button
-                    variant="ghost"
                     size="sm"
-                    onClick={() => setLoginModalOpen(true)}
-                    className="h-9 rounded-full px-4 text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                    onClick={handleDraftSave}
+                    disabled={isSaving}
+                    className="h-9 gap-1.5 rounded-full bg-indigo-600 px-4 text-white shadow-md shadow-indigo-600/10 transition-all font-semibold hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+                    title={user ? (isSaving ? 'Saving...' : 'Save Draft') : 'Sign in to save'}
                   >
-                    Sign in
+                    <Save className="h-3.5 w-3.5" />
+                    {isSaving ? 'Saving...' : 'Save'}
                   </Button>
-                )}
+
+                  <Button
+                    size="sm"
+                    onClick={handleSaveVersionClick}
+                    disabled={isSaving}
+                    variant="outline"
+                    className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                    title={user ? 'Save a version snapshot' : 'Sign in to save versions'}
+                  >
+                    <Archive className="h-3.5 w-3.5" />
+                    Version
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const element = document.getElementById('download-pdf-btn')
+                      element?.click()
+                    }}
+                    className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    PDF
+                  </Button>
+
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCreateNewResume}
+                    className="h-9 gap-1.5 rounded-full border-slate-200 bg-white px-4 font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
+                  >
+                    <Plus className="h-3.5 w-3.5" />
+                    New
+                  </Button>
+
+                  <div className="hidden h-7 w-px bg-slate-200 xl:block dark:bg-slate-700" />
+
+                  {user ? (
+                    <div ref={userMenuRef} className="relative z-30">
+                      <button
+                        type="button"
+                        onClick={() => setUserMenuOpen(!userMenuOpen)}
+                        aria-expanded={userMenuOpen}
+                        aria-haspopup="menu"
+                        className="group flex h-9 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
+                      >
+                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-[10px] font-bold text-white shadow-xs">
+                          {displayName.charAt(0).toUpperCase()}
+                        </div>
+                        <ChevronDown className="h-3.5 w-3.5 text-slate-400 transition-colors group-hover:text-slate-600" />
+                      </button>
+
+                      {userMenuOpen && (
+                        <div
+                          role="menu"
+                          className="absolute right-0 top-full z-[60] mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-slate-700 dark:bg-slate-950"
+                        >
+                          <div className="mb-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-3 dark:border-slate-800 dark:bg-slate-900">
+                            <div className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</div>
+                            <div className="truncate text-xs text-slate-500 dark:text-slate-400">{displayEmail}</div>
+                          </div>
+                          <Link
+                            href="/resumes"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+                          >
+                            📊 Resumes
+                          </Link>
+                          <Link
+                            href="/editor"
+                            onClick={() => setUserMenuOpen(false)}
+                            className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
+                          >
+                            ✏️ Editor
+                          </Link>
+                          <button
+                            type="button"
+                            onClick={handleSignOut}
+                            className="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
+                          >
+                            ↗ Sign out
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setLoginModalOpen(true)}
+                      className="h-9 rounded-full px-4 text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                    >
+                      Sign in
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
