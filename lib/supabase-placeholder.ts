@@ -448,12 +448,12 @@ export const supabasePlaceholder = {
 
   checkUserApproved: async () => {
     const supabase = getSupabaseOrNull()
-    if (!supabase) return true
+    if (!supabase) return false
 
     try {
       const currentUserId = await getCurrentUserId(supabase)
       console.log('[Supabase] Current user ID:', currentUserId)
-      if (!currentUserId) return true
+      if (!currentUserId) return false
 
       // Add timeout for query
       const queryPromise = supabase
@@ -464,7 +464,7 @@ export const supabasePlaceholder = {
 
       const timeoutPromise = new Promise((resolve) =>
         setTimeout(() => {
-          console.log('[Supabase] Query timeout, allowing access')
+          console.log('[Supabase] Query timeout, denying access')
           resolve({ data: null, error: 'timeout' })
         }, 5000)
       )
@@ -472,8 +472,8 @@ export const supabasePlaceholder = {
       const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any
 
       if (error || !data) {
-        console.log('[Supabase] No user data, allowing access')
-        return true
+        console.log('[Supabase] No user data, denying access')
+        return false
       }
 
       const allowed = data.approved === true || data.ai_access_enabled === true
@@ -481,7 +481,7 @@ export const supabasePlaceholder = {
       return allowed
     } catch (error) {
       console.error('[Supabase] Error:', error)
-      return true
+      return false
     }
   },
 }
