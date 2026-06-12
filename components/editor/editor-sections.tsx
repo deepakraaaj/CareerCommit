@@ -130,7 +130,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
     }
 
     return (
-      <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/30 px-5 py-4 mt-6 dark:border-slate-800 dark:bg-slate-900/40">
+      <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/30 px-5 py-4 mt-6 dark:border-slate-800 dark:bg-slate-900/30">
         <div>
           {prev && (
             <Button
@@ -643,12 +643,12 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
   }
 
   // Shared editor layout constants
-  const panelHeader = 'flex flex-row items-center justify-between gap-4 border-b border-slate-100/80 bg-white/95 px-8 py-7 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/75'
+  const panelHeader = 'flex flex-row items-center justify-between gap-4 border-b border-slate-100/80 bg-white/95 px-8 py-7 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/65'
   const panelTitle = 'font-serif text-3xl font-light tracking-tight text-slate-900 dark:text-slate-50'
   const panelSubtitle = 'font-serif italic text-[15px] text-slate-500 dark:text-slate-400'
   const fieldLabel = 'text-[9px] font-black uppercase tracking-widest text-slate-400 transition-colors duration-300 group-focus-within:text-slate-600 dark:text-slate-500 dark:group-focus-within:text-slate-200'
   const inputClass = 'w-full bg-transparent pt-1 text-sm text-slate-900 placeholder-slate-400 outline-none border-none dark:text-slate-100 dark:placeholder-slate-500'
-  const formFieldClass = 'group relative rounded-xl border border-slate-200 bg-slate-50/30 px-4 py-2 transition-all duration-300 focus-within:border-slate-700 focus-within:bg-white focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.03)] dark:border-slate-700 dark:bg-slate-900/45 dark:focus-within:border-slate-500 dark:focus-within:bg-slate-900/60 dark:focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.18)]'
+  const formFieldClass = 'group relative rounded-xl border border-slate-200 bg-slate-50/30 px-4 py-2 transition-all duration-300 focus-within:border-slate-700 focus-within:bg-white focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.03)] dark:border-slate-700 dark:bg-slate-900/35 dark:focus-within:border-slate-500 dark:focus-within:bg-slate-900/50 dark:focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.16)]'
 
   const getSectionMonogram = (key: string) => {
     switch (key) {
@@ -672,7 +672,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
       custom: 'border-t-rose-650',
     }
     
-    return `rounded-2xl border border-slate-205 bg-white transition-all duration-300 relative shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] border-t-[4px] ${activeBorders[colorKey]} overflow-hidden dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.3)]`
+    return `rounded-2xl border border-slate-205 bg-white transition-all duration-300 relative shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] border-t-[4px] ${activeBorders[colorKey]} overflow-hidden dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.26)]`
   }
 
   const getSectionIcon = (key: string) => {
@@ -702,7 +702,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
       case 'education': return 'bg-emerald-50 border border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20'
       case 'skills': return 'bg-amber-50 border border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20'
       case 'custom': return 'bg-rose-50 border border-rose-100 dark:bg-rose-500/10 dark:border-rose-500/20'
-      default: return 'bg-slate-50 border border-slate-100 dark:bg-slate-900/35 dark:border-slate-800'
+      default: return 'bg-slate-50 border border-slate-100 dark:bg-slate-900/25 dark:border-slate-800'
     }
   }
 
@@ -759,8 +759,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
     <div className="pr-1 pb-10">
       <div className={getUnifiedShellClass(activeSection)}>
       {/* Quick Navigation Tabs - Pipeline Stepper Style with Connection Arrow */}
-      <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md pb-2 pt-4 px-5 w-full relative border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900/85">
-        <div className="flex h-11 w-full rounded-full p-[3px] bg-white border border-slate-200 shadow-sm relative z-20 dark:border-slate-700 dark:bg-slate-900/85 dark:shadow-[0_8px_24px_rgba(0,0,0,0.24)]">
+      <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md pb-2 pt-4 px-5 w-full relative border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900/75">
+        <div className="flex h-11 w-full rounded-full p-[3px] bg-white border border-slate-200 shadow-sm relative z-20 dark:border-slate-700 dark:bg-slate-900/75 dark:shadow-[0_8px_24px_rgba(0,0,0,0.2)]">
           {[
             { id: 'personal', label: 'Personal Info' },
             { id: 'summary', label: 'Summary' },
@@ -786,13 +786,13 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             }
 
             const colors: Record<string, { active: string; inactive: string; text: string; arrowBg: string; borderColor: string }> = {
-              personal: { active: 'bg-indigo-200 dark:bg-indigo-500/20', inactive: 'bg-indigo-50/60 hover:bg-indigo-100/80 dark:bg-slate-900/55 dark:hover:bg-indigo-500/10', text: 'text-indigo-900 dark:text-indigo-100', arrowBg: 'bg-indigo-200 dark:bg-indigo-500/20', borderColor: '#4f46e5' },
-              summary: { active: 'bg-violet-200 dark:bg-violet-500/20', inactive: 'bg-violet-50/60 hover:bg-violet-100/80 dark:bg-slate-900/55 dark:hover:bg-violet-500/10', text: 'text-violet-900 dark:text-violet-100', arrowBg: 'bg-violet-200 dark:bg-violet-500/20', borderColor: '#7c3aed' },
-              experience: { active: 'bg-blue-200 dark:bg-blue-500/20', inactive: 'bg-blue-50/60 hover:bg-blue-100/80 dark:bg-slate-900/55 dark:hover:bg-blue-500/10', text: 'text-blue-900 dark:text-blue-100', arrowBg: 'bg-blue-200 dark:bg-blue-500/20', borderColor: '#2563eb' },
-              education: { active: 'bg-emerald-200 dark:bg-emerald-500/20', inactive: 'bg-emerald-50/60 hover:bg-emerald-100/80 dark:bg-slate-900/55 dark:hover:bg-emerald-500/10', text: 'text-emerald-900 dark:text-emerald-100', arrowBg: 'bg-emerald-200 dark:bg-emerald-500/20', borderColor: '#059669' },
-              projects: { active: 'bg-cyan-200 dark:bg-cyan-500/20', inactive: 'bg-cyan-50/60 hover:bg-cyan-100/80 dark:bg-slate-900/55 dark:hover:bg-cyan-500/10', text: 'text-cyan-900 dark:text-cyan-100', arrowBg: 'bg-cyan-200 dark:bg-cyan-500/20', borderColor: '#0891b2' },
-              skills: { active: 'bg-amber-200 dark:bg-amber-500/20', inactive: 'bg-amber-50/60 hover:bg-amber-100/80 dark:bg-slate-900/55 dark:hover:bg-amber-500/10', text: 'text-amber-900 dark:text-amber-100', arrowBg: 'bg-amber-200 dark:bg-amber-500/20', borderColor: '#d97706' },
-              custom: { active: 'bg-rose-200 dark:bg-rose-500/20', inactive: 'bg-rose-50/60 hover:bg-rose-100/80 dark:bg-slate-900/55 dark:hover:bg-rose-500/10', text: 'text-rose-900 dark:text-rose-100', arrowBg: 'bg-rose-200 dark:bg-rose-500/20', borderColor: '#e11d48' },
+              personal: { active: 'bg-indigo-200 dark:bg-indigo-500/20', inactive: 'bg-indigo-50/60 hover:bg-indigo-100/80 dark:bg-slate-800/25 dark:hover:bg-indigo-500/10', text: 'text-indigo-900 dark:text-indigo-100', arrowBg: 'bg-indigo-200 dark:bg-indigo-500/20', borderColor: '#4f46e5' },
+              summary: { active: 'bg-violet-200 dark:bg-violet-500/20', inactive: 'bg-violet-50/60 hover:bg-violet-100/80 dark:bg-slate-800/25 dark:hover:bg-violet-500/10', text: 'text-violet-900 dark:text-violet-100', arrowBg: 'bg-violet-200 dark:bg-violet-500/20', borderColor: '#7c3aed' },
+              experience: { active: 'bg-blue-200 dark:bg-blue-500/20', inactive: 'bg-blue-50/60 hover:bg-blue-100/80 dark:bg-slate-800/25 dark:hover:bg-blue-500/10', text: 'text-blue-900 dark:text-blue-100', arrowBg: 'bg-blue-200 dark:bg-blue-500/20', borderColor: '#2563eb' },
+              education: { active: 'bg-emerald-200 dark:bg-emerald-500/20', inactive: 'bg-emerald-50/60 hover:bg-emerald-100/80 dark:bg-slate-800/25 dark:hover:bg-emerald-500/10', text: 'text-emerald-900 dark:text-emerald-100', arrowBg: 'bg-emerald-200 dark:bg-emerald-500/20', borderColor: '#059669' },
+              projects: { active: 'bg-cyan-200 dark:bg-cyan-500/20', inactive: 'bg-cyan-50/60 hover:bg-cyan-100/80 dark:bg-slate-800/25 dark:hover:bg-cyan-500/10', text: 'text-cyan-900 dark:text-cyan-100', arrowBg: 'bg-cyan-200 dark:bg-cyan-500/20', borderColor: '#0891b2' },
+              skills: { active: 'bg-amber-200 dark:bg-amber-500/20', inactive: 'bg-amber-50/60 hover:bg-amber-100/80 dark:bg-slate-800/25 dark:hover:bg-amber-500/10', text: 'text-amber-900 dark:text-amber-100', arrowBg: 'bg-amber-200 dark:bg-amber-500/20', borderColor: '#d97706' },
+              custom: { active: 'bg-rose-200 dark:bg-rose-500/20', inactive: 'bg-rose-50/60 hover:bg-rose-100/80 dark:bg-slate-800/25 dark:hover:bg-rose-500/10', text: 'text-rose-900 dark:text-rose-100', arrowBg: 'bg-rose-200 dark:bg-rose-500/20', borderColor: '#e11d48' },
             };
             const colorClass = isActive ? colors[step.id].active : colors[step.id].inactive;
 
@@ -831,7 +831,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
         </div>
       </div>
 
-      <div className="relative bg-white min-h-[500px] dark:bg-slate-900/90">
+      <div className="relative bg-white min-h-[500px] dark:bg-slate-900/80">
       {/* 1. Personal Info */}
       {activeSection === 'personal' && (
         <div id="sec-personal" className="animate-in fade-in duration-300">
@@ -959,7 +959,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
           />
           <div className="p-5 pb-0 space-y-5">
             {experiences.map((exp, idx) => (
-              <div key={exp.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-slate-600">
+              <div key={exp.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-slate-600">
                 {/* Collapsible Sub-Header */}
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
@@ -1105,8 +1105,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             {educationEntries.map((entry, idx) => (
               <div key={entry.id} className={`rounded-xl border transition-all p-5 relative group/card ${
                 entry.expanded 
-                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900/70 dark:border-slate-700 dark:ring-slate-800' 
-                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-700 dark:hover:border-slate-600'
+                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900/60 dark:border-slate-700 dark:ring-slate-800' 
+                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300 dark:bg-slate-900/40 dark:border-slate-700 dark:hover:border-slate-600'
               }`}>
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <button
@@ -1218,8 +1218,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             {projects.map((project, idx) => (
               <div key={project.id} className={`rounded-xl border transition-all p-5 relative group/card ${
                 project.expanded
-                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900/70 dark:border-slate-700 dark:ring-slate-800'
-                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-700 dark:hover:border-slate-600'
+                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900/60 dark:border-slate-700 dark:ring-slate-800'
+                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300 dark:bg-slate-900/40 dark:border-slate-700 dark:hover:border-slate-600'
               }`}>
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <button
@@ -1319,7 +1319,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
           />
           <div className="p-5 pb-0 space-y-6">
             {skills.map((group) => (
-              <div key={group.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-slate-600">
+              <div key={group.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-slate-600">
                 <div className="flex items-center gap-3 justify-between mb-4">
                   <div className="flex items-center gap-2 flex-1 max-w-[240px]">
                     <input
@@ -1346,7 +1346,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
 
                 {/* Skill Tags */}
                 {group.items.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-4 p-3 rounded-lg bg-white border border-slate-200/60 shadow-inner-sm dark:border-slate-700 dark:bg-slate-900/50">
+                  <div className="flex flex-wrap gap-1.5 mb-4 p-3 rounded-lg bg-white border border-slate-200/60 shadow-inner-sm dark:border-slate-700 dark:bg-slate-900/40">
                     {group.items.map((item) => (
                       <button
                         key={item}
@@ -1436,7 +1436,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             {customFields.length > 0 ? (
               <div className="space-y-4">
                 {customFields.map((field, idx) => (
-                  <div key={field.id} className="rounded-xl border border-slate-205 bg-slate-50/20 p-5 relative group/card transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-slate-600">
+                  <div key={field.id} className="rounded-xl border border-slate-205 bg-slate-50/20 p-5 relative group/card transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/30 dark:hover:border-slate-600">
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <span className="text-xs font-semibold text-slate-500 font-serif italic dark:text-slate-300">Custom Field {idx + 1}</span>
                       <button
@@ -1473,7 +1473,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center dark:border-slate-700 dark:bg-slate-900/45">
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center dark:border-slate-700 dark:bg-slate-900/35">
                 <p className="text-sm font-semibold text-slate-400 dark:text-slate-300">No Custom Sections Added Yet</p>
                 <p className="mt-1 text-xs text-slate-500 max-w-[280px] mx-auto dark:text-slate-400">Create custom sections to show certifications, languages, awards, or links.</p>
               </div>
