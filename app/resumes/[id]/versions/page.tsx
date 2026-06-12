@@ -115,7 +115,7 @@ export default function Versions() {
     }
   }
 
-  const orderedVersions = [...versions].sort((a, b) => a.versionNumber - b.versionNumber)
+  const orderedVersions = [...versions].sort((a, b) => b.versionNumber - a.versionNumber)
 
   return (
     <>
@@ -187,7 +187,7 @@ export default function Versions() {
                 <VersionCard
                   key={version.id}
                   {...version}
-                  isLatest={idx === orderedVersions.length - 1}
+                  isLatest={idx === 0}
                   index={idx}
                   total={orderedVersions.length}
                   onRestore={handleRestore}
@@ -206,9 +206,9 @@ export default function Versions() {
           )}
 
           <p className="mt-6 text-xs text-muted-foreground">
-            v1 is the initial draft. Every save after that creates a new version, and the newest
-            save is marked Current. Restoring an older version never deletes anything — it simply
-            becomes the new current version.
+            The newest save is marked Current at the top. v1 is the initial draft further down.
+            Restoring an older version never deletes anything — it simply becomes the new current
+            version.
           </p>
         </div>
       </div>
