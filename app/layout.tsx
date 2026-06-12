@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Figtree, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth/auth-provider'
+import { ThemeProvider } from '@/components/theme/theme-provider'
 
 const figtree = Figtree({
   variable: '--font-sans',
@@ -50,8 +51,10 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans antialiased">
-        <AuthProvider>{children}</AuthProvider>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <ThemeProvider>
+          <AuthProvider>{children}</AuthProvider>
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </ThemeProvider>
       </body>
     </html>
   )

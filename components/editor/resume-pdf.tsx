@@ -243,6 +243,24 @@ function BlockPdf({ block, t, size }: { block: Block; t: Theme; size: number }) 
           ) : null}
         </View>
       )
+    case 'entry-right':
+      return (
+        <View style={{ gap: 2 }} wrap={false}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 8 }}>
+            <Text style={{ ...base, maxWidth: '70%' }}>
+              <Text style={{ fontFamily: t.bold }}>{block.primary}</Text>
+            </Text>
+            <Text style={{ ...base, color: t.dateColor, fontFamily: t.italic, flexShrink: 0, textAlign: 'right' }}>
+              {block.right}
+            </Text>
+          </View>
+          {block.middle.length > 0 ? (
+            <Text style={{ ...base, color: t.muted }}>
+              {block.middle.join(' · ')}
+            </Text>
+          ) : null}
+        </View>
+      )
     case 'labeled':
       return (
         <Text style={base}>

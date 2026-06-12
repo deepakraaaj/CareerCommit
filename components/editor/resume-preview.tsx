@@ -27,6 +27,7 @@ export type TemplateType =
 export type Block =
   | { kind: 'bullet'; text: string }
   | { kind: 'entry'; primary: string; middle: string[]; date: string | null }
+  | { kind: 'entry-right'; primary: string; middle: string[]; right: string }
   | { kind: 'labeled'; label: string; text: string }
   | { kind: 'para'; text: string }
 
@@ -50,6 +51,7 @@ const CONTACT_RE =
 const DATE_RE = /\d{4}|present|current/i
 const SECTION_WORDS_RE =
   /SUMMARY|EXPERIENCE|EDUCATION|SKILLS|PROJECTS?|CERTIFICATIONS?|OBJECTIVE|ACHIEVEMENTS?|AWARDS|LANGUAGES|INTERESTS|PROFILE|WORK|EMPLOYMENT|VOLUNTEER|PUBLICATIONS|REFERENCES/
+const PROJECTS_SECTION_RE = /^PROJECTS?$/i
 
 function isUrl(value: string) {
   return /^https?:\/\//i.test(value)
@@ -72,7 +74,7 @@ function isSectionHeading(line: string): boolean {
   )
 }
 
-function parseBlock(line: string): Block {
+function parseBlock(line: string, currentSectionHeading?: string): Block {
   if (/^[-•*–]\s*/.test(line)) {
     return { kind: 'bullet', text: line.replace(/^[-•*–]\s*/, '') }
   }
@@ -81,14 +83,22 @@ function parseBlock(line: string): Block {
     const parts = line
       .split('|')
       .map((p) => p.trim())
-      .filter(Boolean)
-    if (parts.length >= 2) {
+    if (parts[0]) {
+      const isProjectsSection = !!currentSectionHeading && PROJECTS_SECTION_RE.test(currentSectionHeading)
+      if (isProjectsSection && parts.length >= 3) {
+        return {
+          kind: 'entry-right',
+          primary: parts[0],
+          middle: parts.slice(1, -1).filter(Boolean),
+          right: parts[parts.length - 1],
+        }
+      }
       const last = parts[parts.length - 1]
       const hasDate = DATE_RE.test(last) && parts.length > 1
       return {
         kind: 'entry',
         primary: parts[0],
-        middle: hasDate ? parts.slice(1, -1) : parts.slice(1),
+        middle: hasDate ? parts.slice(1, -1).filter(Boolean) : parts.slice(1).filter(Boolean),
         date: hasDate ? last : null,
       }
     }
@@ -122,7 +132,7 @@ export function parseResume(text: string): ParsedResume {
   for (const line of lines) {
     if (!line) continue
 
-    if (isSectionHeading(line) && (!inHeaderZone || result.name || SECTION_WORDS_RE.test(line))) {
+    if (isSectionHeading(line) && SECTION_WORDS_RE.test(line)) {
       currentSection = { heading: line, blocks: [] }
       result.sections.push(currentSection)
       inHeaderZone = false
@@ -148,8 +158,9 @@ export function parseResume(text: string): ParsedResume {
     }
 
     const block = parseBlock(line)
+    const sectionBlock = currentSection ? parseBlock(line, currentSection.heading) : block
     if (currentSection) {
-      currentSection.blocks.push(block)
+      currentSection.blocks.push(sectionBlock)
     } else {
       result.intro.push(block)
     }
@@ -426,6 +437,24 @@ function BlockView({
             <span className={`shrink-0 whitespace-nowrap ${style.entryDate}`}>
               {block.date}
             </span>
+          )}
+        </div>
+      )
+    case 'entry-right':
+      return (
+        <div className={`${body} space-y-0.5`}>
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="min-w-0">
+              <span className={style.entryPrimary}>{block.primary}</span>
+            </span>
+            <span className={`shrink-0 whitespace-nowrap italic ${style.entryDate}`}>
+              {block.right}
+            </span>
+          </div>
+          {block.middle.length > 0 && (
+            <div className={style.entryMiddle}>
+              {block.middle.join(' · ')}
+            </div>
           )}
         </div>
       )

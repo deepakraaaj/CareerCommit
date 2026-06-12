@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Check, ChevronDown, Edit2, X, Trash2, ArrowUp, ArrowDown, Sparkles, Plus, User, Briefcase, GraduationCap, Code2, PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
@@ -41,6 +41,14 @@ interface CustomField {
   value: string
 }
 
+interface ProjectEntry {
+  id: string
+  name: string
+  description: string
+  technologies?: string
+  expanded?: boolean
+}
+
 interface EditorContent {
   name: string
   title: string
@@ -48,17 +56,31 @@ interface EditorContent {
   phone: string
   linkedin: string
   github: string
-  sectionTitles: Record<'summary' | 'experience' | 'education' | 'skills', string>
+  sectionTitles: Record<'summary' | 'experience' | 'education' | 'skills' | 'projects', string>
   summary: string
   experiences: ExperienceEntry[]
   educationEntries: EducationEntry[]
+  projects: ProjectEntry[]
   skills: SkillGroup[]
   customFields: CustomField[]
 }
 
+type EditorSectionId = 'personal' | 'summary' | 'experience' | 'education' | 'projects' | 'skills' | 'custom'
+
 interface EditorSectionsProps {
   initialContent: EditorContent | null
   onContentChange?: (content: EditorContent) => void
+  /**
+   * Bump this number to force the form to re-sync from `initialContent`
+   * (e.g. after the Resume Assistant applies actions). Normal typing does not
+   * change it, so editing is never disrupted.
+   */
+  syncSignal?: number
+  /**
+   * When `syncSignal` changes, navigate the form to this section so the user
+   * immediately sees what the assistant just changed.
+   */
+  focusSection?: EditorSectionId
 }
 
 const COMMON_SKILLS = [
@@ -67,16 +89,18 @@ const COMMON_SKILLS = [
   'GraphQL', 'PostgreSQL', 'Git', 'Agile'
 ]
 
-export function EditorSections({ initialContent, onContentChange }: EditorSectionsProps) {
-  const [activeSection, setActiveSection] = useState<'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'custom'>('personal')
+export function EditorSections({ initialContent, onContentChange, syncSignal, focusSection }: EditorSectionsProps) {
+  const [activeSection, setActiveSection] = useState<EditorSectionId>('personal')
+  const lastSyncedContentKeyRef = useRef<string | null>(null)
   const [sections, setSections] = useState<Record<string, { title: string; expanded: boolean }>>({
     summary: { title: initialContent?.sectionTitles?.summary || 'Professional Summary', expanded: true },
     experience: { title: initialContent?.sectionTitles?.experience || 'Experience', expanded: true },
     education: { title: initialContent?.sectionTitles?.education || 'Education', expanded: true },
+    projects: { title: initialContent?.sectionTitles?.projects || 'Projects', expanded: true },
     skills: { title: initialContent?.sectionTitles?.skills || 'Skills', expanded: true },
   })
 
-  const handleSectionSwitch = (section: 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'custom') => {
+  const handleSectionSwitch = (section: 'personal' | 'summary' | 'experience' | 'education' | 'projects' | 'skills' | 'custom') => {
     setActiveSection(section)
     const container = document.querySelector('.custom-scrollbar')
     if (container) {
@@ -84,9 +108,9 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
     }
   }
 
-  const SectionFooter = ({ current }: { current: 'personal' | 'summary' | 'experience' | 'education' | 'skills' | 'custom' }) => {
-    const list: ('personal' | 'summary' | 'experience' | 'education' | 'skills' | 'custom')[] = [
-      'personal', 'summary', 'experience', 'education', 'skills', 'custom'
+  const SectionFooter = ({ current }: { current: 'personal' | 'summary' | 'experience' | 'education' | 'projects' | 'skills' | 'custom' }) => {
+    const list: ('personal' | 'summary' | 'experience' | 'education' | 'projects' | 'skills' | 'custom')[] = [
+      'personal', 'summary', 'experience', 'education', 'projects', 'skills', 'custom'
     ]
     const idx = list.indexOf(current)
     const prev = idx > 0 ? list[idx - 1] : null
@@ -98,6 +122,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
         case 'summary': return 'Summary'
         case 'experience': return 'Experience'
         case 'education': return 'Education'
+        case 'projects': return 'Projects'
         case 'skills': return 'Skills'
         case 'custom': return 'Custom'
         default: return ''
@@ -193,31 +218,72 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
     initialContent?.customFields || []
   )
 
-  // Sync initialContent changes to local state
-  const contentKey = initialContent ? `${initialContent.name}|${initialContent.title}|${initialContent.email}` : null
+  // Projects State
+  const [projects, setProjects] = useState<ProjectEntry[]>(
+    initialContent?.projects || []
+  )
+
+  // Sync initialContent changes to local state.
+  // Key on the actual content the form manages (not just name/title/email) so
+  // that loading saved resumes, switching versions, or assistant edits all
+  // re-sync — even when personal fields are blank. Typing round-trips through
+  // the parent and comes back identical, so the signature is stable and editing
+  // is not disrupted.
+  const contentKey = initialContent
+    ? JSON.stringify([
+        initialContent.name,
+        initialContent.title,
+        initialContent.email,
+        initialContent.phone,
+        initialContent.linkedin,
+        initialContent.github,
+        initialContent.summary,
+        initialContent.experiences,
+        initialContent.educationEntries,
+        initialContent.projects,
+        initialContent.skills,
+        initialContent.customFields,
+        initialContent.sectionTitles,
+      ])
+    : null
   useEffect(() => {
-    if (initialContent) {
-      console.log('[EditorSections] Syncing initialContent:', initialContent.title)
-      setName(initialContent.name || '')
-      setTitle(initialContent.title || '')
-      setEmail(initialContent.email || '')
-      setPhone(initialContent.phone || '')
-      setLinkedin(initialContent.linkedin || '')
-      setGithub(initialContent.github || '')
-      setSummary(initialContent.summary || '')
-      setExperiences(initialContent.experiences || [])
-      setEducationEntries(initialContent.educationEntries || [])
-      setSkills(initialContent.skills || [])
-      setCustomFields(initialContent.customFields || [])
-      setSections(prev => ({
-        ...prev,
-        summary: { ...prev.summary, title: initialContent.sectionTitles?.summary || prev.summary.title },
-        experience: { ...prev.experience, title: initialContent.sectionTitles?.experience || prev.experience.title },
-        education: { ...prev.education, title: initialContent.sectionTitles?.education || prev.education.title },
-        skills: { ...prev.skills, title: initialContent.sectionTitles?.skills || prev.skills.title },
-      }))
+    if (!initialContent) return
+
+    const shouldSyncFromParent = syncSignal || contentKey !== lastSyncedContentKeyRef.current
+    if (!shouldSyncFromParent) return
+
+    console.log('[EditorSections] Syncing initialContent:', initialContent.title)
+    setName(initialContent.name || '')
+    setTitle(initialContent.title || '')
+    setEmail(initialContent.email || '')
+    setPhone(initialContent.phone || '')
+    setLinkedin(initialContent.linkedin || '')
+    setGithub(initialContent.github || '')
+    setSummary(initialContent.summary || '')
+    setExperiences(initialContent.experiences || [])
+    setEducationEntries(initialContent.educationEntries || [])
+    setProjects(initialContent.projects || [])
+    setSkills(initialContent.skills || [])
+    setCustomFields(initialContent.customFields || [])
+    setSections(prev => ({
+      ...prev,
+      summary: { ...prev.summary, title: initialContent.sectionTitles?.summary || prev.summary.title },
+      experience: { ...prev.experience, title: initialContent.sectionTitles?.experience || prev.experience.title },
+      education: { ...prev.education, title: initialContent.sectionTitles?.education || prev.education.title },
+      projects: { ...prev.projects, title: initialContent.sectionTitles?.projects || prev.projects.title },
+      skills: { ...prev.skills, title: initialContent.sectionTitles?.skills || prev.skills.title },
+    }))
+    lastSyncedContentKeyRef.current = contentKey
+  }, [contentKey, initialContent, syncSignal])
+
+  // When the assistant applies a change, jump to the section it edited so the
+  // user can see it. Keyed on syncSignal only, so typing never triggers a jump.
+  useEffect(() => {
+    if (syncSignal && focusSection) {
+      setActiveSection(focusSection)
     }
-  }, [contentKey])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [syncSignal])
 
   // Sync to Parent Callback
   useEffect(() => {
@@ -232,14 +298,31 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
         summary: sections.summary.title,
         experience: sections.experience.title,
         education: sections.education.title,
+        projects: sections.projects.title,
         skills: sections.skills.title,
       },
       summary,
       experiences,
       educationEntries,
+      projects,
       skills,
       customFields,
     }
+    lastSyncedContentKeyRef.current = JSON.stringify([
+      content.name,
+      content.title,
+      content.email,
+      content.phone,
+      content.linkedin,
+      content.github,
+      content.summary,
+      content.experiences,
+      content.educationEntries,
+      content.projects,
+      content.skills,
+      content.customFields,
+      content.sectionTitles,
+    ])
     onContentChange?.(content)
   }, [
     name,
@@ -251,10 +334,12 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
     sections.summary.title,
     sections.experience.title,
     sections.education.title,
+    sections.projects.title,
     sections.skills.title,
     summary,
     experiences,
     educationEntries,
+    projects,
     skills,
     customFields,
     onContentChange,
@@ -460,6 +545,43 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
     )
   }
 
+  // --- PROJECTS OPERATIONS ---
+  const handleAddProject = () => {
+    const id = `proj-${Date.now()}`
+    setProjects((prev) => [
+      ...prev.map(p => ({ ...p, expanded: false })),
+      { id, name: '', description: '', expanded: true }
+    ])
+  }
+
+  const handleUpdateProject = (id: string, patch: Partial<Omit<ProjectEntry, 'id'>>) => {
+    setProjects((prev) =>
+      prev.map((proj) => (proj.id === id ? { ...proj, ...patch } : proj))
+    )
+  }
+
+  const handleDeleteProject = (id: string) => {
+    setProjects((prev) => prev.filter((proj) => proj.id !== id))
+  }
+
+  const handleMoveProject = (idx: number, direction: 'up' | 'down') => {
+    setProjects((prev) => {
+      const next = [...prev]
+      if (direction === 'up' && idx > 0) {
+        ;[next[idx], next[idx - 1]] = [next[idx - 1], next[idx]]
+      } else if (direction === 'down' && idx < next.length - 1) {
+        ;[next[idx], next[idx + 1]] = [next[idx + 1], next[idx]]
+      }
+      return next
+    })
+  }
+
+  const handleToggleProjectExpand = (id: string) => {
+    setProjects((prev) =>
+      prev.map((proj) => (proj.id === id ? { ...proj, expanded: !proj.expanded } : proj))
+    )
+  }
+
   // --- SKILLS OPERATIONS ---
   const handleAddSkillGroup = () => {
     const id = `skills-${Date.now()}`
@@ -644,6 +766,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
             { id: 'summary', label: 'Summary' },
             { id: 'experience', label: 'Experience' },
             { id: 'education', label: 'Education' },
+            { id: 'projects', label: 'Projects' },
             { id: 'skills', label: 'Skills' },
             { id: 'custom', label: 'Custom' },
           ].map((step, idx, arr) => {
@@ -667,6 +790,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
               summary: { active: 'bg-violet-200', inactive: 'bg-violet-50/60 hover:bg-violet-100/80', text: 'text-violet-900', arrowBg: 'bg-violet-200', borderColor: '#7c3aed' },
               experience: { active: 'bg-blue-200', inactive: 'bg-blue-50/60 hover:bg-blue-100/80', text: 'text-blue-900', arrowBg: 'bg-blue-200', borderColor: '#2563eb' },
               education: { active: 'bg-emerald-200', inactive: 'bg-emerald-50/60 hover:bg-emerald-100/80', text: 'text-emerald-900', arrowBg: 'bg-emerald-200', borderColor: '#059669' },
+              projects: { active: 'bg-cyan-200', inactive: 'bg-cyan-50/60 hover:bg-cyan-100/80', text: 'text-cyan-900', arrowBg: 'bg-cyan-200', borderColor: '#0891b2' },
               skills: { active: 'bg-amber-200', inactive: 'bg-amber-50/60 hover:bg-amber-100/80', text: 'text-amber-900', arrowBg: 'bg-amber-200', borderColor: '#d97706' },
               custom: { active: 'bg-rose-200', inactive: 'bg-rose-50/60 hover:bg-rose-100/80', text: 'text-rose-900', arrowBg: 'bg-rose-200', borderColor: '#e11d48' },
             };
@@ -690,7 +814,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
                 <button
                    type="button"
                    onClick={() => handleSectionSwitch(step.id as any)}
-                   className={`relative z-10 w-full h-full flex items-center justify-center text-[11px] sm:text-xs uppercase tracking-wider ${paddingLeft} ${paddingRight} ${isActive ? colors[step.id].text + ' font-bold' : 'text-slate-700 font-medium'}`}
+                   className={`relative z-10 w-full h-full flex items-center justify-center text-[11px] sm:text-xs uppercase tracking-wider ${paddingLeft} ${paddingRight} ${(isActive || step.id === 'projects') ? colors[step.id].text + ' font-bold' : 'text-slate-700 font-medium'}`}
                 >
                   <span className="truncate">{step.label}</span>
                 </button>
@@ -1083,7 +1207,110 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
         </div>
       )}
 
-      {/* 5. Skills */}
+      {/* 5. Projects */}
+      {activeSection === 'projects' && (
+        <div id="sec-projects" className="animate-in fade-in duration-300">
+          <SectionHeader
+            sectionKey="projects"
+            counts={`${projects.length} project${projects.length !== 1 ? 's' : ''}`}
+          />
+          <div className="p-5 pb-0 space-y-5">
+            {projects.map((project, idx) => (
+              <div key={project.id} className={`rounded-xl border transition-all p-5 relative group/card ${
+                project.expanded
+                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100'
+                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300'
+              }`}>
+                <div className="flex items-center justify-between gap-3 mb-4">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleProjectExpand(project.id)}
+                    className="flex items-center gap-2 text-left flex-1"
+                  >
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${project.expanded ? 'rotate-180' : ''}`} />
+                    <span className="text-sm font-semibold text-slate-700">{project.name || `Project ${idx + 1}`}</span>
+                  </button>
+
+                  <div className="flex items-center gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
+                    {idx > 0 && (
+                      <button
+                        title="Move Up"
+                        onClick={() => handleMoveProject(idx, 'up')}
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    {idx < projects.length - 1 && (
+                      <button
+                        title="Move Down"
+                        onClick={() => handleMoveProject(idx, 'down')}
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                    <button
+                      title="Remove Project"
+                      onClick={() => handleDeleteProject(project.id)}
+                      disabled={projects.length === 1}
+                      className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md disabled:opacity-40"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {project.expanded && (
+                  <div className="space-y-4 pt-1">
+                    <div className={formFieldClass}>
+                      <label className={fieldLabel}>Project Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. BuildBot"
+                        value={project.name}
+                        onChange={(e) => handleUpdateProject(project.id, { name: e.target.value })}
+                        className={inputClass}
+                      />
+                    </div>
+
+                    <div className={formFieldClass}>
+                      <label className={fieldLabel}>Description</label>
+                      <textarea
+                        placeholder="Brief description of the project and your role..."
+                        value={project.description}
+                        onChange={(e) => handleUpdateProject(project.id, { description: e.target.value })}
+                        className={`${inputClass} resize-none min-h-[80px]`}
+                      />
+                    </div>
+
+                    <div className={formFieldClass}>
+                      <label className={fieldLabel}>Technologies (optional)</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. React, Node.js, AWS"
+                        value={project.technologies || ''}
+                        onChange={(e) => handleUpdateProject(project.id, { technologies: e.target.value })}
+                        className={inputClass}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+
+            <Button
+              onClick={handleAddProject}
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+            >
+              <Plus className="w-4 h-4 mr-2" /> Add Project
+            </Button>
+          </div>
+          <SectionFooter current="projects" />
+        </div>
+      )}
+
+      {/* 6. Skills */}
       {activeSection === 'skills' && (
         <div id="sec-skills" className="animate-in fade-in duration-300">
           <SectionHeader 
@@ -1190,7 +1417,7 @@ export function EditorSections({ initialContent, onContentChange }: EditorSectio
         </div>
       )}
 
-      {/* 6. Custom Fields */}
+      {/* 7. Custom Fields */}
       {activeSection === 'custom' && (
         <div id="sec-custom" className="animate-in fade-in duration-300">
           <div className={panelHeader}>

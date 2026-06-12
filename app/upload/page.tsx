@@ -2,13 +2,21 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Cloud, CheckCircle2, AlertCircle, FileText, File, Loader2 } from 'lucide-react'
+import { Cloud, CheckCircle2, FileText, File, Loader2, Sparkles } from 'lucide-react'
 import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { loadUploadedFiles } from '@/lib/supabase-loaders'
 import { supabasePlaceholder } from '@/lib/supabase-placeholder'
 import { getConfidenceBadge, getConfidenceLabel } from '@/lib/utils'
-import type { UploadedFile } from '@/lib/types'
+import type { ExtractedResume, UploadedFile } from '@/lib/types'
+import {
+  extractTextFromDocument,
+  mapParsedResumeToEditor,
+  mapParsedResumeToExtracted,
+  parseResumeWithFallback,
+  type EditorResumeContent,
+} from '@/lib/resume-parser-client'
+import { ResumeChatbot } from '@/components/upload/resume-chatbot'
 
 type UploadState = 'ready' | 'uploading' | 'extracting' | 'completed' | 'review_needed' | 'failed'
 
@@ -18,6 +26,9 @@ export default function Upload() {
   const [dragActive, setDragActive] = useState(false)
   const [uploadedFile, setUploadedFile] = useState<{ name: string; size: number; type: 'PDF' | 'DOCX' } | null>(null)
   const [recentUploads, setRecentUploads] = useState<UploadedFile[]>([])
+  const [parsedResume, setParsedResume] = useState<ExtractedResume | null>(null)
+  const [parsedEditorContent, setParsedEditorContent] = useState<EditorResumeContent | null>(null)
+  const [parseSource, setParseSource] = useState<'cerebras' | null>(null)
 
   useEffect(() => {
     let active = true
@@ -53,24 +64,27 @@ export default function Upload() {
       const fileType = fileName.endsWith('.pdf') ? 'PDF' : fileName.endsWith('.docx') ? 'DOCX' : null
 
       if (fileType) {
-        void handleFileSelect(file.name, fileType)
+        void handleFileSelect(file)
       }
     }
   }
 
-  const handleFileSelect = async (name: string, type: 'PDF' | 'DOCX') => {
+  const handleFileSelect = async (file: File) => {
+    const type = file.name.endsWith('.pdf') ? 'PDF' : 'DOCX'
     const id = crypto.randomUUID()
-    setUploadedFile({ name, size: 245000, type })
+    setUploadedFile({ name: file.name, size: file.size, type })
     setUploadState('uploading')
-
+    setParsedResume(null)
+    setParsedEditorContent(null)
+    setParseSource(null)
     setRecentUploads((current) => [
       {
         id,
-        name,
+        name: file.name,
         type,
-        size: 245000,
+        size: file.size,
         uploadedAt: new Date().toISOString(),
-        status: 'completed',
+        status: 'uploading',
       },
       ...current,
     ])
@@ -78,19 +92,47 @@ export default function Upload() {
     void supabasePlaceholder.uploadFile({
       id,
       user_id: null,
-      filename: name,
+      filename: file.name,
       file_type: type,
-      file_size: 245000,
+      file_size: file.size,
       uploaded_at: new Date().toISOString(),
     })
 
-    setTimeout(() => {
+    try {
       setUploadState('extracting')
-    }, 1500)
+      const extractedText = await extractTextFromDocument(file)
+      const { parsed, source } = await parseResumeWithFallback(extractedText)
+      const extracted = mapParsedResumeToExtracted(parsed)
+      const editorContent = mapParsedResumeToEditor(parsed)
 
-    setTimeout(() => {
-      setUploadState('completed')
-    }, 3000)
+      setParseSource(source)
+      setParsedResume(extracted)
+      setParsedEditorContent(editorContent)
+      setUploadState(extracted.confidence === 'high' ? 'completed' : 'review_needed')
+      setRecentUploads((current) =>
+        current.map((entry) =>
+          entry.id === id
+            ? {
+                ...entry,
+                status: 'completed',
+              }
+            : entry
+        )
+      )
+    } catch (error) {
+      console.error('[Upload] Parsing failed:', error)
+      setUploadState('failed')
+      setRecentUploads((current) =>
+        current.map((entry) =>
+          entry.id === id
+            ? {
+                ...entry,
+                status: 'failed',
+              }
+            : entry
+        )
+      )
+    }
   }
 
   const handleReviewClick = () => {
@@ -98,8 +140,18 @@ export default function Upload() {
   }
 
   const handleLoadToEditor = () => {
+    if (parsedEditorContent) {
+      localStorage.setItem('career-commit-editor-state', JSON.stringify(parsedEditorContent))
+      localStorage.setItem('career-commit-resume-id', crypto.randomUUID())
+    }
     router.push('/editor')
   }
+
+  const resumeChatContext = parsedEditorContent
+    ? JSON.stringify(parsedEditorContent, null, 2)
+    : parsedResume
+      ? JSON.stringify(parsedResume, null, 2)
+      : ''
 
   const getStatusMessage = (state: UploadState) => {
     switch (state) {
@@ -165,10 +217,7 @@ export default function Upload() {
                   className="hidden"
                   onChange={(e) => {
                     const file = e.target.files?.[0]
-                    if (file) {
-                      const type = file.name.endsWith('.pdf') ? 'PDF' : 'DOCX'
-                      void handleFileSelect(file.name, type)
-                    }
+                    if (file) void handleFileSelect(file)
                   }}
                 />
 
@@ -255,31 +304,18 @@ export default function Upload() {
   }
 
   if (uploadState === 'completed' || uploadState === 'review_needed') {
-    const extracted = uploadedFile
-      ? {
-          name: uploadedFile.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' '),
-          role: null,
-          email: null,
-          phone: null,
-          location: null,
-          skills: [],
-          experience: [],
-          projects: [],
-          education: [],
-          confidence: 'needs_review' as const,
-        }
-      : {
-          name: null,
-          role: null,
-          email: null,
-          phone: null,
-          location: null,
-          skills: [],
-          experience: [],
-          projects: [],
-          education: [],
-          confidence: 'missing' as const,
-        }
+    const extracted = parsedResume ?? {
+      name: uploadedFile ? uploadedFile.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ') : null,
+      role: null,
+      email: null,
+      phone: null,
+      location: null,
+      skills: [],
+      experience: [],
+      projects: [],
+      education: [],
+      confidence: 'missing' as const,
+    }
 
     return (
       <>
@@ -299,6 +335,12 @@ export default function Upload() {
                   <p className="text-muted-foreground mt-2">
                     Review the extracted information below. Confidence badges show extraction reliability.
                   </p>
+                  {parseSource && (
+                    <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      Parsed with Cerebras AI
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -461,6 +503,7 @@ export default function Upload() {
                     size="lg"
                     className="w-full"
                     onClick={handleLoadToEditor}
+                    disabled={!parsedEditorContent}
                   >
                     Load into Editor
                   </Button>
@@ -473,6 +516,15 @@ export default function Upload() {
                     Review Extracted Content
                   </Button>
                 </div>
+
+                {resumeChatContext && (
+                  <div className="mt-6">
+                    <ResumeChatbot
+                      context={resumeChatContext}
+                      sourceLabel="Cerebras"
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

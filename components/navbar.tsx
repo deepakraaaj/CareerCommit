@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { Menu, X, ChevronDown, Shield, FileText } from 'lucide-react'
+import { Menu, X, ChevronDown, Shield, FileText, Sun, Moon } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
+import { useTheme } from '@/components/theme/theme-provider'
 import { Button } from '@/components/ui/button'
 
 export function Navbar() {
@@ -13,6 +14,7 @@ export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const { user, profile, signOut } = useAuth()
+  const { theme, toggleTheme } = useTheme()
 
   const isActive = (href: string) => pathname === href
 
@@ -76,9 +78,23 @@ export function Navbar() {
           )}
 
           {/* Right Side */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-foreground/70 hover:bg-secondary hover:text-foreground transition-colors"
+              aria-label="Toggle theme"
+              title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+            >
+              {theme === 'light' ? (
+                <Moon className="w-5 h-5" />
+              ) : (
+                <Sun className="w-5 h-5" />
+              )}
+            </button>
+
             {user ? (
-              <div className="hidden md:flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-2">
                 <div className="relative">
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}

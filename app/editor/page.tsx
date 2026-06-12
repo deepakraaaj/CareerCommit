@@ -12,6 +12,9 @@ import { LoginModal } from '@/components/auth/login-modal'
 import { SaveVersionModal, type SaveVersionData } from '@/components/versions/save-version-modal'
 import { useAuth } from '@/components/auth/auth-provider'
 import { loadResumes } from '@/lib/supabase-loaders'
+import { ResumeChatbot } from '@/components/upload/resume-chatbot'
+import { applyAgentActions, type EditorContent as ActionEditorContent } from '@/lib/resume-action-handler'
+import type { AgentAction } from '@/lib/resume-agent-actions'
 
 type ExperienceEntry = {
   id: string
@@ -22,6 +25,14 @@ type ExperienceEntry = {
   expanded?: boolean
 }
 
+type ProjectEntry = {
+  id: string
+  name: string
+  description: string
+  technologies?: string
+  expanded?: boolean
+}
+
 type EditorContent = {
   name: string
   title: string
@@ -29,10 +40,11 @@ type EditorContent = {
   phone: string
   linkedin: string
   github: string
-  sectionTitles: Record<'summary' | 'experience' | 'education' | 'skills', string>
+  sectionTitles: Record<'summary' | 'experience' | 'education' | 'skills' | 'projects', string>
   summary: string
   experiences: ExperienceEntry[]
   educationEntries: { id: string; school: string; degree: string; duration: string; expanded?: boolean }[]
+  projects: ProjectEntry[]
   skills: { id: string; label: string; items: string[] }[]
   customFields: { id: string; label: string; value: string }[]
   accentColor: string
@@ -69,10 +81,12 @@ function createBlankResumeData(): EditorContent {
       experience: 'Experience',
       education: 'Education',
       skills: 'Skills',
+      projects: 'Projects',
     },
     summary: '',
     experiences: [],
     educationEntries: [],
+    projects: [],
     skills: [],
     customFields: [],
     accentColor: 'blue',
@@ -128,6 +142,10 @@ export default function Editor() {
 
   const [preview, setPreview] = useState('')
   const [editorContent, setEditorContent] = useState<EditorContent>(createBlankResumeData())
+  const [agentSyncSignal, setAgentSyncSignal] = useState(0)
+  const [agentFocusSection, setAgentFocusSection] = useState<
+    'personal' | 'summary' | 'experience' | 'education' | 'projects' | 'skills' | 'custom' | undefined
+  >(undefined)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [versionModalOpen, setVersionModalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -273,6 +291,15 @@ export default function Editor() {
       .filter((group) => group.label.trim() && group.items.length > 0)
       .map((group) => `${group.label.trim()}: ${group.items.join(', ')}`)
 
+    const projectLines = content.projects
+      .filter((proj) => proj.name.trim() || proj.description.trim())
+      .map((proj) => {
+        const title = proj.name.trim()
+        const description = proj.description.trim()
+        const tech = proj.technologies?.trim()
+        return [title, description, tech || ''].filter(Boolean).join(' | ')
+      })
+
     // Format multiple experiences
     const experienceLines = content.experiences
       .map((exp) => {
@@ -295,6 +322,9 @@ ${experienceLines.join('\n')}
 ${content.sectionTitles.education.toUpperCase()}
 ${educationLines.join('\n')}
 
+${content.sectionTitles.projects.toUpperCase()}
+${projectLines.join('\n')}
+
 ${content.sectionTitles.skills.toUpperCase()}
 ${skillLines.join('\n')}
 ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim()
@@ -309,6 +339,31 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
 
     // Sync to LocalStorage
     localStorage.setItem('career-commit-editor-state', JSON.stringify(content))
+  }, [])
+
+  const handleApplyAgentActions = useCallback((actions: AgentAction[]) => {
+    setEditorContent((prev) => {
+      const updated = applyAgentActions(prev as ActionEditorContent, actions)
+      setDraftStatus('unsaved')
+      triggerPreviewUpdate(updated)
+      localStorage.setItem('career-commit-editor-state', JSON.stringify(updated))
+      return updated
+    })
+    // Navigate the form to the section the last action touched.
+    const last = actions[actions.length - 1]
+    const sectionByType: Record<string, typeof agentFocusSection> = {
+      update_personal_info: 'personal',
+      add_project: 'projects',
+      update_project: 'projects',
+      delete_project: 'projects',
+      add_skill: 'skills',
+      update_experience: 'experience',
+      add_bullet: 'experience',
+    }
+    setAgentFocusSection(last ? sectionByType[last.type] : undefined)
+    // Force the form to re-sync from the updated content so assistant changes
+    // (new projects, skills, etc.) become visible immediately.
+    setAgentSyncSignal((s) => s + 1)
   }, [])
 
   const handleDraftSave = async () => {
@@ -777,10 +832,24 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
           {/* Left Side: Scrollable Input Form */}
           <div className="w-full lg:w-[55%] h-full overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 border-r border-slate-200/80 bg-[#FAF9F6] custom-scrollbar">
             {editorContent && (
-              <EditorSections
-                initialContent={editorContent}
-                onContentChange={handleEditorChange}
-              />
+              <div className="space-y-8">
+                <EditorSections
+                  initialContent={editorContent}
+                  onContentChange={handleEditorChange}
+                  syncSignal={agentSyncSignal}
+                  focusSection={agentFocusSection}
+                />
+
+                {user && (
+                  <div className="pb-6">
+                    <ResumeChatbot
+                      context={JSON.stringify(editorContent)}
+                      sourceLabel="Editor"
+                      onApplyActions={handleApplyAgentActions}
+                    />
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
