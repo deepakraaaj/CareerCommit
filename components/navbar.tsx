@@ -13,7 +13,7 @@ export function Navbar() {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const { user, profile } = useAuth()
+  const { user, profile, signOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
 
   const isActive = (href: string) => pathname === href
@@ -29,6 +29,13 @@ export function Navbar() {
       ? rawDisplayName
       : user?.email?.split('@')[0] || 'Account'
   const displayInitial = displayName.charAt(0).toUpperCase()
+
+  const handleSignOut = async () => {
+    await signOut()
+    setUserMenuOpen(false)
+    setIsOpen(false)
+    router.push('/')
+  }
 
   return (
     <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/95 backdrop-blur-sm">
@@ -109,11 +116,12 @@ export function Navbar() {
                         <div className="font-medium text-foreground">{displayName}</div>
                         <div>{user.email}</div>
                       </div>
-                      <Link href="/resumes">
-                        <button className="w-full px-3 py-2 rounded-lg text-sm text-left text-foreground/70 hover:bg-secondary hover:text-foreground transition-colors">
-                          Resumes
-                        </button>
-                      </Link>
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full px-3 py-2 rounded-lg text-sm text-left text-foreground/70 hover:bg-destructive/10 hover:text-destructive transition-colors"
+                      >
+                        Sign out
+                      </button>
                     </div>
                   )}
                 </div>
@@ -167,13 +175,12 @@ export function Navbar() {
             ))}
             {user && (
               <div className="pt-3 border-t border-border/50 mt-3 space-y-2">
-                <Link
-                  href="/resumes"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-4 py-2.5 text-sm font-medium rounded-lg text-foreground/70 hover:bg-secondary hover:text-foreground transition-colors"
+                <button
+                  onClick={handleSignOut}
+                  className="w-full px-4 py-2.5 text-sm text-left text-foreground/70 hover:bg-destructive/10 hover:text-destructive transition-colors rounded-lg"
                 >
-                  Resumes
-                </Link>
+                  Sign out
+                </button>
               </div>
             )}
             {!user && (
