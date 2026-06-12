@@ -130,7 +130,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
     }
 
     return (
-      <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/30 px-5 py-4 mt-6">
+      <div className="flex items-center justify-between border-t border-slate-100 bg-slate-50/30 px-5 py-4 mt-6 dark:border-slate-800 dark:bg-slate-900/40">
         <div>
           {prev && (
             <Button
@@ -138,7 +138,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
               variant="outline"
               size="sm"
               onClick={() => handleSectionSwitch(prev)}
-              className="text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg"
+              className="text-xs font-bold text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-50"
             >
               ← Back to {getLabel(prev)}
             </Button>
@@ -149,7 +149,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             <Button
               type="button"
               onClick={() => handleSectionSwitch(next)}
-              className="text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm rounded-lg px-4"
+              className="text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-sm rounded-lg px-4 dark:bg-indigo-500 dark:hover:bg-indigo-400"
             >
               Next: {getLabel(next)} →
             </Button>
@@ -642,13 +642,13 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
     setCustomFields((prev) => prev.filter((field) => field.id !== id))
   }
 
-  // Light Mode Layout Constants (Classic Modernized Theme)
-  const panelHeader = 'flex flex-row items-center justify-between gap-4 border-b border-slate-100/80 bg-white px-8 py-7 dark:border-slate-800 dark:bg-slate-950/70'
-  const panelTitle = 'font-serif text-3xl font-light tracking-tight text-slate-900 dark:text-slate-100'
+  // Shared editor layout constants
+  const panelHeader = 'flex flex-row items-center justify-between gap-4 border-b border-slate-100/80 bg-white/95 px-8 py-7 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/75'
+  const panelTitle = 'font-serif text-3xl font-light tracking-tight text-slate-900 dark:text-slate-50'
   const panelSubtitle = 'font-serif italic text-[15px] text-slate-500 dark:text-slate-400'
-  const fieldLabel = 'text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-slate-650 transition-colors duration-300 dark:text-slate-500 dark:group-focus-within:text-slate-300'
-  const inputClass = 'w-full bg-transparent pt-1 text-sm text-slate-850 placeholder-slate-350 outline-none border-none dark:text-slate-100 dark:placeholder-slate-500'
-  const formFieldClass = 'group relative rounded-xl border border-slate-200 bg-slate-50/20 px-4 py-2 transition-all duration-300 focus-within:bg-white focus-within:border-slate-800 focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.03)] dark:border-slate-700 dark:bg-slate-900/50 dark:focus-within:bg-slate-900 dark:focus-within:border-slate-500 dark:focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.25)]'
+  const fieldLabel = 'text-[9px] font-black uppercase tracking-widest text-slate-400 transition-colors duration-300 group-focus-within:text-slate-600 dark:text-slate-500 dark:group-focus-within:text-slate-200'
+  const inputClass = 'w-full bg-transparent pt-1 text-sm text-slate-900 placeholder-slate-400 outline-none border-none dark:text-slate-100 dark:placeholder-slate-500'
+  const formFieldClass = 'group relative rounded-xl border border-slate-200 bg-slate-50/30 px-4 py-2 transition-all duration-300 focus-within:border-slate-700 focus-within:bg-white focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.03)] dark:border-slate-700 dark:bg-slate-900/45 dark:focus-within:border-slate-500 dark:focus-within:bg-slate-900/60 dark:focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.18)]'
 
   const getSectionMonogram = (key: string) => {
     switch (key) {
@@ -672,7 +672,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
       custom: 'border-t-rose-650',
     }
     
-    return `rounded-2xl border border-slate-205 bg-white transition-all duration-300 relative shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] border-t-[4px] ${activeBorders[colorKey]} overflow-hidden dark:border-slate-700 dark:bg-slate-950/70 dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.35)]`
+    return `rounded-2xl border border-slate-205 bg-white transition-all duration-300 relative shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] border-t-[4px] ${activeBorders[colorKey]} overflow-hidden dark:border-slate-800 dark:bg-slate-900/90 dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.3)]`
   }
 
   const getSectionIcon = (key: string) => {
@@ -696,13 +696,13 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
 
   const getSectionIconBg = (key: string) => {
     switch (key) {
-      case 'personal': return 'bg-indigo-50 border border-indigo-100'
-      case 'summary': return 'bg-violet-50 border border-violet-100'
-      case 'experience': return 'bg-blue-50 border border-blue-100'
-      case 'education': return 'bg-emerald-50 border border-emerald-100'
-      case 'skills': return 'bg-amber-50 border border-amber-100'
-      case 'custom': return 'bg-rose-50 border border-rose-100'
-      default: return 'bg-slate-50 border border-slate-100 dark:bg-slate-900/60 dark:border-slate-800'
+      case 'personal': return 'bg-indigo-50 border border-indigo-100 dark:bg-indigo-500/10 dark:border-indigo-500/20'
+      case 'summary': return 'bg-violet-50 border border-violet-100 dark:bg-violet-500/10 dark:border-violet-500/20'
+      case 'experience': return 'bg-blue-50 border border-blue-100 dark:bg-blue-500/10 dark:border-blue-500/20'
+      case 'education': return 'bg-emerald-50 border border-emerald-100 dark:bg-emerald-500/10 dark:border-emerald-500/20'
+      case 'skills': return 'bg-amber-50 border border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/20'
+      case 'custom': return 'bg-rose-50 border border-rose-100 dark:bg-rose-500/10 dark:border-rose-500/20'
+      default: return 'bg-slate-50 border border-slate-100 dark:bg-slate-900/35 dark:border-slate-800'
     }
   }
 
@@ -720,7 +720,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
           size="icon-sm"
           onClick={() => setRenamingSection(null)}
           title="Save"
-          className="rounded-lg text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 ml-2"
+          className="rounded-lg text-emerald-600 hover:bg-emerald-500/10 hover:text-emerald-700 ml-2 dark:text-emerald-400 dark:hover:bg-emerald-500/15 dark:hover:text-emerald-300"
         >
           <Check className="w-4 h-4" />
         </Button>
@@ -729,7 +729,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
           size="icon-sm"
           onClick={() => setRenamingSection(null)}
           title="Cancel"
-          className="rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
         >
           <X className="w-4 h-4" />
         </Button>
@@ -748,7 +748,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
           size="icon-sm"
           onClick={() => setRenamingSection(sectionKey)}
           title="Rename Section"
-          className="rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+          className="rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200"
         >
           <Edit2 className="w-3.5 h-3.5" />
         </Button>
@@ -759,8 +759,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
     <div className="pr-1 pb-10">
       <div className={getUnifiedShellClass(activeSection)}>
       {/* Quick Navigation Tabs - Pipeline Stepper Style with Connection Arrow */}
-      <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md pb-2 pt-4 px-5 w-full relative border-b border-slate-200 dark:border-slate-800 dark:bg-slate-950/90">
-        <div className="flex h-11 w-full rounded-full p-[3px] bg-white border border-slate-200 shadow-sm relative z-20 dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
+      <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md pb-2 pt-4 px-5 w-full relative border-b border-slate-200 dark:border-slate-800 dark:bg-slate-900/85">
+        <div className="flex h-11 w-full rounded-full p-[3px] bg-white border border-slate-200 shadow-sm relative z-20 dark:border-slate-700 dark:bg-slate-900/85 dark:shadow-[0_8px_24px_rgba(0,0,0,0.24)]">
           {[
             { id: 'personal', label: 'Personal Info' },
             { id: 'summary', label: 'Summary' },
@@ -786,13 +786,13 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             }
 
             const colors: Record<string, { active: string; inactive: string; text: string; arrowBg: string; borderColor: string }> = {
-              personal: { active: 'bg-indigo-200', inactive: 'bg-indigo-50/60 hover:bg-indigo-100/80', text: 'text-indigo-900', arrowBg: 'bg-indigo-200', borderColor: '#4f46e5' },
-              summary: { active: 'bg-violet-200', inactive: 'bg-violet-50/60 hover:bg-violet-100/80', text: 'text-violet-900', arrowBg: 'bg-violet-200', borderColor: '#7c3aed' },
-              experience: { active: 'bg-blue-200', inactive: 'bg-blue-50/60 hover:bg-blue-100/80', text: 'text-blue-900', arrowBg: 'bg-blue-200', borderColor: '#2563eb' },
-              education: { active: 'bg-emerald-200', inactive: 'bg-emerald-50/60 hover:bg-emerald-100/80', text: 'text-emerald-900', arrowBg: 'bg-emerald-200', borderColor: '#059669' },
-              projects: { active: 'bg-cyan-200', inactive: 'bg-cyan-50/60 hover:bg-cyan-100/80', text: 'text-cyan-900', arrowBg: 'bg-cyan-200', borderColor: '#0891b2' },
-              skills: { active: 'bg-amber-200', inactive: 'bg-amber-50/60 hover:bg-amber-100/80', text: 'text-amber-900', arrowBg: 'bg-amber-200', borderColor: '#d97706' },
-              custom: { active: 'bg-rose-200', inactive: 'bg-rose-50/60 hover:bg-rose-100/80', text: 'text-rose-900', arrowBg: 'bg-rose-200', borderColor: '#e11d48' },
+              personal: { active: 'bg-indigo-200 dark:bg-indigo-500/20', inactive: 'bg-indigo-50/60 hover:bg-indigo-100/80 dark:bg-slate-900/55 dark:hover:bg-indigo-500/10', text: 'text-indigo-900 dark:text-indigo-100', arrowBg: 'bg-indigo-200 dark:bg-indigo-500/20', borderColor: '#4f46e5' },
+              summary: { active: 'bg-violet-200 dark:bg-violet-500/20', inactive: 'bg-violet-50/60 hover:bg-violet-100/80 dark:bg-slate-900/55 dark:hover:bg-violet-500/10', text: 'text-violet-900 dark:text-violet-100', arrowBg: 'bg-violet-200 dark:bg-violet-500/20', borderColor: '#7c3aed' },
+              experience: { active: 'bg-blue-200 dark:bg-blue-500/20', inactive: 'bg-blue-50/60 hover:bg-blue-100/80 dark:bg-slate-900/55 dark:hover:bg-blue-500/10', text: 'text-blue-900 dark:text-blue-100', arrowBg: 'bg-blue-200 dark:bg-blue-500/20', borderColor: '#2563eb' },
+              education: { active: 'bg-emerald-200 dark:bg-emerald-500/20', inactive: 'bg-emerald-50/60 hover:bg-emerald-100/80 dark:bg-slate-900/55 dark:hover:bg-emerald-500/10', text: 'text-emerald-900 dark:text-emerald-100', arrowBg: 'bg-emerald-200 dark:bg-emerald-500/20', borderColor: '#059669' },
+              projects: { active: 'bg-cyan-200 dark:bg-cyan-500/20', inactive: 'bg-cyan-50/60 hover:bg-cyan-100/80 dark:bg-slate-900/55 dark:hover:bg-cyan-500/10', text: 'text-cyan-900 dark:text-cyan-100', arrowBg: 'bg-cyan-200 dark:bg-cyan-500/20', borderColor: '#0891b2' },
+              skills: { active: 'bg-amber-200 dark:bg-amber-500/20', inactive: 'bg-amber-50/60 hover:bg-amber-100/80 dark:bg-slate-900/55 dark:hover:bg-amber-500/10', text: 'text-amber-900 dark:text-amber-100', arrowBg: 'bg-amber-200 dark:bg-amber-500/20', borderColor: '#d97706' },
+              custom: { active: 'bg-rose-200 dark:bg-rose-500/20', inactive: 'bg-rose-50/60 hover:bg-rose-100/80 dark:bg-slate-900/55 dark:hover:bg-rose-500/10', text: 'text-rose-900 dark:text-rose-100', arrowBg: 'bg-rose-200 dark:bg-rose-500/20', borderColor: '#e11d48' },
             };
             const colorClass = isActive ? colors[step.id].active : colors[step.id].inactive;
 
@@ -822,7 +822,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                 {/* The Connecting Arrow */}
                 {isActive && (
                   <div 
-                    className={`absolute -bottom-[14px] left-1/2 -translate-x-1/2 w-5 h-5 rotate-45 border-b-[1px] border-r-[1px] border-slate-200 z-10 shadow-[2px_2px_4px_-2px_rgba(0,0,0,0.05)] ${colors[step.id].arrowBg}`}
+                    className={`absolute -bottom-[14px] left-1/2 -translate-x-1/2 w-5 h-5 rotate-45 border-b-[1px] border-r-[1px] border-slate-200 dark:border-slate-700 z-10 shadow-[2px_2px_4px_-2px_rgba(0,0,0,0.05)] ${colors[step.id].arrowBg}`}
                   />
                 )}
               </div>
@@ -831,7 +831,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
         </div>
       </div>
 
-      <div className="relative bg-white min-h-[500px] dark:bg-slate-950">
+      <div className="relative bg-white min-h-[500px] dark:bg-slate-900/90">
       {/* 1. Personal Info */}
       {activeSection === 'personal' && (
         <div id="sec-personal" className="animate-in fade-in duration-300">
@@ -959,7 +959,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
           />
           <div className="p-5 pb-0 space-y-5">
             {experiences.map((exp, idx) => (
-              <div key={exp.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-350">
+              <div key={exp.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 relative group/card transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-slate-600">
                 {/* Collapsible Sub-Header */}
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
@@ -968,11 +968,11 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                       onClick={() => toggleExperienceExpand(exp.id)}
                       className="flex items-center gap-2 text-left"
                     >
-                      <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${exp.expanded ? 'rotate-180' : ''}`} />
-                      <span className="text-sm font-semibold text-slate-700">
+                      <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform dark:text-slate-500 ${exp.expanded ? 'rotate-180' : ''}`} />
+                      <span className="text-sm font-semibold text-slate-700 dark:text-slate-100">
                         {exp.position || exp.company ? (
                           <>
-                            {exp.position || 'Position'} <span className="text-slate-400">at</span> {exp.company || 'Company'}
+                            {exp.position || 'Position'} <span className="text-slate-400 dark:text-slate-500">at</span> {exp.company || 'Company'}
                           </>
                         ) : (
                           `Work Experience ${idx + 1}`
@@ -986,7 +986,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                       <button
                         title="Move Up"
                         onClick={() => handleMoveExperience(idx, 'up')}
-                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md dark:hover:bg-slate-800 dark:hover:text-slate-100"
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
                       </button>
@@ -995,7 +995,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                       <button
                         title="Move Down"
                         onClick={() => handleMoveExperience(idx, 'down')}
-                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md dark:hover:bg-slate-800 dark:hover:text-slate-100"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
                       </button>
@@ -1048,7 +1048,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                     </div>
 
                     {/* Bullet Points */}
-                    <div className="space-y-2.5 pt-3 border-t border-slate-100">
+                    <div className="space-y-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
                       <label className={fieldLabel}>Core Achievements & Responsibilities</label>
                       
                       <div className="space-y-2.5">
@@ -1073,7 +1073,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                         variant="outline"
                         size="sm"
                         onClick={() => handleAddBullet(exp.id)}
-                        className="w-full border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg py-1.5 font-medium transition-all shadow-xs"
+                        className="w-full border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg py-1.5 font-medium transition-all shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
                       >
                         <Plus className="w-3.5 h-3.5 mr-1.5" /> Add Bullet Point
                       </Button>
@@ -1085,7 +1085,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
 
             <Button
               onClick={handleAddExperience}
-              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Professional Experience
             </Button>
@@ -1105,8 +1105,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             {educationEntries.map((entry, idx) => (
               <div key={entry.id} className={`rounded-xl border transition-all p-5 relative group/card ${
                 entry.expanded 
-                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100' 
-                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300'
+                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900/70 dark:border-slate-700 dark:ring-slate-800' 
+                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-700 dark:hover:border-slate-600'
               }`}>
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <button
@@ -1114,11 +1114,11 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                     onClick={() => toggleEducationExpand(entry.id)}
                     className="flex items-center gap-2 text-left"
                   >
-                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${entry.expanded ? 'rotate-180' : ''}`} />
-                    <span className="text-sm font-semibold text-slate-700">
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform dark:text-slate-500 ${entry.expanded ? 'rotate-180' : ''}`} />
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-100">
                       {entry.school || entry.degree ? (
                         <>
-                          {entry.degree || 'Degree'} <span className="text-slate-400">at</span> {entry.school || 'School'}
+                          {entry.degree || 'Degree'} <span className="text-slate-400 dark:text-slate-500">at</span> {entry.school || 'School'}
                         </>
                       ) : (
                         `Education ${idx + 1}`
@@ -1131,7 +1131,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                       <button
                         title="Move Up"
                         onClick={() => handleMoveEducation(idx, 'up')}
-                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md dark:hover:bg-slate-800 dark:hover:text-slate-100"
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
                       </button>
@@ -1140,7 +1140,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                       <button
                         title="Move Down"
                         onClick={() => handleMoveEducation(idx, 'down')}
-                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md dark:hover:bg-slate-800 dark:hover:text-slate-100"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
                       </button>
@@ -1198,7 +1198,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
 
             <Button
               onClick={handleAddEducationEntry}
-              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Education
             </Button>
@@ -1218,8 +1218,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             {projects.map((project, idx) => (
               <div key={project.id} className={`rounded-xl border transition-all p-5 relative group/card ${
                 project.expanded
-                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100'
-                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300'
+                  ? 'bg-white border-slate-350 shadow-sm ring-1 ring-slate-100 dark:bg-slate-900/70 dark:border-slate-700 dark:ring-slate-800'
+                  : 'bg-slate-50/40 border-slate-200/80 hover:border-slate-300 dark:bg-slate-900/50 dark:border-slate-700 dark:hover:border-slate-600'
               }`}>
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <button
@@ -1227,8 +1227,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                     onClick={() => handleToggleProjectExpand(project.id)}
                     className="flex items-center gap-2 text-left flex-1"
                   >
-                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 ${project.expanded ? 'rotate-180' : ''}`} />
-                    <span className="text-sm font-semibold text-slate-700">{project.name || `Project ${idx + 1}`}</span>
+                    <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform flex-shrink-0 dark:text-slate-500 ${project.expanded ? 'rotate-180' : ''}`} />
+                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-100">{project.name || `Project ${idx + 1}`}</span>
                   </button>
 
                   <div className="flex items-center gap-1 opacity-0 group-hover/card:opacity-100 transition-opacity">
@@ -1236,7 +1236,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                       <button
                         title="Move Up"
                         onClick={() => handleMoveProject(idx, 'up')}
-                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md dark:hover:bg-slate-800 dark:hover:text-slate-100"
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
                       </button>
@@ -1245,7 +1245,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                       <button
                         title="Move Down"
                         onClick={() => handleMoveProject(idx, 'down')}
-                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md"
+                        className="p-1 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-md dark:hover:bg-slate-800 dark:hover:text-slate-100"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
                       </button>
@@ -1301,7 +1301,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
 
             <Button
               onClick={handleAddProject}
-              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Project
             </Button>
@@ -1319,25 +1319,25 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
           />
           <div className="p-5 pb-0 space-y-6">
             {skills.map((group) => (
-              <div key={group.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 transition-all hover:border-slate-350">
+              <div key={group.id} className="rounded-xl border border-slate-200/80 bg-slate-50/40 p-5 transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/60 dark:hover:border-slate-600">
                 <div className="flex items-center gap-3 justify-between mb-4">
                   <div className="flex items-center gap-2 flex-1 max-w-[240px]">
                     <input
                       value={group.label}
                       onChange={(e) => handleUpdateSkillGroup(group.id, { label: e.target.value })}
                       placeholder="Category name"
-                      className="bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 text-sm font-semibold text-slate-800 outline-none pb-0.5 transition-all w-full"
+                      className="bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 text-sm font-semibold text-slate-800 outline-none pb-0.5 transition-all w-full dark:text-slate-100 dark:hover:border-slate-600"
                     />
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 ring-1 ring-indigo-500/15">
+                    <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 ring-1 ring-indigo-500/15 dark:bg-indigo-500/10 dark:text-indigo-200 dark:ring-indigo-400/20">
                       {group.items.length} items
                     </span>
                     <button
                       title="Delete Category"
                       onClick={() => handleDeleteSkillGroup(group.id)}
-                      className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md"
+                      className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md dark:hover:bg-rose-500/15 dark:hover:text-rose-300"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -1346,13 +1346,13 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
 
                 {/* Skill Tags */}
                 {group.items.length > 0 && (
-                  <div className="flex flex-wrap gap-1.5 mb-4 p-3 rounded-lg bg-white border border-slate-200/60 shadow-inner-sm">
+                  <div className="flex flex-wrap gap-1.5 mb-4 p-3 rounded-lg bg-white border border-slate-200/60 shadow-inner-sm dark:border-slate-700 dark:bg-slate-900/50">
                     {group.items.map((item) => (
                       <button
                         key={item}
                         type="button"
                         onClick={() => handleDeleteSkill(group.id, item)}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs text-slate-600 transition-all hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-rose-400 dark:hover:bg-rose-500/10 dark:hover:text-rose-200"
                         title="Click to remove"
                       >
                         {item}
@@ -1376,12 +1376,12 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                       }
                     }}
                     placeholder="Type skill and press Enter"
-                    className="flex-1 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
+                    className="flex-1 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-800 placeholder-slate-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-500/15"
                   />
                   <Button
                     variant="outline"
                     onClick={() => handleAddSkillToGroup(group.id)}
-                    className="border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg px-4 shadow-xs"
+                    className="border-slate-200 bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-800 rounded-lg px-4 shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
                   >
                     Add
                   </Button>
@@ -1396,7 +1396,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                         key={skill}
                         type="button"
                         onClick={() => handleAddSkillToGroup(group.id, skill)}
-                        className="text-[11px] font-semibold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 px-2.5 py-0.5 rounded-md border border-slate-200 bg-white transition-colors shadow-xxs"
+                        className="text-[11px] font-semibold text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 px-2.5 py-0.5 rounded-md border border-slate-200 bg-white transition-colors shadow-xxs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-200"
                       >
                         + {skill}
                       </button>
@@ -1408,7 +1408,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
 
             <Button
               onClick={handleAddSkillGroup}
-              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs"
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Skill Category
             </Button>
@@ -1436,12 +1436,12 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             {customFields.length > 0 ? (
               <div className="space-y-4">
                 {customFields.map((field, idx) => (
-                  <div key={field.id} className="rounded-xl border border-slate-205 bg-slate-50/20 p-5 relative group/card transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-slate-600">
+                  <div key={field.id} className="rounded-xl border border-slate-205 bg-slate-50/20 p-5 relative group/card transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/40 dark:hover:border-slate-600">
                     <div className="flex items-center justify-between gap-3 mb-3">
-                      <span className="text-xs font-semibold text-slate-500 font-serif italic">Custom Field {idx + 1}</span>
+                      <span className="text-xs font-semibold text-slate-500 font-serif italic dark:text-slate-300">Custom Field {idx + 1}</span>
                       <button
                         onClick={() => handleDeleteCustomField(field.id)}
-                        className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md"
+                        className="p-1 hover:bg-rose-500/10 text-rose-600 hover:text-rose-700 rounded-md dark:hover:bg-rose-500/15 dark:hover:text-rose-300"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -1473,7 +1473,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center dark:border-slate-700 dark:bg-slate-900/40">
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center dark:border-slate-700 dark:bg-slate-900/45">
                 <p className="text-sm font-semibold text-slate-400 dark:text-slate-300">No Custom Sections Added Yet</p>
                 <p className="mt-1 text-xs text-slate-500 max-w-[280px] mx-auto dark:text-slate-400">Create custom sections to show certifications, languages, awards, or links.</p>
               </div>
@@ -1481,7 +1481,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             
             <Button
               onClick={handleAddCustomField}
-              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs mb-4"
+              className="w-full bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 hover:text-slate-800 rounded-xl py-2 font-semibold transition-all shadow-xs mb-4 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-slate-50"
             >
               <Plus className="w-4 h-4 mr-2" /> Add Custom Field
             </Button>
