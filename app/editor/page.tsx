@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
-import { Download, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive, Plus } from 'lucide-react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
+import { Download, Save, Edit2, Palette, Type, Space, Sparkles, Archive, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -101,11 +101,10 @@ function getOrCreateResumeId(forceNew = false): string {
 }
 
 export default function Editor() {
-  const { user, profile, signOut } = useAuth()
+  const { user } = useAuth()
   const router = useRouter()
   const [versionId, setVersionId] = useState<string | null>(null)
   const [isNewResume, setIsNewResume] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [resumeName, setResumeName] = useState('My Resume')
   const [isEditingName, setIsEditingName] = useState(false)
   const [tempName, setTempName] = useState('My Resume')
@@ -131,10 +130,6 @@ export default function Editor() {
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [versionModalOpen, setVersionModalOpen] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const userMenuRef = useRef<HTMLDivElement | null>(null)
-
-  const displayName = profile?.name || user?.email?.split('@')[0] || 'Account'
-  const displayEmail = user?.email || 'No email available'
 
   // Extract versionId from URL
   useEffect(() => {
@@ -219,32 +214,6 @@ export default function Editor() {
       }
     })
   }, [versionId, user?.id])
-
-  useEffect(() => {
-    if (!userMenuOpen) return
-
-    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setUserMenuOpen(false)
-      }
-    }
-
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setUserMenuOpen(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handlePointerDown)
-    document.addEventListener('touchstart', handlePointerDown)
-    document.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      document.removeEventListener('mousedown', handlePointerDown)
-      document.removeEventListener('touchstart', handlePointerDown)
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [userMenuOpen])
 
   const handleSaveName = () => {
     setIsEditingName(false)
@@ -435,11 +404,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
     } finally {
       setIsSaving(false)
     }
-  }
-
-  const handleSignOut = async () => {
-    await signOut()
-    setUserMenuOpen(false)
   }
 
   const handleCreateNewResume = () => {
@@ -664,66 +628,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     New
                   </Button>
 
-                  <div className="hidden h-7 w-px bg-slate-200 xl:block dark:bg-slate-700" />
-
-                  {user ? (
-                    <div ref={userMenuRef} className="relative z-30">
-                      <button
-                        type="button"
-                        onClick={() => setUserMenuOpen(!userMenuOpen)}
-                        aria-expanded={userMenuOpen}
-                        aria-haspopup="menu"
-                        className="group flex h-9 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-sm text-slate-700 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
-                      >
-                        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 text-[10px] font-bold text-white shadow-xs">
-                          {displayName.charAt(0).toUpperCase()}
-                        </div>
-                        <ChevronDown className="h-3.5 w-3.5 text-slate-400 transition-colors group-hover:text-slate-600" />
-                      </button>
-
-                      {userMenuOpen && (
-                        <div
-                          role="menu"
-                          className="absolute right-0 top-full z-[60] mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl dark:border-slate-700 dark:bg-slate-950"
-                        >
-                          <div className="mb-2 rounded-xl border border-slate-100 bg-slate-50 px-3 py-3 dark:border-slate-800 dark:bg-slate-900">
-                            <div className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</div>
-                            <div className="truncate text-xs text-slate-500 dark:text-slate-400">{displayEmail}</div>
-                          </div>
-                          <Link
-                            href="/resumes"
-                            onClick={() => setUserMenuOpen(false)}
-                            className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-                          >
-                            📊 Resumes
-                          </Link>
-                          <Link
-                            href="/editor"
-                            onClick={() => setUserMenuOpen(false)}
-                            className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
-                          >
-                            ✏️ Editor
-                          </Link>
-                          <button
-                            type="button"
-                            onClick={handleSignOut}
-                            className="mt-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-red-600 transition-colors hover:bg-red-50 hover:text-red-700"
-                          >
-                            ↗ Sign out
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setLoginModalOpen(true)}
-                      className="h-9 rounded-full px-4 text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-                    >
-                      Sign in
-                    </Button>
-                  )}
                 </div>
               </div>
             </div>

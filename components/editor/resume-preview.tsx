@@ -1011,68 +1011,78 @@ export function ResumePreview({
       </button>
 
       {/* Premium Preview Control Header - Light Mode */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-6 py-4 z-10 shrink-0 dark:border-slate-800 dark:bg-slate-950/90">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-slate-50 rounded-lg border border-slate-200 text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-indigo-300">
-            <Eye className="w-4 h-4" />
-          </div>
-          <div>
-            <h4 className="text-xs font-semibold text-slate-800 flex items-center gap-1.5 dark:text-slate-100">
-              Live Preview
-              <span className={`inline-block w-1.5 h-1.5 rounded-full ${draftStatus === 'unsaved' ? 'bg-amber-500' : 'bg-emerald-500'} animate-pulse`} />
-            </h4>
-            <div className="text-[10px] text-slate-500 font-medium flex items-center gap-2 mt-0.5 dark:text-slate-400">
-              <span>{getDraftLabel()}</span>
-              <span className="w-1 h-1 rounded-full bg-slate-300" />
-              <span>v{currentVersion}</span>
-              <span className="w-1 h-1 rounded-full bg-slate-300" />
-              <span>{previewMetrics.pageCount} page{previewMetrics.pageCount === 1 ? '' : 's'}</span>
+      <div className="shrink-0 border-b border-slate-200/80 bg-white/90 px-4 py-3 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/90 sm:px-6">
+        <div className="flex flex-col gap-3 rounded-2xl border border-slate-200/80 bg-gradient-to-r from-white to-slate-50 px-4 py-3 shadow-sm dark:border-slate-800 dark:from-slate-950 dark:to-slate-900 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-indigo-500/15 bg-indigo-500/10 text-indigo-600 shadow-sm dark:border-indigo-400/15 dark:bg-indigo-400/10 dark:text-indigo-300">
+              <Eye className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h4 className="text-xs font-extrabold uppercase tracking-[0.22em] text-slate-800 dark:text-slate-100">
+                  Live Preview
+                </h4>
+                <span className={`inline-block h-1.5 w-1.5 rounded-full ${draftStatus === 'unsaved' ? 'bg-amber-500' : 'bg-emerald-500'} animate-pulse`} />
+              </div>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-[10px] font-semibold text-slate-500 dark:text-slate-400">
+                <span className="rounded-full border border-slate-200 bg-white px-2 py-1 dark:border-slate-700 dark:bg-slate-900">
+                  {getDraftLabel()}
+                </span>
+                <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                <span className="rounded-full border border-slate-200 bg-white px-2 py-1 dark:border-slate-700 dark:bg-slate-900">
+                  v{currentVersion}
+                </span>
+                <span className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-600" />
+                <span className="rounded-full border border-slate-200 bg-white px-2 py-1 dark:border-slate-700 dark:bg-slate-900">
+                  {previewMetrics.pageCount} page{previewMetrics.pageCount === 1 ? '' : 's'}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Zoom and Fit Toolbar */}
-        <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 shadow-xxs self-end sm:self-auto dark:border-slate-700 dark:bg-slate-900">
-          <button
-            onClick={handleZoomOut}
-            title="Zoom Out"
-            className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-          >
-            <ZoomOut className="w-3.5 h-3.5" />
-          </button>
-          
-          <button
-            onClick={handleResetZoom}
-            title="Auto-Fit Screen"
-            className={`px-2 py-0.5 text-[10px] font-semibold rounded-md transition-colors ${
-              zoomLevel === null 
-                ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' 
-                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
-            }`}
-          >
-            {displayZoom}% {zoomLevel === null && 'Auto'}
-          </button>
+          {/* Zoom and Fit Toolbar */}
+          <div className="flex items-center gap-1 rounded-full border border-slate-200 bg-white p-1 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+            <button
+              onClick={handleZoomOut}
+              title="Zoom Out"
+              className="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+            >
+              <ZoomOut className="h-3.5 w-3.5" />
+            </button>
 
-          <button
-            onClick={handleZoomIn}
-            title="Zoom In"
-            className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-          >
-            <ZoomIn className="w-3.5 h-3.5" />
-          </button>
-          
-          {zoomLevel !== null && (
-            <>
-              <div className="w-px h-3 bg-slate-200 mx-1" />
-              <button
-                onClick={handleResetZoom}
-                title="Fit to Width"
-                className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
-              >
-                <Maximize2 className="w-3.5 h-3.5" />
-              </button>
-            </>
-          )}
+            <button
+              onClick={handleResetZoom}
+              title="Auto-Fit Screen"
+              className={`min-w-20 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] transition-colors ${
+                zoomLevel === null
+                  ? 'border border-indigo-500/15 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300'
+                  : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
+              }`}
+            >
+              {displayZoom}% {zoomLevel === null && 'Auto'}
+            </button>
+
+            <button
+              onClick={handleZoomIn}
+              title="Zoom In"
+              className="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+            >
+              <ZoomIn className="h-3.5 w-3.5" />
+            </button>
+
+            {zoomLevel !== null && (
+              <>
+                <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
+                <button
+                  onClick={handleResetZoom}
+                  title="Fit to Width"
+                  className="rounded-full p-1.5 text-slate-500 transition-colors hover:bg-slate-50 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
+                >
+                  <Maximize2 className="h-3.5 w-3.5" />
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
