@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
-import { CheckCircle2, Clock3, Download, FileText, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive, Plus } from 'lucide-react'
+import { CheckCircle2, Clock3, Download, Save, Edit2, Palette, Type, Space, Sparkles, ChevronDown, Archive, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -521,21 +521,6 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         <div className="shrink-0 border-b border-slate-200/80 bg-white/90 px-4 py-3.5 shadow-[0_2px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:px-6 lg:px-8 dark:border-slate-800 dark:bg-slate-950/90 dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
           <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex min-w-0 items-center gap-3 xl:flex-1">
-              <Link
-                href="/"
-                className="flex shrink-0 items-center gap-2 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-3 py-2 shadow-sm transition-transform hover:-translate-y-0.5 dark:border-slate-700 dark:bg-slate-900/80"
-              >
-                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 shadow-sm">
-                  <FileText className="h-4.5 w-4.5 text-white" />
-                </div>
-                <div className="hidden sm:block">
-                  <div className="text-sm font-extrabold tracking-tight text-slate-800 dark:text-slate-100">CareerCommit</div>
-                  <div className="text-[10px] font-medium text-slate-400 dark:text-slate-500">Workspace</div>
-                </div>
-              </Link>
-
-              <div className="hidden h-11 w-px bg-slate-200/80 xl:block dark:bg-slate-800" />
-
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="inline-flex items-center rounded-full border border-indigo-500/15 bg-indigo-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-300">
