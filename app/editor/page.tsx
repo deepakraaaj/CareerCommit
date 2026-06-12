@@ -460,42 +460,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
 
         {/* Workspace Toolbar */}
         <div className="shrink-0 border-b border-slate-200/80 bg-white/90 px-4 py-3.5 shadow-[0_2px_24px_rgba(15,23,42,0.06)] backdrop-blur-xl sm:px-6 lg:px-8 dark:border-slate-800 dark:bg-slate-950/90 dark:shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
-          <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex min-w-0 items-center gap-3 xl:flex-1">
-              <div className="min-w-0">
-                <div className="mt-1 flex min-w-0 items-center gap-2">
-                  {isEditingName ? (
-                    <input
-                      type="text"
-                      value={tempName}
-                      onChange={(e) => setTempName(e.target.value)}
-                      onBlur={handleSaveName}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSaveName()
-                      }}
-                      className="min-w-0 rounded-2xl border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400"
-                      autoFocus
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setTempName(resumeName)
-                        setIsEditingName(true)
-                      }}
-                      className="group flex min-w-0 items-center gap-1.5 text-left"
-                      title="Click to rename"
-                    >
-                      <h2 className="truncate text-base font-bold tracking-tight text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-300">
-                        {resumeName}
-                      </h2>
-                      <Edit2 className="h-3.5 w-3.5 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-
+          <div className="flex flex-col gap-3 xl:flex-row xl:items-start xl:gap-4">
             <div className="flex w-full flex-1 flex-col gap-2">
               <div className="grid w-full gap-3 rounded-[1.4rem] border border-slate-200/80 bg-slate-50/90 p-2 shadow-sm backdrop-blur dark:border-slate-800 dark:bg-slate-900/70 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center xl:justify-items-stretch">
                 <div className="flex w-full flex-wrap items-center gap-2 xl:justify-self-start">
@@ -628,6 +593,41 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     New
                   </Button>
 
+                </div>
+              </div>
+            </div>
+
+            <div className="flex min-w-0 items-center gap-3 xl:w-auto xl:flex-none xl:justify-end">
+              <div className="min-w-0">
+                <div className="mt-1 flex min-w-0 items-center gap-2">
+                  {isEditingName ? (
+                    <input
+                      type="text"
+                      value={tempName}
+                      onChange={(e) => setTempName(e.target.value)}
+                      onBlur={handleSaveName}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSaveName()
+                      }}
+                      className="min-w-0 rounded-2xl border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-800 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400"
+                      autoFocus
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTempName(resumeName)
+                        setIsEditingName(true)
+                      }}
+                      className="group flex min-w-0 items-center gap-1.5 text-left"
+                      title="Click to rename"
+                    >
+                      <h2 className="truncate text-base font-bold tracking-tight text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-slate-100 dark:group-hover:text-indigo-300">
+                        {resumeName}
+                      </h2>
+                      <Edit2 className="h-3.5 w-3.5 text-slate-400 opacity-0 transition-opacity group-hover:opacity-100 dark:text-slate-500" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
