@@ -55,7 +55,7 @@ export async function extractTextFromDocument(file: File) {
   }
 }
 
-export async function parseResumeWithFallback(text: string): Promise<{
+export async function parseResumeWithFallback(text: string, userId?: string): Promise<{
   parsed: ParsedResumeDocument
   source: 'cerebras' | 'local' | 'local-fallback'
   debug?: any
@@ -69,10 +69,16 @@ export async function parseResumeWithFallback(text: string): Promise<{
   const response = await fetch('/api/ai/parse-resume', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, apiKey }),
+    body: JSON.stringify({ text, apiKey, userId }),
   })
 
   if (!response.ok) {
+    const data = await response.json().catch(() => ({}))
+    if (data.error === 'contact_support') {
+      const error = new Error(data.message || 'Your account needs approval for AI features')
+      ;(error as any).code = 'contact_support'
+      throw error
+    }
     const message = await response.text()
     throw new Error(message || 'Parse request failed')
   }

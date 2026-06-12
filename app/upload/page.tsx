@@ -18,6 +18,7 @@ import {
 import { ResumeChatbot } from '@/components/upload/resume-chatbot'
 import { ApiKeyModal } from '@/components/upload/api-key-modal'
 import { ApprovalLock } from '@/components/upload/approval-lock'
+import { ContactSupportModal } from '@/components/upload/contact-support-modal'
 
 type UploadState = 'ready' | 'uploading' | 'extracting' | 'completed' | 'review_needed' | 'failed'
 
@@ -32,14 +33,31 @@ export default function Upload() {
   const [parseSource, setParseSource] = useState<'cerebras' | null>(null)
   const [showApiKeyModal, setShowApiKeyModal] = useState(false)
   const [isApproved, setIsApproved] = useState<boolean | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [showContactSupport, setShowContactSupport] = useState(false)
 
   useEffect(() => {
     let active = true
 
-    // Check user approval
-    supabasePlaceholder.checkUserApproved().then((approved) => {
-      if (active) setIsApproved(approved)
-    })
+    // Get current user and check approval
+    async function checkApproval() {
+      try {
+        const { getSupabaseClient } = await import('@/lib/supabase-placeholder')
+        const supabase = getSupabaseClient()
+        const { data: { user } } = await supabase.auth.getUser()
+
+        if (active) {
+          setUserId(user?.id ?? null)
+          const approved = await supabasePlaceholder.checkUserApproved()
+          setIsApproved(approved)
+        }
+      } catch (error) {
+        console.error('[Upload] Failed to check approval:', error)
+        if (active) setIsApproved(true)
+      }
+    }
+
+    void checkApproval()
 
     return () => {
       active = false
@@ -119,7 +137,7 @@ export default function Upload() {
     try {
       setUploadState('extracting')
       const extractedText = await extractTextFromDocument(file)
-      const { parsed, source } = await parseResumeWithFallback(extractedText)
+      const { parsed, source } = await parseResumeWithFallback(extractedText, userId || undefined)
 
       console.log('[Upload] Raw parsed from API:', { name: parsed.name, title: parsed.title, email: parsed.email })
 
@@ -157,8 +175,17 @@ export default function Upload() {
         )
       )
     } catch (error) {
-      console.error('[Upload] Parsing failed:', error)
-      setUploadState('failed')
+      const errorCode = (error as any)?.code
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      console.error('[Upload] Parsing failed:', errorMessage)
+
+      if (errorCode === 'contact_support') {
+        setShowContactSupport(true)
+        setUploadState('ready')
+      } else {
+        setUploadState('failed')
+      }
+
       setRecentUploads((current) =>
         current.map((entry) =>
           entry.id === id
@@ -313,6 +340,7 @@ export default function Upload() {
           </div>
         </div>
         <ApiKeyModal isOpen={showApiKeyModal} onClose={() => setShowApiKeyModal(false)} />
+        <ContactSupportModal open={showContactSupport} onClose={() => setShowContactSupport(false)} />
       </>
     )
   }
