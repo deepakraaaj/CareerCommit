@@ -739,7 +739,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
         <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 text-left">
           <h3 className={panelTitle}>{sections[sectionKey].title}</h3>
           <div className="flex items-center gap-4">
-            <span className="hidden sm:block w-8 h-[1px] bg-slate-200" />
+            <span className="hidden sm:block w-8 h-[1px] bg-slate-200 dark:bg-slate-700" />
             <p className={panelSubtitle}>{counts}</p>
           </div>
         </div>
@@ -1424,7 +1424,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 text-left">
               <h3 className={panelTitle}>Custom Sections</h3>
               <div className="flex items-center gap-4">
-                <span className="hidden sm:block w-8 h-[1px] bg-slate-200" />
+                <span className="hidden sm:block w-8 h-[1px] bg-slate-200 dark:bg-slate-700" />
                 <p className={panelSubtitle}>Add custom metadata</p>
               </div>
             </div>
