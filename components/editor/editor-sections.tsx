@@ -643,12 +643,12 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
   }
 
   // Light Mode Layout Constants (Classic Modernized Theme)
-  const panelHeader = 'flex flex-row items-center justify-between gap-4 border-b border-slate-100/80 bg-white px-8 py-7'
-  const panelTitle = 'font-serif text-3xl font-light tracking-tight text-slate-900'
-  const panelSubtitle = 'font-serif italic text-[15px] text-slate-500'
-  const fieldLabel = 'text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-slate-650 transition-colors duration-300'
-  const inputClass = 'w-full bg-transparent pt-1 text-sm text-slate-850 placeholder-slate-350 outline-none border-none'
-  const formFieldClass = 'group relative rounded-xl border border-slate-200 bg-slate-50/20 px-4 py-2 transition-all duration-300 focus-within:bg-white focus-within:border-slate-800 focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.03)]'
+  const panelHeader = 'flex flex-row items-center justify-between gap-4 border-b border-slate-100/80 bg-white px-8 py-7 dark:border-slate-800 dark:bg-slate-950/70'
+  const panelTitle = 'font-serif text-3xl font-light tracking-tight text-slate-900 dark:text-slate-100'
+  const panelSubtitle = 'font-serif italic text-[15px] text-slate-500 dark:text-slate-400'
+  const fieldLabel = 'text-[9px] font-black uppercase tracking-widest text-slate-400 group-focus-within:text-slate-650 transition-colors duration-300 dark:text-slate-500 dark:group-focus-within:text-slate-300'
+  const inputClass = 'w-full bg-transparent pt-1 text-sm text-slate-850 placeholder-slate-350 outline-none border-none dark:text-slate-100 dark:placeholder-slate-500'
+  const formFieldClass = 'group relative rounded-xl border border-slate-200 bg-slate-50/20 px-4 py-2 transition-all duration-300 focus-within:bg-white focus-within:border-slate-800 focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.03)] dark:border-slate-700 dark:bg-slate-900/50 dark:focus-within:bg-slate-900 dark:focus-within:border-slate-500 dark:focus-within:shadow-[0_4px_16px_rgba(0,0,0,0.25)]'
 
   const getSectionMonogram = (key: string) => {
     switch (key) {
@@ -672,7 +672,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
       custom: 'border-t-rose-650',
     }
     
-    return `rounded-2xl border border-slate-205 bg-white transition-all duration-300 relative shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] border-t-[4px] ${activeBorders[colorKey]} overflow-hidden`
+    return `rounded-2xl border border-slate-205 bg-white transition-all duration-300 relative shadow-[0_8px_30px_-4px_rgba(0,0,0,0.08)] border-t-[4px] ${activeBorders[colorKey]} overflow-hidden dark:border-slate-700 dark:bg-slate-950/70 dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.35)]`
   }
 
   const getSectionIcon = (key: string) => {
@@ -702,7 +702,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
       case 'education': return 'bg-emerald-50 border border-emerald-100'
       case 'skills': return 'bg-amber-50 border border-amber-100'
       case 'custom': return 'bg-rose-50 border border-rose-100'
-      default: return 'bg-slate-50 border border-slate-100'
+      default: return 'bg-slate-50 border border-slate-100 dark:bg-slate-900/60 dark:border-slate-800'
     }
   }
 
@@ -713,7 +713,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
           autoFocus
           value={sections[sectionKey].title}
           onChange={(e) => handleSectionTitleChange(sectionKey, e.target.value)}
-          className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-800 outline-none focus:border-indigo-500 transition-all"
+          className="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3.5 py-2 text-sm font-medium text-slate-800 outline-none focus:border-indigo-500 transition-all dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-indigo-400"
         />
         <Button
           variant="ghost"
@@ -759,8 +759,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
     <div className="pr-1 pb-10">
       <div className={getUnifiedShellClass(activeSection)}>
       {/* Quick Navigation Tabs - Pipeline Stepper Style with Connection Arrow */}
-      <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md pb-2 pt-4 px-5 w-full relative border-b border-slate-200">
-        <div className="flex h-11 w-full rounded-full p-[3px] bg-white border border-slate-200 shadow-sm relative z-20">
+      <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-md pb-2 pt-4 px-5 w-full relative border-b border-slate-200 dark:border-slate-800 dark:bg-slate-950/90">
+        <div className="flex h-11 w-full rounded-full p-[3px] bg-white border border-slate-200 shadow-sm relative z-20 dark:border-slate-700 dark:bg-slate-900/90 dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)]">
           {[
             { id: 'personal', label: 'Personal Info' },
             { id: 'summary', label: 'Summary' },
@@ -831,7 +831,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
         </div>
       </div>
 
-      <div className="relative bg-white min-h-[500px]">
+      <div className="relative bg-white min-h-[500px] dark:bg-slate-950">
       {/* 1. Personal Info */}
       {activeSection === 'personal' && (
         <div id="sec-personal" className="animate-in fade-in duration-300">
@@ -839,7 +839,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4 text-left">
               <h3 className={panelTitle}>Personal Information</h3>
               <div className="flex items-center gap-4">
-                <span className="hidden sm:block w-8 h-[1px] bg-slate-200" />
+                <span className="hidden sm:block w-8 h-[1px] bg-slate-200 dark:bg-slate-700" />
                 <p className={panelSubtitle}>Your identity and professional contacts</p>
               </div>
             </div>
@@ -1428,7 +1428,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                 <p className={panelSubtitle}>Add custom metadata</p>
               </div>
             </div>
-            <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-serif italic text-rose-700 ring-1 ring-rose-500/20">
+            <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-serif italic text-rose-700 ring-1 ring-rose-500/20 dark:bg-rose-500/10 dark:text-rose-300 dark:ring-rose-400/20">
               {customFields.length} fields
             </span>
           </div>
@@ -1436,7 +1436,7 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
             {customFields.length > 0 ? (
               <div className="space-y-4">
                 {customFields.map((field, idx) => (
-                  <div key={field.id} className="rounded-xl border border-slate-205 bg-slate-50/20 p-5 relative group/card transition-all hover:border-slate-350">
+                  <div key={field.id} className="rounded-xl border border-slate-205 bg-slate-50/20 p-5 relative group/card transition-all hover:border-slate-350 dark:border-slate-700 dark:bg-slate-900/50 dark:hover:border-slate-600">
                     <div className="flex items-center justify-between gap-3 mb-3">
                       <span className="text-xs font-semibold text-slate-500 font-serif italic">Custom Field {idx + 1}</span>
                       <button
@@ -1473,9 +1473,9 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center">
-                <p className="text-sm font-semibold text-slate-400">No Custom Sections Added Yet</p>
-                <p className="mt-1 text-xs text-slate-500 max-w-[280px] mx-auto">Create custom sections to show certifications, languages, awards, or links.</p>
+              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/30 px-5 py-8 text-center dark:border-slate-700 dark:bg-slate-900/40">
+                <p className="text-sm font-semibold text-slate-400 dark:text-slate-300">No Custom Sections Added Yet</p>
+                <p className="mt-1 text-xs text-slate-500 max-w-[280px] mx-auto dark:text-slate-400">Create custom sections to show certifications, languages, awards, or links.</p>
               </div>
             )}
             

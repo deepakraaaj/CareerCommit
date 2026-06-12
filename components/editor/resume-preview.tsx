@@ -1001,7 +1001,7 @@ export function ResumePreview({
   const displayZoom = Math.round((zoomLevel || previewMetrics.scale) * 100)
 
   return (
-    <div className="flex h-full flex-col bg-slate-100 overflow-hidden relative border-l border-slate-200/80">
+    <div className="flex h-full flex-col bg-slate-100 overflow-hidden relative border-l border-slate-200/80 dark:border-slate-800 dark:bg-slate-950">
       <button
         id="download-pdf-btn"
         onClick={handleDownloadPDF}
@@ -1011,17 +1011,17 @@ export function ResumePreview({
       </button>
 
       {/* Premium Preview Control Header - Light Mode */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-6 py-4 z-10 shrink-0">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-6 py-4 z-10 shrink-0 dark:border-slate-800 dark:bg-slate-950/90">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-slate-50 rounded-lg border border-slate-200 text-indigo-600">
+          <div className="p-2 bg-slate-50 rounded-lg border border-slate-200 text-indigo-600 dark:border-slate-700 dark:bg-slate-900 dark:text-indigo-300">
             <Eye className="w-4 h-4" />
           </div>
           <div>
-            <h4 className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+            <h4 className="text-xs font-semibold text-slate-800 flex items-center gap-1.5 dark:text-slate-100">
               Live Preview
               <span className={`inline-block w-1.5 h-1.5 rounded-full ${draftStatus === 'unsaved' ? 'bg-amber-500' : 'bg-emerald-500'} animate-pulse`} />
             </h4>
-            <div className="text-[10px] text-slate-500 font-medium flex items-center gap-2 mt-0.5">
+            <div className="text-[10px] text-slate-500 font-medium flex items-center gap-2 mt-0.5 dark:text-slate-400">
               <span>{getDraftLabel()}</span>
               <span className="w-1 h-1 rounded-full bg-slate-300" />
               <span>v{currentVersion}</span>
@@ -1032,11 +1032,11 @@ export function ResumePreview({
         </div>
 
         {/* Zoom and Fit Toolbar */}
-        <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 shadow-xxs self-end sm:self-auto">
+        <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 shadow-xxs self-end sm:self-auto dark:border-slate-700 dark:bg-slate-900">
           <button
             onClick={handleZoomOut}
             title="Zoom Out"
-            className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors"
+            className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
           >
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
@@ -1047,7 +1047,7 @@ export function ResumePreview({
             className={`px-2 py-0.5 text-[10px] font-semibold rounded-md transition-colors ${
               zoomLevel === null 
                 ? 'bg-indigo-50 text-indigo-600 border border-indigo-100' 
-                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800'
+                : 'text-slate-500 hover:bg-slate-50 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100'
             }`}
           >
             {displayZoom}% {zoomLevel === null && 'Auto'}
@@ -1056,7 +1056,7 @@ export function ResumePreview({
           <button
             onClick={handleZoomIn}
             title="Zoom In"
-            className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors"
+            className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
@@ -1067,7 +1067,7 @@ export function ResumePreview({
               <button
                 onClick={handleResetZoom}
                 title="Fit to Width"
-                className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors"
+                className="p-1 hover:bg-slate-50 rounded-md text-slate-500 hover:text-slate-800 transition-colors dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </button>
@@ -1077,7 +1077,7 @@ export function ResumePreview({
       </div>
 
       {/* Paginated Sheet Renderer inside viewport-locked container */}
-      <div className="flex-1 min-h-0 overflow-y-hidden flex flex-col bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] bg-slate-100">
+      <div className="flex-1 min-h-0 overflow-y-hidden flex flex-col bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:20px_20px] bg-slate-100 dark:bg-[radial-gradient(rgba(148,163,184,0.10)_1px,transparent_1px)] dark:[background-size:20px_20px] dark:bg-slate-950">
         <PaginatedResume
           parsed={parsed}
           template={template}

@@ -518,10 +518,10 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
     <>
       
       {/* Redesigned Premium Editor Workspace Panel - Light Mode Theme */}
-      <div className="h-screen overflow-hidden flex flex-col bg-slate-50 text-slate-800">
+      <div className="h-screen overflow-hidden flex flex-col bg-slate-50 text-slate-800 dark:bg-[#0b1020] dark:text-slate-100">
         
         {/* Workspace Toolbar (Controls) */}
-        <div className="shrink-0 border-b border-slate-200/80 bg-white px-4 py-3.5 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-4 items-center justify-between z-10 shadow-[0_2px_8px_rgba(0,0,0,0.03)]">
+        <div className="shrink-0 border-b border-slate-200/80 bg-white px-4 py-3.5 sm:px-6 lg:px-8 flex flex-col md:flex-row gap-4 items-center justify-between z-10 shadow-[0_2px_8px_rgba(0,0,0,0.03)] dark:border-slate-700/80 dark:bg-slate-950/90 dark:shadow-[0_2px_8px_rgba(0,0,0,0.35)]">
           
           {/* Left: Logo, Separator, Document Details, Save Status Badge */}
           <div className="flex items-center gap-4 min-w-0 w-full md:w-auto">
@@ -530,12 +530,12 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                 <FileText className="w-4.5 h-4.5 text-white" />
               </div>
               <div className="hidden sm:block">
-                <div className="font-extrabold text-sm text-slate-800 tracking-tight leading-tight">CareerCommit</div>
-                <div className="text-[10px] text-slate-400 font-medium -mt-0.5">Workspace</div>
+                <div className="font-extrabold text-sm text-slate-800 tracking-tight leading-tight dark:text-slate-100">CareerCommit</div>
+                <div className="text-[10px] text-slate-400 font-medium -mt-0.5 dark:text-slate-500">Workspace</div>
               </div>
             </Link>
             
-            <div className="h-6 w-px bg-slate-200 hidden sm:block" />
+            <div className="h-6 w-px bg-slate-200 hidden sm:block dark:bg-slate-700" />
 
             <div className="hidden xl:flex items-center gap-1">
               <Link href="/resumes">
@@ -578,7 +578,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') handleSaveName()
                     }}
-                    className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-semibold text-slate-800 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20"
+                    className="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-sm font-semibold text-slate-800 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-100 dark:focus:border-indigo-400"
                     autoFocus
                   />
                 ) : (
@@ -587,13 +587,13 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     className="flex items-center gap-1.5 cursor-pointer group"
                     title="Click to rename"
                   >
-                    <h2 className="truncate text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
+                    <h2 className="truncate text-sm font-bold text-slate-800 group-hover:text-indigo-600 transition-colors dark:text-slate-100 dark:group-hover:text-indigo-300">
                       {resumeName}
                     </h2>
-                    <Edit2 className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
+                    <Edit2 className="h-3 w-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity dark:text-slate-500" />
+                </div>
                 )}
-                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[10px] text-slate-500 font-medium">
+                <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[10px] text-slate-500 font-medium dark:text-slate-400">
                   <span>{formatRelativeTime(lastSaved)}</span>
                 </div>
               </div>
@@ -601,11 +601,11 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
               {/* Save Status Badge */}
               <div className="flex items-center ml-1 shrink-0">
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                     draftStatus === 'unsaved'
                       ? 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
                       : 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                  }`}
+                  } dark:shadow-[0_0_0_1px_rgba(255,255,255,0.04)]`}
                 >
                   {draftStatus === 'unsaved' ? (
                     <Clock3 className="h-2.5 w-2.5" />
@@ -622,8 +622,8 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
           <div className="flex flex-wrap items-center gap-3 md:justify-end w-full md:w-auto">
             
             {/* Customizer: Accent Color Picker */}
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
-              <Palette className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl dark:bg-slate-900/80 dark:border-slate-700">
+              <Palette className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               <div className="flex items-center gap-1.5">
                 {COLOR_OPTIONS.map((c) => (
                   <button
@@ -646,8 +646,8 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
             </div>
 
             {/* Customizer: Font Picker */}
-            <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs">
-              <Type className="w-3.5 h-3.5 text-slate-400" />
+              <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs dark:bg-slate-900/80 dark:border-slate-700">
+              <Type className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               <select
                 value={fontFamily}
                 onChange={(e) => {
@@ -658,7 +658,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
                   }
                 }}
-                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1"
+                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1 dark:text-slate-200"
               >
                 <option value="sans">Sans</option>
                 <option value="serif">Serif</option>
@@ -667,8 +667,8 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
             </div>
 
             {/* Customizer: Spacing Picker */}
-            <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs">
-              <Space className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs dark:bg-slate-900/80 dark:border-slate-700">
+              <Space className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               <select
                 value={density}
                 onChange={(e) => {
@@ -679,7 +679,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
                   }
                 }}
-                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1"
+                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1 dark:text-slate-200"
               >
                 <option value="auto">Spacing: Auto</option>
                 <option value="compact">Compact</option>
@@ -689,12 +689,12 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
             </div>
 
             {/* Customizer: Template Selector */}
-            <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs">
-              <Sparkles className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex h-8.5 items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs dark:bg-slate-900/80 dark:border-slate-700">
+              <Sparkles className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
               <select
                 value={template}
                 onChange={(e) => setTemplate(e.target.value as TemplateType)}
-                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1"
+                className="cursor-pointer bg-transparent text-xs font-semibold text-slate-700 outline-none border-none pr-1 dark:text-slate-200"
               >
                 <option value="modern">Modern Theme</option>
                 <option value="classic">Classic Theme</option>
@@ -723,7 +723,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                 onClick={handleSaveVersionClick}
                 disabled={isSaving}
                 variant="outline"
-                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
                 title={user ? 'Save a version snapshot' : 'Sign in to save versions'}
               >
                 <Archive className="h-3.5 w-3.5" />
@@ -737,7 +737,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   const element = document.getElementById('download-pdf-btn')
                   element?.click()
                 }}
-                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm"
+                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
               >
                 <Download className="h-3.5 w-3.5" />
                 PDF
@@ -747,7 +747,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                 variant="outline"
                 size="sm"
                 onClick={handleCreateNewResume}
-                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm"
+                className="gap-1.5 rounded-lg border-slate-200 bg-white px-4 text-slate-700 hover:bg-slate-50 transition-all font-semibold shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800"
               >
                 <Plus className="h-3.5 w-3.5" />
                 New
@@ -762,7 +762,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     aria-expanded={userMenuOpen}
                     aria-haspopup="menu"
-                    className="flex items-center gap-1.5 p-1 rounded-lg text-sm text-slate-650 hover:bg-slate-50 border border-slate-200 transition-colors group"
+                    className="flex items-center gap-1.5 p-1 rounded-lg text-sm text-slate-650 hover:bg-slate-50 border border-slate-200 transition-colors group dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
                   >
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-[10px] font-bold text-white shadow-xs">
                       {displayName.charAt(0).toUpperCase()}
@@ -773,30 +773,30 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   {userMenuOpen && (
                     <div
                       role="menu"
-                      className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl z-[60]"
+                      className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl z-[60] dark:border-slate-700 dark:bg-slate-950"
                     >
-                      <div className="rounded-xl bg-slate-50 px-3 py-3 border border-slate-100 mb-2">
-                        <div className="truncate text-sm font-semibold text-slate-800">{displayName}</div>
-                        <div className="truncate text-xs text-slate-500">{displayEmail}</div>
+                      <div className="rounded-xl bg-slate-50 px-3 py-3 border border-slate-100 mb-2 dark:bg-slate-900 dark:border-slate-800">
+                        <div className="truncate text-sm font-semibold text-slate-800 dark:text-slate-100">{displayName}</div>
+                        <div className="truncate text-xs text-slate-500 dark:text-slate-400">{displayEmail}</div>
                       </div>
                       <Link
                         href="/resumes"
                         onClick={() => setUserMenuOpen(false)}
-                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
                         📊 Resumes
                       </Link>
                       <Link
                         href="/jd-matcher"
                         onClick={() => setUserMenuOpen(false)}
-                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
                         🧩 Job Matcher
                       </Link>
                       <Link
                         href="/editor"
                         onClick={() => setUserMenuOpen(false)}
-                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50"
+                        className="block rounded-lg px-3 py-2 text-left text-xs font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800"
                       >
                         ✏️ Editor
                       </Link>
@@ -815,7 +815,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   variant="ghost"
                   size="sm"
                   onClick={() => setLoginModalOpen(true)}
-                  className="text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-slate-800 rounded-lg px-3 py-1.5 h-8.5"
+                  className="text-xs font-bold text-slate-650 hover:bg-slate-50 hover:text-slate-800 rounded-lg px-3 py-1.5 h-8.5 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-slate-100"
                 >
                   Sign in
                 </Button>
@@ -828,7 +828,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
         <div className="flex-1 min-h-0 flex flex-col lg:flex-row">
           
           {/* Left Side: Scrollable Input Form */}
-          <div className="w-full lg:w-[55%] h-full overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 border-r border-slate-200/80 bg-[#FAF9F6] custom-scrollbar">
+          <div className="w-full lg:w-[55%] h-full overflow-y-auto px-4 py-6 sm:px-6 lg:px-8 border-r border-slate-200/80 bg-[#FAF9F6] custom-scrollbar dark:border-slate-800 dark:bg-[#0f172a]">
             {editorContent && (
               <div className="space-y-8">
                 <EditorSections
@@ -852,7 +852,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
           </div>
 
           {/* Right Side: Sticky Rendered A4 Preview */}
-          <div className="w-full lg:w-[45%] h-full overflow-y-hidden bg-slate-100">
+          <div className="w-full lg:w-[45%] h-full overflow-y-hidden bg-slate-100 dark:bg-[#020617]">
             <ResumePreview
               name={resumeName}
               currentVersion={1}
