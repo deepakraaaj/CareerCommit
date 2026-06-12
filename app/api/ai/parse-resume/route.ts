@@ -56,7 +56,10 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const text = typeof body?.text === 'string' ? body.text : ''
-    const apiKey = typeof body?.apiKey === 'string' ? body.apiKey : ''
+    // API key from request body (for local testing) or env (production)
+    const requestApiKey = typeof body?.apiKey === 'string' ? body.apiKey : ''
+    const envApiKey = process.env.CEREBRAS_API_KEY
+    const apiKey = requestApiKey || envApiKey
 
     if (!text.trim()) {
       return NextResponse.json({ error: 'text required' }, { status: 400 })
@@ -75,8 +78,11 @@ export async function POST(request: NextRequest) {
       email: localResult.email,
     })
 
-    // If local parsing is good enough, return it
-    if (!shouldFallbackToAI(confidence)) {
+    // If API key available (from env or request), always use Cerebras for best results
+    if (apiKey) {
+      console.log('[Parser] Using Cerebras API (from', requestApiKey ? 'request' : 'env', ')')
+    } else if (!shouldFallbackToAI(confidence)) {
+      // Only use local if no API key and confidence is good
       return NextResponse.json({
         data: localResult,
         source: 'local',
@@ -85,8 +91,8 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Fallback to Cerebras for complex cases
-    console.log('[Parser] Confidence too low, falling back to Cerebras')
+    // Use Cerebras
+    console.log('[Parser] Falling back to Cerebras API')
     try {
       const aiResult = await parseWithCerebras(text, apiKey)
       return NextResponse.json({
