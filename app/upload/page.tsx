@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Cloud, CheckCircle2, FileText, File, Loader2, Sparkles } from 'lucide-react'
-import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { loadUploadedFiles } from '@/lib/supabase-loaders'
 import { supabasePlaceholder } from '@/lib/supabase-placeholder'
@@ -175,7 +174,6 @@ export default function Upload() {
   if (uploadState === 'ready' || uploadState === 'failed') {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-background">
           <div className="absolute inset-0 -z-10 premium-grid opacity-25" />
           <div className="absolute left-[-8rem] top-20 -z-10 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
@@ -271,7 +269,6 @@ export default function Upload() {
   if (uploadState === 'uploading' || uploadState === 'extracting') {
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="absolute inset-0 -z-10 premium-grid opacity-20" />
           <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -319,7 +316,6 @@ export default function Upload() {
 
     return (
       <>
-        <Navbar />
         <div className="min-h-screen bg-background">
           <div className="absolute inset-0 -z-10 premium-grid opacity-25" />
           <div className="absolute left-[-8rem] top-20 -z-10 h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl" />

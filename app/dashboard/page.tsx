@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Plus, FileText, Clock3, Download, LogIn } from 'lucide-react'
-import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/layout/page-header'
 import { StatCard } from '@/components/shared/stat-card'
@@ -40,7 +39,6 @@ export default function Dashboard() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-background">
         <div className="absolute inset-0 -z-10 premium-grid opacity-30" />
         <div className="absolute left-[-8rem] top-32 -z-10 h-96 w-96 rounded-full bg-primary/8 blur-3xl" />

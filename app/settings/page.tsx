@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { LogIn, User } from 'lucide-react'
-import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { useAuth } from '@/components/auth/auth-provider'
 import { supabasePlaceholder } from '@/lib/supabase-placeholder'
@@ -58,7 +57,6 @@ export default function SettingsPage() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-background">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="mb-10">

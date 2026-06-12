@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { Plus, LogIn } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { PageHeader } from '@/components/layout/page-header'
 import { ResumeCard } from '@/components/resume/resume-card'
@@ -36,7 +35,6 @@ export default function Resumes() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <PageHeader

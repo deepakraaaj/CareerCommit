@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Navbar } from '@/components/navbar'
 import { ExportOptions } from '@/components/export/export-options'
 import { FormatComparison } from '@/components/export/format-comparison'
 import { parseResume } from '@/components/editor/resume-preview'
@@ -55,7 +54,6 @@ export default function Export() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-background">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="mb-12">

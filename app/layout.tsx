@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Figtree, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth/auth-provider'
+import { Navbar } from '@/components/navbar'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 
 const figtree = Figtree({
@@ -52,7 +53,10 @@ export default function RootLayout({
     >
       <body className="font-sans antialiased">
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <Navbar />
+            {children}
+          </AuthProvider>
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </ThemeProvider>
       </body>

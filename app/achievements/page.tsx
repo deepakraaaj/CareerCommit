@@ -12,7 +12,6 @@ import {
   GitCompare,
   Trash2,
 } from 'lucide-react'
-import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { projectList, tagList } from '@/lib/content'
 import { loadAchievements } from '@/lib/supabase-loaders'
@@ -166,7 +165,6 @@ export default function Achievements() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-background">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="mb-12">

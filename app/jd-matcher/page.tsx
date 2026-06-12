@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { GitCompare } from 'lucide-react'
-import { Navbar } from '@/components/navbar'
 import { Button } from '@/components/ui/button'
 import { MatcherResults } from '@/components/jd/matcher-results'
 import { loadResumes } from '@/lib/supabase-loaders'
@@ -94,7 +93,6 @@ export default function JDMatcher() {
 
   return (
     <>
-      <Navbar />
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="mb-12">
