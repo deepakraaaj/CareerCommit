@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { Menu, X, ChevronDown, FileText, Sun, Moon } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/components/auth/auth-provider'
+import { useLoginModal } from '@/components/auth/login-modal-provider'
 import { useTheme } from '@/components/theme/theme-provider'
 import { Button } from '@/components/ui/button'
 
@@ -15,6 +16,7 @@ export function Navbar() {
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const { user, profile, signOut } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { open: openLoginModal } = useLoginModal()
 
   // Hide navbar on login/signup page
   if (pathname === '/login') {
@@ -136,7 +138,7 @@ export function Navbar() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => router.push('/login')}
+                  onClick={openLoginModal}
                 >
                   Sign in
                 </Button>
@@ -194,7 +196,7 @@ export function Navbar() {
                   variant="outline"
                   className="w-full"
                   onClick={() => {
-                    router.push('/login')
+                    openLoginModal()
                     setIsOpen(false)
                   }}
                 >

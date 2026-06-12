@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { Figtree, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { AuthProvider } from '@/components/auth/auth-provider'
+import { LoginModalProvider } from '@/components/auth/login-modal-provider'
 import { Navbar } from '@/components/navbar'
 import { ThemeProvider } from '@/components/theme/theme-provider'
 
@@ -54,8 +55,10 @@ export default function RootLayout({
       <body className="font-sans antialiased">
         <ThemeProvider>
           <AuthProvider>
-            <Navbar />
-            {children}
+            <LoginModalProvider>
+              <Navbar />
+              {children}
+            </LoginModalProvider>
           </AuthProvider>
           {process.env.NODE_ENV === 'production' && <Analytics />}
         </ThemeProvider>
