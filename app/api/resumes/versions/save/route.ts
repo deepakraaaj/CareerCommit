@@ -81,6 +81,7 @@ export async function POST(request: NextRequest) {
         section_changes: {},
         saved_by,
         fit_score,
+        created_at: new Date().toISOString(),
       })
       .select()
       .single()
