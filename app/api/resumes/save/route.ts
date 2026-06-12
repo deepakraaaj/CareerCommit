@@ -22,27 +22,30 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { id, user_id, name, title, template, content_text, created_at, updated_at } = body
 
+    // Build upsert object with only provided fields
+    const upsertData: Record<string, any> = { id }
+    if (user_id) upsertData.user_id = user_id
+    if (name) upsertData.name = name
+    if (title) upsertData.title = title
+    if (template) upsertData.template = template
+    if (content_text) upsertData.content_text = content_text
+    if (created_at) upsertData.created_at = created_at
+    if (updated_at) upsertData.updated_at = updated_at
+
+    console.log('[API] Upserting resume:', { id, name, hasContent: !!content_text })
+
     const { data, error } = await supabase
       .from('resumes')
-      .upsert({
-        id,
-        user_id,
-        name,
-        title,
-        template,
-        content_text,
-        created_at,
-        updated_at
-      })
+      .upsert(upsertData)
       .select()
       .single()
 
     if (error) {
-      console.error('[API] Supabase error:', error)
+      console.error('[API] Supabase error:', error.message, error.details)
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    console.log('[API] Resume saved successfully')
+    console.log('[API] Resume saved successfully:', id)
     return NextResponse.json({ success: true, data })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

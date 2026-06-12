@@ -234,12 +234,14 @@ export default function Editor() {
     // Client-side initialization
     const local = localStorage.getItem('career-commit-editor-state')
     console.log('[Editor] Initialization - localStorage content:', local ? 'Found' : 'Not found')
+    console.log('[Editor] Raw localStorage string:', local?.substring(0, 200))
 
     if (local) {
       try {
         const parsed = JSON.parse(local)
-        console.log('[Editor] Loaded from localStorage:', parsed.title)
+        console.log('[Editor] ✅ Parsed localStorage successfully:', { name: parsed.name, title: parsed.title, expCount: parsed.experiences?.length })
         const normalized = normalizeResumeContent(parsed)
+        console.log('[Editor] After normalization:', { name: normalized.name, title: normalized.title, expCount: normalized.experiences?.length })
         setEditorContent(normalized)
         setResumeName(normalized.name ? `${normalized.name}'s Resume` : 'My Resume')
         if (normalized.accentColor) setAccentColor(normalized.accentColor)
@@ -247,13 +249,17 @@ export default function Editor() {
         if (normalized.fontFamily) setFontFamily(normalized.fontFamily)
 
         triggerPreviewUpdate(normalized)
+        console.log('[Editor] ✅ Loaded and displayed from localStorage')
         return
       } catch (e) {
         console.error('[Editor] Error parsing localStorage:', e)
       }
     }
 
+    // Don't load from DB if we just loaded from localStorage
+    console.log('[Editor] No localStorage data, loading from database...')
     loadResumes().then((rows) => {
+      console.log('[Editor] Database resumes loaded:', rows?.length)
       if (rows && rows[0]) {
         setResumeName(rows[0].name)
         const blank = createBlankResumeData()
@@ -336,12 +342,20 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
   }
 
   const handleEditorChange = useCallback((content: any) => {
+    // Don't save blank content to localStorage
+    if (!content.name && !content.email && !content.phone) {
+      console.log('[Editor] Ignoring blank content save')
+      return
+    }
+
     setEditorContent(content)
     setDraftStatus('unsaved')
     triggerPreviewUpdate(content)
 
-    // Sync to LocalStorage
-    localStorage.setItem('career-commit-editor-state', JSON.stringify(content))
+    // Sync to LocalStorage only if content has data
+    if (content.name || content.experiences?.length > 0 || content.educationEntries?.length > 0) {
+      localStorage.setItem('career-commit-editor-state', JSON.stringify(content))
+    }
   }, [])
 
   const handleApplyAgentActions = useCallback((actions: AgentAction[]) => {

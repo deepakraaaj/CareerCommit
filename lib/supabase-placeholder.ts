@@ -55,6 +55,8 @@ export interface DbProfile {
   id: string
   email: string
   name: string
+  approved: boolean
+  ai_access_enabled: boolean
   created_at: string
   updated_at: string
 }
@@ -442,5 +444,44 @@ export const supabasePlaceholder = {
     return safeSelect<DbJDAnalysis>(
       supabase.from('jd_analyses').insert(payload).select('*').single()
     )
+  },
+
+  checkUserApproved: async () => {
+    const supabase = getSupabaseOrNull()
+    if (!supabase) return true
+
+    try {
+      const currentUserId = await getCurrentUserId(supabase)
+      console.log('[Supabase] Current user ID:', currentUserId)
+      if (!currentUserId) return true
+
+      // Add timeout for query
+      const queryPromise = supabase
+        .from('users')
+        .select('ai_access_enabled, approved')
+        .eq('id', currentUserId)
+        .single()
+
+      const timeoutPromise = new Promise((resolve) =>
+        setTimeout(() => {
+          console.log('[Supabase] Query timeout, allowing access')
+          resolve({ data: null, error: 'timeout' })
+        }, 5000)
+      )
+
+      const { data, error } = await Promise.race([queryPromise, timeoutPromise]) as any
+
+      if (error || !data) {
+        console.log('[Supabase] No user data, allowing access')
+        return true
+      }
+
+      const allowed = data.approved === true || data.ai_access_enabled === true
+      console.log('[Supabase] Access allowed:', allowed)
+      return allowed
+    } catch (error) {
+      console.error('[Supabase] Error:', error)
+      return true
+    }
   },
 }

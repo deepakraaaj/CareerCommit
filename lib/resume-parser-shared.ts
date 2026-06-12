@@ -51,10 +51,11 @@ export interface EditorResumeContent {
   phone: string
   linkedin: string
   github: string
-  sectionTitles: Record<'summary' | 'experience' | 'education' | 'skills', string>
+  sectionTitles: Record<'summary' | 'experience' | 'education' | 'skills' | 'projects', string>
   summary: string
   experiences: EditorExperienceEntry[]
   educationEntries: { id: string; school: string; degree: string; duration: string; expanded?: boolean }[]
+  projects: { id: string; name: string; description: string; expanded?: boolean }[]
   skills: { id: string; label: string; items: string[] }[]
   customFields: { id: string; label: string; value: string }[]
   accentColor: string
@@ -224,6 +225,39 @@ function confidenceFromFilledFields(filled: number, total: number): ExtractedRes
   return 'missing'
 }
 
+function parseAndGroupSkills(skills: string[]): { id: string; label: string; items: string[] }[] {
+  const groups: { id: string; label: string; items: string[] }[] = []
+  let groupId = 1
+
+  for (const skill of skills) {
+    // Check if this skill has a category (format: "Category: item1, item2, item3")
+    if (skill.includes(':')) {
+      const [category, itemsStr] = skill.split(':').map(s => s.trim())
+      const items = itemsStr.split(',').map(s => s.trim()).filter(Boolean)
+
+      if (items.length > 0) {
+        groups.push({
+          id: `skill-group-${groupId++}`,
+          label: category,
+          items
+        })
+      }
+    } else {
+      // Ungrouped skill - add to a general skills group
+      if (!groups.find(g => g.label === 'Skills')) {
+        groups.push({
+          id: `skill-group-${groupId++}`,
+          label: 'Skills',
+          items: []
+        })
+      }
+      groups[groups.length - 1].items.push(skill)
+    }
+  }
+
+  return groups
+}
+
 export function toExtractedResume(parsed: ParsedResumeDocument): ExtractedResume {
   const experience: ExtractedExperience[] = parsed.experiences.map((item) => {
     const filled = [item.company, item.position, item.duration, item.bullets.join(' ')].filter(Boolean).length
@@ -286,7 +320,7 @@ export function toExtractedResume(parsed: ParsedResumeDocument): ExtractedResume
 }
 
 export function toEditorResumeContent(parsed: ParsedResumeDocument): EditorResumeContent {
-  return {
+  const result: EditorResumeContent = {
     name: parsed.name || '',
     title: parsed.title || '',
     email: parsed.email || '',
@@ -298,6 +332,7 @@ export function toEditorResumeContent(parsed: ParsedResumeDocument): EditorResum
       experience: 'Experience',
       education: 'Education',
       skills: 'Skills',
+      projects: 'Projects',
     },
     summary: parsed.summary || '',
     experiences: parsed.experiences.map((item, index) => ({
@@ -318,12 +353,21 @@ export function toEditorResumeContent(parsed: ParsedResumeDocument): EditorResum
       duration: [item.field, item.graduation, item.duration].filter(Boolean).join(' | '),
       expanded: index === 0,
     })),
+    projects: parsed.projects.map((item, index) => ({
+      id: `proj-${index + 1}`,
+      name: item.name || '',
+      description: item.description || '',
+      expanded: index === 0,
+    })),
     skills: parsed.skills.length
-      ? [{ id: 'skills-1', label: 'Skills', items: parsed.skills }]
+      ? parseAndGroupSkills(parsed.skills)
       : [],
     customFields: [],
     accentColor: 'blue',
     density: 'auto',
     fontFamily: 'sans',
   }
+
+  console.log('[Mapping] toEditorResumeContent result:', { name: result.name, title: result.title, email: result.email })
+  return result
 }

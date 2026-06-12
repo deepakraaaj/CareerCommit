@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Cloud, CheckCircle2, FileText, File, Loader2, Sparkles } from 'lucide-react'
+import { Cloud, CheckCircle2, FileText, File, Loader2, Sparkles, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { loadUploadedFiles } from '@/lib/supabase-loaders'
 import { supabasePlaceholder } from '@/lib/supabase-placeholder'
@@ -16,6 +16,8 @@ import {
   type EditorResumeContent,
 } from '@/lib/resume-parser-client'
 import { ResumeChatbot } from '@/components/upload/resume-chatbot'
+import { ApiKeyModal } from '@/components/upload/api-key-modal'
+import { ApprovalLock } from '@/components/upload/approval-lock'
 
 type UploadState = 'ready' | 'uploading' | 'extracting' | 'completed' | 'review_needed' | 'failed'
 
@@ -28,8 +30,25 @@ export default function Upload() {
   const [parsedResume, setParsedResume] = useState<ExtractedResume | null>(null)
   const [parsedEditorContent, setParsedEditorContent] = useState<EditorResumeContent | null>(null)
   const [parseSource, setParseSource] = useState<'cerebras' | null>(null)
+  const [showApiKeyModal, setShowApiKeyModal] = useState(false)
+  const [isApproved, setIsApproved] = useState<boolean | null>(null)
 
   useEffect(() => {
+    let active = true
+
+    // Check user approval
+    supabasePlaceholder.checkUserApproved().then((approved) => {
+      if (active) setIsApproved(approved)
+    })
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (isApproved === false) return
+
     let active = true
 
     loadUploadedFiles().then((rows) => {
@@ -39,7 +58,7 @@ export default function Upload() {
     return () => {
       active = false
     }
-  }, [])
+  }, [isApproved])
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
@@ -101,12 +120,31 @@ export default function Upload() {
       setUploadState('extracting')
       const extractedText = await extractTextFromDocument(file)
       const { parsed, source } = await parseResumeWithFallback(extractedText)
+
+      console.log('[Upload] Raw parsed from API:', { name: parsed.name, title: parsed.title, email: parsed.email })
+
       const extracted = mapParsedResumeToExtracted(parsed)
       const editorContent = mapParsedResumeToEditor(parsed)
+
+      console.log('[Upload] After mapping to editor:', { name: editorContent.name, title: editorContent.title, email: editorContent.email })
+
+      // Save to localStorage immediately
+      console.log('[Upload] About to save editorContent object:', { name: editorContent.name, title: editorContent.title, hasEmail: !!editorContent.email })
+      console.log('[Upload] Full editorContent:', JSON.stringify(editorContent).substring(0, 300))
+
+      const json = JSON.stringify(editorContent)
+      localStorage.setItem('career-commit-editor-state', json)
+      localStorage.setItem('career-commit-resume-id', id)
+
+      // Verify immediately
+      const saved = localStorage.getItem('career-commit-editor-state')
+      const parsed_check = JSON.parse(saved || '{}')
+      console.log('[Upload] ✅ Saved to localStorage - verify read:', { name: parsed_check.name, title: parsed_check.title })
 
       setParseSource(source)
       setParsedResume(extracted)
       setParsedEditorContent(editorContent)
+
       setUploadState(extracted.confidence === 'high' ? 'completed' : 'review_needed')
       setRecentUploads((current) =>
         current.map((entry) =>
@@ -139,10 +177,6 @@ export default function Upload() {
   }
 
   const handleLoadToEditor = () => {
-    if (parsedEditorContent) {
-      localStorage.setItem('career-commit-editor-state', JSON.stringify(parsedEditorContent))
-      localStorage.setItem('career-commit-resume-id', crypto.randomUUID())
-    }
     router.push('/editor')
   }
 
@@ -171,6 +205,12 @@ export default function Upload() {
     }
   }
 
+  // Show lock ONLY if we explicitly confirmed they're not approved
+  // Don't block rendering while checking
+  if (isApproved === false) {
+    return <ApprovalLock />
+  }
+
   if (uploadState === 'ready' || uploadState === 'failed') {
     return (
       <>
@@ -179,11 +219,21 @@ export default function Upload() {
           <div className="absolute left-[-8rem] top-20 -z-10 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
           <div className="absolute right-[-6rem] top-40 -z-10 h-96 w-96 rounded-full bg-accent/10 blur-3xl" />
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div className="mb-12">
-              <h1 className="text-5xl font-semibold tracking-tight mb-2">Upload Resume</h1>
-              <p className="text-lg text-muted-foreground">
-                Import your resume and we&apos;ll extract the content into an editable format.
-              </p>
+            <div className="mb-12 flex items-start justify-between">
+              <div>
+                <h1 className="text-5xl font-semibold tracking-tight mb-2">Upload Resume</h1>
+                <p className="text-lg text-muted-foreground">
+                  Import your resume and we&apos;ll extract the content into an editable format.
+                </p>
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowApiKeyModal(true)}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Settings size={20} />
+              </Button>
             </div>
 
             <div
@@ -262,6 +312,7 @@ export default function Upload() {
             )}
           </div>
         </div>
+        <ApiKeyModal isOpen={showApiKeyModal} onClose={() => setShowApiKeyModal(false)} />
       </>
     )
   }

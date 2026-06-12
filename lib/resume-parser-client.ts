@@ -57,23 +57,35 @@ export async function extractTextFromDocument(file: File) {
 
 export async function parseResumeWithFallback(text: string): Promise<{
   parsed: ParsedResumeDocument
-  source: 'cerebras'
+  source: 'cerebras' | 'local' | 'local-fallback'
+  debug?: any
 }> {
+  console.log('[Parse] Starting with text length:', text.length)
+  console.log('[Parse] Text preview:', text.substring(0, 300))
+
+  // Get API key from localStorage if available
+  const apiKey = typeof window !== 'undefined' ? localStorage.getItem('cerebras-api-key') : null
+
   const response = await fetch('/api/ai/parse-resume', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, apiKey }),
   })
 
   if (!response.ok) {
     const message = await response.text()
-    throw new Error(message || 'Cerebras request failed')
+    throw new Error(message || 'Parse request failed')
   }
 
   const result = await response.json()
+  console.log('[Parse] Result source:', result.source)
+  console.log('[Parse] Parsed data:', result.data)
+  if (result.debug) console.log('[Parse] Debug info:', result.debug)
+
   return {
     parsed: normalizeParsedResume(result.data),
-    source: 'cerebras',
+    source: result.source,
+    debug: result.debug,
   }
 }
 
