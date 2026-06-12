@@ -48,12 +48,20 @@ export default function Upload() {
 
         if (active) {
           setUserId(user?.id ?? null)
+
+          // If not logged in, redirect to login
+          if (!user?.id) {
+            router.push('/login')
+            return
+          }
+
+          // If logged in, check approval
           const approved = await supabasePlaceholder.checkUserApproved()
           setIsApproved(approved)
         }
       } catch (error) {
         console.error('[Upload] Failed to check approval:', error)
-        if (active) setIsApproved(true)
+        if (active) setIsApproved(false)
       }
     }
 
@@ -62,7 +70,7 @@ export default function Upload() {
     return () => {
       active = false
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
     if (isApproved === false) return
