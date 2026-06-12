@@ -63,6 +63,7 @@ function mapVersion(row: Partial<DbResumeVersion>): ResumeVersion {
     fitStatus: Number(row.fit_score ?? 0),
     isActive: versionNumber === 1,
     contentSnapshot: row.content_snapshot as Record<string, unknown> | undefined,
+    sectionChanges: row.section_changes as Record<string, 'added' | 'modified' | 'removed' | 'unchanged'> | undefined,
   }
 }
 

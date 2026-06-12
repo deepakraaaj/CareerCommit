@@ -24,26 +24,35 @@ function resolveProfileName(user: User) {
   )
 }
 
+function isPlaceholderName(name: string | null | undefined) {
+  const trimmed = name?.trim().toLowerCase()
+  return !trimmed || trimmed === 'user' || trimmed === 'account'
+}
+
 async function upsertProfile(user: User) {
-  const supabase = getSupabaseClient()
-
-  const { data, error } = await supabase
-    .from('profiles')
-    .upsert({
-      id: user.id,
-      email: user.email ?? '',
-      name: resolveProfileName(user),
-      updated_at: new Date().toISOString(),
+  try {
+    const response = await fetch('/api/profile/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: user.id,
+        email: user.email ?? '',
+        name: resolveProfileName(user),
+      }),
     })
-    .select('*')
-    .single()
 
-  if (error) {
-    console.warn('[Supabase] Profile sync failed:', error.message)
+    if (!response.ok) {
+      const { error } = await response.json()
+      console.warn('[Supabase] Profile sync failed:', error)
+      return null
+    }
+
+    const { data } = await response.json()
+    return data ?? null
+  } catch (error) {
+    console.warn('[Supabase] Profile sync failed:', error)
     return null
   }
-
-  return data ?? null
 }
 
 async function loadProfile(userId: string) {
@@ -75,6 +84,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const existingProfile = await loadProfile(user.id)
     if (existingProfile) {
+      const resolvedName = resolveProfileName(user)
+      if (isPlaceholderName(existingProfile.name) && !isPlaceholderName(resolvedName)) {
+        const repairedProfile = await upsertProfile(user)
+        setProfile(repairedProfile ?? existingProfile)
+        setProfileLoading(false)
+        return
+      }
+
       setProfile(existingProfile)
       setProfileLoading(false)
       return
@@ -128,7 +145,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
       signOut: async () => {
         const supabase = getSupabaseClient()
-        await supabase.auth.signOut()
+        setSession(null)
+        setProfile(null)
+        try {
+          await supabase.auth.signOut({ scope: 'local' })
+        } catch (error) {
+          console.warn('[Supabase] Sign out failed:', error)
+        }
       },
     }),
     [loading, profile, profileLoading, session]

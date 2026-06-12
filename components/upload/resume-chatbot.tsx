@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useMemo, useState } from 'react'
-import { Bot, Send, Sparkles, Check, AlertCircle } from 'lucide-react'
+import { Bot, Send, Loader2, Check, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { sendResumeChatMessage } from '@/lib/resume-chat-client'
 import type { ChatMessage } from '@/lib/resume-chat-shared'
@@ -109,7 +109,7 @@ export function ResumeChatbot({ context, sourceLabel, onApplyActions }: ResumeCh
             className="min-h-[52px] flex-1 resize-none rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10"
           />
           <Button type="submit" disabled={sending || !input.trim() || !chatContext} className="shrink-0">
-            {sending ? <Sparkles className="mr-2 h-4 w-4 animate-pulse" /> : <Send className="mr-2 h-4 w-4" />}
+            {sending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Send className="mr-2 h-4 w-4" />}
             Send
           </Button>
         </div>

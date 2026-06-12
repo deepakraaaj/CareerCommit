@@ -33,6 +33,7 @@ export interface ResumeVersion {
   fitStatus: number
   isActive?: boolean
   contentSnapshot?: Record<string, unknown>
+  sectionChanges?: Record<string, 'added' | 'modified' | 'removed' | 'unchanged'>
 }
 
 export interface VersionChange {

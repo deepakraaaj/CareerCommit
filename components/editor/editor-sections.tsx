@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Check, ChevronDown, Edit2, X, Trash2, ArrowUp, ArrowDown, Sparkles, Plus, User, Briefcase, GraduationCap, Code2, PlusCircle } from 'lucide-react'
+import { Check, ChevronDown, Edit2, X, Trash2, ArrowUp, ArrowDown, FileText, Plus, User, Briefcase, GraduationCap, Code2, PlusCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { DateRangePicker } from '@/components/ui/date-range-picker'
 import { AISuggestionModal } from './ai-suggestion-modal'
@@ -681,8 +681,8 @@ export function EditorSections({ initialContent, onContentChange, syncSignal, fo
       case 'personal':
         return <User className="w-4 h-4 text-indigo-600" />
       case 'summary':
-        return <Sparkles className="w-4 h-4 text-violet-600" />
-      case 'experience':
+        return <FileText className="w-4 h-4 text-violet-600" />
+        case 'experience':
         return <Briefcase className="w-4 h-4 text-blue-600" />
       case 'education':
         return <GraduationCap className="w-4 h-4 text-emerald-600" />

@@ -52,9 +52,10 @@ export function Navbar() {
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 shadow-md shadow-indigo-500/10 group-hover:scale-105 transition-transform duration-300">
               <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <path d="M14 2v6h6" />
+                <path d="M9 12h3a1.5 1.5 0 0 0 0-3H9v6" />
+                <path d="M12 12l2 3" />
               </svg>
               <span className="absolute -inset-0.5 rounded-xl bg-gradient-to-br from-indigo-500 to-pink-500 opacity-20 blur-sm group-hover:opacity-40 transition duration-300 -z-10" />
             </div>

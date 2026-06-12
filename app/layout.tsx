@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'CareerCommit | Premium Resume Workspace',
+  title: 'Raceum | Premium Resume Workspace',
   description:
     'Maintain, edit, and version your resume with a polished, ATS-safe workflow. Upload, optimize, and export without losing your originals.',
   generator: 'v0.app',

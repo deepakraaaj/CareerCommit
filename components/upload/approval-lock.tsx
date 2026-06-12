@@ -18,14 +18,14 @@ export function ApprovalLock() {
 
         <h1 className="text-3xl font-bold mb-3">Access Pending</h1>
         <p className="text-muted-foreground text-lg mb-6">
-          Your account is awaiting approval to use CareerCommit. Please check back soon or contact support for more information.
+          Your account is awaiting approval to use Raceum. Please check back soon or contact support for more information.
         </p>
 
         <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
           <p className="text-sm text-blue-900">
             📧 If you believe this is an error, please reach out to{' '}
-            <a href="mailto:support@careercommit.com" className="font-semibold hover:underline">
-              support@careercommit.com
+            <a href="mailto:support@raceum.com" className="font-semibold hover:underline">
+              support@raceum.com
             </a>
           </p>
         </div>

@@ -30,8 +30,8 @@ export function ContactSupportModal({ open, onClose }: ContactSupportModalProps)
             <Mail size={20} className="text-blue-600 mt-0.5 flex-shrink-0" />
             <div>
               <p className="font-semibold text-blue-900 text-sm mb-1">Contact Support</p>
-              <a href="mailto:support@careercommit.com" className="text-blue-600 hover:underline text-sm">
-                support@careercommit.com
+              <a href="mailto:support@raceum.com" className="text-blue-600 hover:underline text-sm">
+                support@raceum.com
               </a>
             </div>
           </div>

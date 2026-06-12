@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Cloud, CheckCircle2, FileText, File, Loader2, Sparkles, Settings } from 'lucide-react'
+import { Cloud, CheckCircle2, FileText, File, Loader2, Bot, Settings } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { loadUploadedFiles } from '@/lib/supabase-loaders'
 import { supabasePlaceholder } from '@/lib/supabase-placeholder'
@@ -159,11 +159,11 @@ export default function Upload() {
       console.log('[Upload] Full editorContent:', JSON.stringify(editorContent).substring(0, 300))
 
       const json = JSON.stringify(editorContent)
-      localStorage.setItem('career-commit-editor-state', json)
-      localStorage.setItem('career-commit-resume-id', id)
+      localStorage.setItem('raceum-editor-state', json)
+      localStorage.setItem('raceum-resume-id', id)
 
       // Verify immediately
-      const saved = localStorage.getItem('career-commit-editor-state')
+      const saved = localStorage.getItem('raceum-editor-state')
       const parsed_check = JSON.parse(saved || '{}')
       console.log('[Upload] ✅ Saved to localStorage - verify read:', { name: parsed_check.name, title: parsed_check.title })
 
@@ -312,7 +312,7 @@ export default function Upload() {
 
             <div className="premium-chip mt-12 p-4 inline-flex flex-col gap-2">
               <p className="text-sm text-muted-foreground">
-                <span className="font-semibold text-foreground">💡 Smart Extraction:</span> CareerCommit extracts your content and rebuilds it into an editable format. Original files stay untouched.
+                <span className="font-semibold text-foreground">💡 Smart Extraction:</span> Raceum extracts your content and rebuilds it into an editable format. Original files stay untouched.
               </p>
             </div>
 
@@ -420,7 +420,7 @@ export default function Upload() {
                   </p>
                   {parseSource && (
                     <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-xs font-medium text-muted-foreground">
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <Bot className="w-3.5 h-3.5" />
                       Parsed with Cerebras AI
                     </div>
                   )}

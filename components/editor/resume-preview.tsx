@@ -1,7 +1,7 @@
 'use client'
 
 import { useLayoutEffect, useMemo, useRef, useState, ReactNode } from 'react'
-import { Sparkles } from 'lucide-react'
+import { FileText } from 'lucide-react'
 
 export interface PreviewMetrics {
   pageCount: number
@@ -483,7 +483,7 @@ const A4_HEIGHT_PX = 1123
 function EmptyState() {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-slate-100 text-center">
-      <Sparkles className="w-8 h-8 text-indigo-400 animate-pulse mb-2" />
+      <FileText className="w-8 h-8 text-indigo-400 mb-2" />
       <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Preview will appear here</p>
       <p className="text-[11px] text-slate-400 mt-1 max-w-[200px]">Start filling in your information on the left to see it beautifully rendered.</p>
     </div>

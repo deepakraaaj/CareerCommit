@@ -161,20 +161,26 @@ export const supabasePlaceholder = {
     if (!supabase) return null
 
     const currentUserId = await getCurrentUserId(supabase)
-    if (!currentUserId && !profile.id) {
+    const id = profile.id || currentUserId
+    if (!id) {
       console.warn('[Supabase] Skipping profile save because no authenticated user is available.')
       return null
     }
 
-    const payload = {
-      ...profile,
-      id: profile.id || currentUserId,
-      updated_at: new Date().toISOString(),
+    const response = await fetch('/api/profile/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, email: profile.email, name: profile.name }),
+    })
+
+    if (!response.ok) {
+      const { error } = await response.json()
+      console.error('[Supabase] Profile save failed:', error)
+      return null
     }
 
-    return safeSelect<DbProfile>(
-      supabase.from('profiles').upsert(payload, { onConflict: 'id' }).select('*').single()
-    )
+    const { data } = await response.json()
+    return (data as DbProfile) ?? null
   },
 
   getResumes: async (userId?: string, options?: { light?: boolean }) => {

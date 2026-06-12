@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState, useCallback } from 'react'
-import { Download, Save, Edit2, Palette, Type, Space, Sparkles, Archive, Plus, Eye, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
+import { Download, Save, Edit2, Palette, Type, Space, Layout, Archive, Plus, Eye, ZoomIn, ZoomOut, Maximize2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -108,13 +108,17 @@ const COLOR_OPTIONS = [
 
 // Initialize resume ID synchronously before component render
 function getOrCreateResumeId(forceNew = false): string {
-  const stored = typeof window !== 'undefined' ? localStorage.getItem('career-commit-resume-id') : null
-  if (!forceNew && stored) return stored
+  if (typeof window === 'undefined') return ''
+  const stored = localStorage.getItem('raceum-resume-id') || localStorage.getItem('career-commit-resume-id')
+  if (!forceNew && stored) {
+    if (!localStorage.getItem('raceum-resume-id')) {
+      localStorage.setItem('raceum-resume-id', stored)
+    }
+    return stored
+  }
 
   const newId = crypto.randomUUID()
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('career-commit-resume-id', newId)
-  }
+  localStorage.setItem('raceum-resume-id', newId)
   return newId
 }
 
@@ -232,12 +236,15 @@ export default function Editor() {
     }
 
     // Client-side initialization
-    const local = localStorage.getItem('career-commit-editor-state')
+    const local = localStorage.getItem('raceum-editor-state') || localStorage.getItem('career-commit-editor-state')
     console.log('[Editor] Initialization - localStorage content:', local ? 'Found' : 'Not found')
     console.log('[Editor] Raw localStorage string:', local?.substring(0, 200))
 
     if (local) {
       try {
+        if (!localStorage.getItem('raceum-editor-state')) {
+          localStorage.setItem('raceum-editor-state', local)
+        }
         const parsed = JSON.parse(local)
         console.log('[Editor] ✅ Parsed localStorage successfully:', { name: parsed.name, title: parsed.title, expCount: parsed.experiences?.length })
         const normalized = normalizeResumeContent(parsed)
@@ -280,7 +287,7 @@ export default function Editor() {
       if (editorContent) {
         const next = { ...editorContent, name: tempName.trim() }
         setEditorContent(next)
-        localStorage.setItem('career-commit-editor-state', JSON.stringify(next))
+        localStorage.setItem('raceum-editor-state', JSON.stringify(next))
       }
     }
   }
@@ -354,7 +361,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
 
     // Sync to LocalStorage only if content has data
     if (content.name || content.experiences?.length > 0 || content.educationEntries?.length > 0) {
-      localStorage.setItem('career-commit-editor-state', JSON.stringify(content))
+      localStorage.setItem('raceum-editor-state', JSON.stringify(content))
     }
   }, [])
 
@@ -363,7 +370,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
       const updated = applyAgentActions(prev as ActionEditorContent, actions)
       setDraftStatus('unsaved')
       triggerPreviewUpdate(updated)
-      localStorage.setItem('career-commit-editor-state', JSON.stringify(updated))
+      localStorage.setItem('raceum-editor-state', JSON.stringify(updated))
       return updated
     })
     // Navigate the form to the section the last action touched.
@@ -488,7 +495,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
       setDensity(blank.density)
       setFontFamily(blank.fontFamily)
       setPreview('')
-      localStorage.removeItem('career-commit-editor-state')
+      localStorage.removeItem('raceum-editor-state')
       return
     }
 
@@ -596,7 +603,7 @@ ${customFieldLines.length > 0 ? `\n${customFieldLines.join('\n\n')}` : ''}`.trim
                   </div>
 
                   <div className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs dark:border-slate-700 dark:bg-slate-950/80">
-                    <Sparkles className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
+                    <Layout className="h-3.5 w-3.5 text-slate-400 dark:text-slate-500" />
                     <select
                       value={template}
                       onChange={(e) => setTemplate(e.target.value as TemplateType)}
