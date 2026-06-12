@@ -83,6 +83,11 @@ export function VersionCard({
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold">{title}</h3>
+              {versionNumber === 1 && (
+                <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:ring-slate-700">
+                  Initial draft
+                </span>
+              )}
               {isLatest && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary ring-1 ring-primary/20">
                   Current

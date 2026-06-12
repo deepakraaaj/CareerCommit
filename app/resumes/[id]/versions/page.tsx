@@ -206,8 +206,9 @@ export default function Versions() {
           )}
 
           <p className="mt-6 text-xs text-muted-foreground">
-            Every save creates a new version. Restoring an older version never deletes anything —
-            it simply becomes the new current version.
+            v1 is the initial draft. Every save after that creates a new version, and the newest
+            save is marked Current. Restoring an older version never deletes anything — it simply
+            becomes the new current version.
           </p>
         </div>
       </div>

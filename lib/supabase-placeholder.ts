@@ -175,11 +175,12 @@ export const supabasePlaceholder = {
     )
   },
 
-  getResumes: async (userId?: string) => {
+  getResumes: async (userId?: string, options?: { light?: boolean }) => {
     if (!userId) return []
 
     try {
-      const response = await fetch(`/api/resumes/list?userId=${userId}`)
+      const light = options?.light ? '&light=1' : ''
+      const response = await fetch(`/api/resumes/list?userId=${userId}${light}`)
 
       if (!response.ok) return []
 
@@ -188,6 +189,27 @@ export const supabasePlaceholder = {
     } catch (error) {
       console.error('[API] getResumes error:', error)
       return []
+    }
+  },
+
+  getVersionCounts: async (userId?: string) => {
+    if (!userId) return {}
+
+    try {
+      const response = await fetch(`/api/resumes/versions?userId=${userId}&fields=resume_id`)
+
+      if (!response.ok) return {}
+
+      const result = await response.json()
+      const rows = (result.data ?? []) as { resume_id?: string }[]
+      return rows.reduce<Record<string, number>>((acc, row) => {
+        const key = String(row.resume_id ?? '')
+        acc[key] = (acc[key] ?? 0) + 1
+        return acc
+      }, {})
+    } catch (error) {
+      console.error('[API] getVersionCounts error:', error)
+      return {}
     }
   },
 

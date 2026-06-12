@@ -20,6 +20,8 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = request.nextUrl.searchParams.get('userId')
+    // light=1 skips content_text, which can be large — used by the resume list page
+    const light = request.nextUrl.searchParams.get('light') === '1'
 
     if (!userId) {
       return NextResponse.json({ error: 'userId required' }, { status: 400 })
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase
       .from('resumes')
-      .select('*')
+      .select(light ? 'id,user_id,name,title,template,created_at,updated_at' : '*')
       .eq('user_id', userId)
       .order('updated_at', { ascending: false })
 

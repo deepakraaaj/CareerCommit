@@ -21,6 +21,8 @@ export async function GET(request: NextRequest) {
 
     const userId = request.nextUrl.searchParams.get('userId')
     const resumeId = request.nextUrl.searchParams.get('resumeId')
+    // fields=resume_id returns only resume ids, for cheap version counting
+    const fields = request.nextUrl.searchParams.get('fields')
 
     if (!userId) {
       return NextResponse.json({ error: 'userId required' }, { status: 400 })
@@ -28,7 +30,7 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from('resume_versions')
-      .select('*')
+      .select(fields === 'resume_id' ? 'resume_id' : '*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
