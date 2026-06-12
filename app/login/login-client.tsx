@@ -196,15 +196,16 @@ export default function LoginClient() {
               </Button>
             </form>
 
-              {/* Info Text */}
-              <div className="mt-8 p-3 rounded-lg bg-blue-50/30 border border-blue-200/50">
-                <p className="flex items-start gap-2 text-xs text-muted-foreground">
-                  <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                  <span>No login required to use the editor. Sign in only to save your work to your account.</span>
-                </p>
-              </div>
+            {/* Info Text */}
+            <div className="mt-8 p-3 rounded-lg bg-blue-50/30 border border-blue-200/50">
+              <p className="flex items-start gap-2 text-xs text-muted-foreground">
+                <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                <span>No login required to use the editor. Sign in only to save your work to your account.</span>
+              </p>
             </div>
+          </div>
         </div>
+      </div>
     </div>
   )
 }
