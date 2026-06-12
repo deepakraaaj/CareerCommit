@@ -72,14 +72,14 @@ export default function LoginClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-secondary/10 flex items-center justify-center">
+    <div className="min-h-screen w-full bg-gradient-to-br from-background via-background to-secondary/10">
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
       </div>
 
-      <div className="w-full max-w-md px-4">
-        <div className="rounded-2xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-lg p-8">
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="w-full max-w-md rounded-2xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-lg p-8">
           <div className="flex flex-col">
             {/* Header */}
             <div className="mb-8">
@@ -196,14 +196,14 @@ export default function LoginClient() {
               </Button>
             </form>
 
-            {/* Info Text */}
-            <div className="mt-8 p-3 rounded-lg bg-blue-50/30 border border-blue-200/50">
-              <p className="flex items-start gap-2 text-xs text-muted-foreground">
-                <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
-                <span>No login required to use the editor. Sign in only to save your work to your account.</span>
-              </p>
+              {/* Info Text */}
+              <div className="mt-8 p-3 rounded-lg bg-blue-50/30 border border-blue-200/50">
+                <p className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <CheckCircle2 className="h-4 w-4 text-blue-600 shrink-0 mt-0.5" />
+                  <span>No login required to use the editor. Sign in only to save your work to your account.</span>
+                </p>
+              </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
