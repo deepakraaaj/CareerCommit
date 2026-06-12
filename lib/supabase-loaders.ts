@@ -46,20 +46,22 @@ function mapVersion(row: Partial<DbResumeVersion>): ResumeVersion {
   const dateObj = row.created_at ? new Date(row.created_at) : new Date()
   const created = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   const time = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+  const versionNumber = Number(row.version_number ?? 1)
 
   const changes = row.change_notes || (row.title ? `Saved as: ${row.title}` : 'Saved version')
 
   return {
     id: row.id ?? 0,
-    name: `Version ${row.version_number ?? 1}`,
-    title: row.title ?? `Version ${row.version_number ?? 1}`,
+    versionNumber,
+    name: `Version ${versionNumber}`,
+    title: row.title ?? `Version ${versionNumber}`,
     date: created,
     time,
     changes,
     savedBy: row.saved_by ?? 'Manual',
     template: 'Modern',
     fitStatus: Number(row.fit_score ?? 0),
-    isActive: Number(row.version_number ?? 0) === 1,
+    isActive: versionNumber === 1,
     contentSnapshot: row.content_snapshot as Record<string, unknown> | undefined,
   }
 }
@@ -88,16 +90,15 @@ function mapUploadedFile(row: Partial<DbUploadedFile>): UploadedFile {
   }
 }
 
-export async function loadResumes(userId?: string): Promise<Resume[]> {
-  const rows = await supabasePlaceholder.getResumes(userId)
+export async function loadResumes(
+  userId?: string,
+  options?: { light?: boolean }
+): Promise<Resume[]> {
+  const [rows, versionCounts] = await Promise.all([
+    supabasePlaceholder.getResumes(userId, options),
+    supabasePlaceholder.getVersionCounts(userId),
+  ])
   if (!rows.length) return []
-
-  const versions = await supabasePlaceholder.getVersions(undefined, userId)
-  const versionCounts = versions.reduce<Record<string, number>>((acc, version) => {
-    const key = String((version as { resume_id?: string }).resume_id ?? '')
-    acc[key] = (acc[key] ?? 0) + 1
-    return acc
-  }, {})
 
   return rows.map((row) =>
     mapResume({
@@ -110,10 +111,7 @@ export async function loadResumes(userId?: string): Promise<Resume[]> {
 
 export async function loadVersions(resumeId?: string, userId?: string): Promise<ResumeVersion[]> {
   const rows = await supabasePlaceholder.getVersions(resumeId, userId)
-  console.log('[loadVersions] Raw rows:', rows)
-  const mapped = rows.map(mapVersion)
-  console.log('[loadVersions] Mapped versions:', mapped)
-  return mapped
+  return rows.map(mapVersion)
 }
 
 export async function loadAchievements(userId?: string): Promise<AchievementNote[]> {

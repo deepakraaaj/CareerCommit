@@ -22,6 +22,7 @@ export interface Achievement {
 // Version types
 export interface ResumeVersion {
   id: string | number
+  versionNumber: number
   name: string
   date: string
   time: string

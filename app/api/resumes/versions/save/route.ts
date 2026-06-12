@@ -49,6 +49,25 @@ export async function POST(request: NextRequest) {
 
     console.log('[API] Saving version for user:', user_id)
 
+    const { data: latestVersion, error: latestError } = await supabase
+      .from('resume_versions')
+      .select('version_number')
+      .eq('resume_id', resume_id)
+      .eq('user_id', user_id)
+      .order('version_number', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (latestError) {
+      console.error('[API] Failed to resolve next version number:', latestError.message)
+      return NextResponse.json(
+        { error: `Failed to resolve next version number: ${latestError.message}` },
+        { status: 400 }
+      )
+    }
+
+    const nextVersionNumber = Number(latestVersion?.version_number ?? 0) + 1
+
     // Insert the version
     const { data, error } = await supabase
       .from('resume_versions')
@@ -56,6 +75,7 @@ export async function POST(request: NextRequest) {
         resume_id,
         user_id,
         title,
+        version_number: nextVersionNumber,
         content_snapshot,
         change_notes: change_notes || null,
         section_changes: {},
@@ -73,7 +93,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('[API] ✅ Version saved:', data.id)
+    console.log('[API] ✅ Version saved:', data.id, 'version', nextVersionNumber)
     return NextResponse.json({ success: true, data })
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
