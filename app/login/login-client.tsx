@@ -72,13 +72,13 @@ export default function LoginClient() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-background via-background to-secondary/10">
+    <div className="h-screen w-screen overflow-hidden bg-gradient-to-br from-background via-background to-secondary/10 flex items-center justify-center">
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute -top-40 -right-40 h-80 w-80 rounded-full bg-primary/5 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
       </div>
 
-      <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="px-4">
         <div className="w-full max-w-md rounded-2xl border border-border/50 bg-card/95 backdrop-blur-sm shadow-lg p-8">
           <div className="flex flex-col">
             {/* Header */}
@@ -205,7 +205,6 @@ export default function LoginClient() {
               </div>
             </div>
         </div>
-      </div>
     </div>
   )
 }
